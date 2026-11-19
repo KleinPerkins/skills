@@ -1,0 +1,1852 @@
+{
+  "schema": "codex-work-native-screen/v1",
+  "observed_on": "2026-11-02",
+  "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+  "host_build": "26.1027.51404-23880",
+  "host_build_basis": "Running /Applications/ChatGPT.app; Info.plist com.openai.codex version 26.1027.51404 build 23880",
+  "started_workers": 16,
+  "maximum_started_workers": 16,
+  "preferred_passes": 8,
+  "comparison_passes": 8,
+  "activated": false,
+  "limitations": [
+    "model-execution-unverified",
+    "metrics-unavailable",
+    "not-activation",
+    "bounded-synthetic-screen-not-general-quality-benchmark",
+    "observed-elapsed-includes-orchestrator-delay"
+  ],
+  "runs": [
+    {
+      "fixture": "d0-extract",
+      "band": 0,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6-luna",
+        "effort": "low"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 40.937,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "ids": [
+          2,
+          9
+        ]
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d0-extract",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "inspect",
+          "ratings": {
+            "ambiguity": {
+              "level": 0,
+              "evidence": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+            },
+            "reasoning": {
+              "level": 0,
+              "evidence": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+            },
+            "coupling": {
+              "level": 0,
+              "evidence": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 0,
+        "reasons": [
+          "ambiguity: D0: From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only.",
+          "reasoning: D0: From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only.",
+          "coupling: D0: From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-luna",
+          "effort": "low"
+        },
+        "rank": 0,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b80-b47d-75e1-9af2-c7ccb3b86076",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "be4c1304af1c1a58966eb2392a6c898362ef7316c5127702facb52d59dfca550"
+      }
+    },
+    {
+      "fixture": "d0-extract",
+      "band": 0,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 37.617,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "ids": [
+          2,
+          9
+        ]
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d0-extract",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "inspect",
+          "ratings": {
+            "ambiguity": {
+              "level": 0,
+              "evidence": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+            },
+            "reasoning": {
+              "level": 0,
+              "evidence": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+            },
+            "coupling": {
+              "level": 0,
+              "evidence": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 0,
+        "reasons": [
+          "ambiguity: D0: From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only.",
+          "reasoning: D0: From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only.",
+          "coupling: D0: From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        },
+        "rank": 1,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b80-e98f-7782-a65e-6b0508280e4d",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "534bf7d2b01dcda007cc5a141ebecf9fe5496eaf0d9b1c3b8a0f1a6f5b7d2fc7"
+      }
+    },
+    {
+      "fixture": "d0-count",
+      "band": 0,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6-luna",
+        "effort": "low"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 37.172,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "total": 10
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d0-count",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "inspect",
+          "ratings": {
+            "ambiguity": {
+              "level": 0,
+              "evidence": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+            },
+            "reasoning": {
+              "level": 0,
+              "evidence": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+            },
+            "coupling": {
+              "level": 0,
+              "evidence": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 0,
+        "reasons": [
+          "ambiguity: D0: Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only.",
+          "reasoning: D0: Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only.",
+          "coupling: D0: Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-luna",
+          "effort": "low"
+        },
+        "rank": 0,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b80-eb56-7d43-80e1-b9e3d4d78d27",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "0b2e2ef80c44aa589bccbd7e1a29722c35832cac46763732adafebf6f721d0c2"
+      }
+    },
+    {
+      "fixture": "d0-count",
+      "band": 0,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 36.274,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "total": 10
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d0-count",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "inspect",
+          "ratings": {
+            "ambiguity": {
+              "level": 0,
+              "evidence": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+            },
+            "reasoning": {
+              "level": 0,
+              "evidence": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+            },
+            "coupling": {
+              "level": 0,
+              "evidence": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 0,
+        "reasons": [
+          "ambiguity: D0: Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only.",
+          "reasoning: D0: Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only.",
+          "coupling: D0: Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        },
+        "rank": 1,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b80-eee2-7222-bba2-21aa877d3c21",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "d6666731b1a887b17a54fb68d9b8342fb36a453764d70feb93fef8ba591e8daa"
+      }
+    },
+    {
+      "fixture": "d1-boundary",
+      "band": 1,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 41.853,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "at5": [
+          "B",
+          "C"
+        ],
+        "at10": []
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d1-boundary",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 1,
+              "evidence": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+            },
+            "reasoning": {
+              "level": 1,
+              "evidence": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+            },
+            "coupling": {
+              "level": 1,
+              "evidence": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 1,
+        "reasons": [
+          "ambiguity: D1: A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10.",
+          "reasoning: D1: A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10.",
+          "coupling: D1: A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        },
+        "rank": 1,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b81-da09-76a2-838e-4d33e38bb9b7",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "014eaff3472a545781d90d4b6f79aa3f192f85bec1d804f2bf6357f266152712"
+      }
+    },
+    {
+      "fixture": "d1-boundary",
+      "band": 1,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 41.484,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "at5": [
+          "B",
+          "C"
+        ],
+        "at10": []
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d1-boundary",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 1,
+              "evidence": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+            },
+            "reasoning": {
+              "level": 1,
+              "evidence": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+            },
+            "coupling": {
+              "level": 1,
+              "evidence": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 1,
+        "reasons": [
+          "ambiguity: D1: A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10.",
+          "reasoning: D1: A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10.",
+          "coupling: D1: A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "rank": 2,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6.1-sol",
+          "effort": "high",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b81-db89-7ed1-ae4c-e592f1b39237",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "99d8d85129ecf0e6c54257c949374a5b7ed2cbbef93095ceff16d68c9e9d2995"
+      }
+    },
+    {
+      "fixture": "d1-normalize",
+      "band": 1,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "medium"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 39.969,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "labels": [
+          "bee",
+          "ant",
+          "cat"
+        ]
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d1-normalize",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 1,
+              "evidence": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+            },
+            "reasoning": {
+              "level": 1,
+              "evidence": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+            },
+            "coupling": {
+              "level": 1,
+              "evidence": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 1,
+        "reasons": [
+          "ambiguity: D1: Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only.",
+          "reasoning: D1: Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only.",
+          "coupling: D1: Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "medium"
+        },
+        "rank": 1,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b81-e17f-7b92-91ee-db40fd76b039",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "98867afb3e076de9c70892cf75811a85c2f91f0f2686ef8f931fc42d7a12ca71"
+      }
+    },
+    {
+      "fixture": "d1-normalize",
+      "band": 1,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 37.256,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "labels": [
+          "bee",
+          "ant",
+          "cat"
+        ]
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d1-normalize",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 1,
+              "evidence": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+            },
+            "reasoning": {
+              "level": 1,
+              "evidence": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+            },
+            "coupling": {
+              "level": 1,
+              "evidence": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 1,
+        "reasons": [
+          "ambiguity: D1: Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only.",
+          "reasoning: D1: Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only.",
+          "coupling: D1: Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "rank": 2,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6.1-sol",
+          "effort": "high",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b81-ec26-7133-b3f4-52b3056afccb",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "61fa5acbd14c9769a03d24b9456eece5482c66d2a888e030a50030b7e21659d3"
+      }
+    },
+    {
+      "fixture": "d2-race",
+      "band": 2,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 77.462,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "observed": 1,
+        "expected": 2,
+        "fixes": [
+          "atomic-increment",
+          "lock-read-modify-write",
+          "retry-on-CAS-failure"
+        ]
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d2-race",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 2,
+              "evidence": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+            },
+            "reasoning": {
+              "level": 2,
+              "evidence": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+            },
+            "coupling": {
+              "level": 2,
+              "evidence": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 2,
+        "reasons": [
+          "ambiguity: D2: Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels).",
+          "reasoning: D2: Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels).",
+          "coupling: D2: Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "rank": 2,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b82-7da3-7310-96a5-77774d3fbd02",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "37a184545897cfc0a2070dc355491faf3557146f82497b99c885d6a2d2f61a76"
+      }
+    },
+    {
+      "fixture": "d2-race",
+      "band": 2,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 77.058,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "observed": 1,
+        "expected": 2,
+        "fixes": [
+          "atomic-increment",
+          "lock-read-modify-write",
+          "retry-on-CAS-failure"
+        ]
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d2-race",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 2,
+              "evidence": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+            },
+            "reasoning": {
+              "level": 2,
+              "evidence": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+            },
+            "coupling": {
+              "level": 2,
+              "evidence": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 2,
+        "reasons": [
+          "ambiguity: D2: Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels).",
+          "reasoning: D2: Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels).",
+          "coupling: D2: Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels)."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "rank": 3,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b82-7f45-71f0-b703-8a0f0391a0d0",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "9e41a147e951509330a75a378da6529b11cd2a42ef7661f352914870115b116a"
+      }
+    },
+    {
+      "fixture": "d2-transaction",
+      "band": 2,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 74.594,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "requirements": [
+          "atomic-debit-and-key",
+          "transactional-retry-check",
+          "unique-dedup-key"
+        ],
+        "duplicate_effect_possible_without_atomicity": true
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d2-transaction",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 2,
+              "evidence": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+            },
+            "reasoning": {
+              "level": 2,
+              "evidence": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+            },
+            "coupling": {
+              "level": 2,
+              "evidence": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 2,
+        "reasons": [
+          "ambiguity: D2: An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean.",
+          "reasoning: D2: An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean.",
+          "coupling: D2: An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "rank": 2,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b82-88fc-7b00-abc9-ad870cd9270b",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "d1d60d9b637a20c99b038f8295afda9dbd3c72a46c325611cd801d1c3a96c0d1"
+      }
+    },
+    {
+      "fixture": "d2-transaction",
+      "band": 2,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 72.819,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "requirements": [
+          "atomic-debit-and-key",
+          "transactional-retry-check",
+          "unique-dedup-key"
+        ],
+        "duplicate_effect_possible_without_atomicity": true
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d2-transaction",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "operate",
+          "ratings": {
+            "ambiguity": {
+              "level": 2,
+              "evidence": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+            },
+            "reasoning": {
+              "level": 2,
+              "evidence": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+            },
+            "coupling": {
+              "level": 2,
+              "evidence": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 2,
+        "reasons": [
+          "ambiguity: D2: An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean.",
+          "reasoning: D2: An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean.",
+          "coupling: D2: An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "rank": 3,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b82-8ff2-7133-ba1a-e7657179c76e",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "23bf236c3bb774fc9a2ea3cdea0f6239159b3ad059566cb0baab9922587fe6c6"
+      }
+    },
+    {
+      "fixture": "d3-consistency",
+      "band": 3,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 76.117,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "choice": "Q",
+        "partition_policy": "refuse-without-quorum",
+        "acknowledgement": "after-durable-quorum",
+        "retry_identity": "stable",
+        "rationale": "Linearizable allocation prevents double allocation and invented stock, a durable quorum configured to tolerate one node failure preserves acknowledged allocations, and stable idempotency keys prevent retries from allocating again."
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d3-consistency",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "design",
+          "ratings": {
+            "ambiguity": {
+              "level": 3,
+              "evidence": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+            },
+            "reasoning": {
+              "level": 3,
+              "evidence": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+            },
+            "coupling": {
+              "level": 3,
+              "evidence": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 3,
+        "reasons": [
+          "ambiguity: D3: Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence).",
+          "reasoning: D3: Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence).",
+          "coupling: D3: Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "rank": 3,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b83-ac63-75c1-be37-9f250e3e95f8",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "71972f0ae344072f9d4320e897af720e40fcdecd02bb7d4633f033f1066bbdcf"
+      }
+    },
+    {
+      "fixture": "d3-consistency",
+      "band": 3,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 75.758,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "choice": "Q",
+        "partition_policy": "refuse-without-quorum",
+        "acknowledgement": "after-durable-quorum",
+        "retry_identity": "stable",
+        "rationale": "Linearizable allocation prevents allocating the same unit twice, durable quorum commits preserve completed allocations through one node failure, stable idempotency keys prevent duplicate retries, and refusing requests without quorum prevents partitions from inventing stock."
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d3-consistency",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "design",
+          "ratings": {
+            "ambiguity": {
+              "level": 3,
+              "evidence": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+            },
+            "reasoning": {
+              "level": 3,
+              "evidence": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+            },
+            "coupling": {
+              "level": 3,
+              "evidence": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 3,
+        "reasons": [
+          "ambiguity: D3: Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence).",
+          "reasoning: D3: Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence).",
+          "coupling: D3: Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence)."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "rank": 4,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b83-addf-77a1-92d1-618532086f5e",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "42a749b3a56b090dd9b5e4a06cd4a61e3785def1ec553a659fa40ba3b473e437"
+      }
+    },
+    {
+      "fixture": "d3-migration",
+      "band": 3,
+      "variant": "preferred",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 75.061,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "choice": "Y",
+        "backfill": "idempotent",
+        "contract_gate": "retirement-and-convergence",
+        "rollback_preserves_A": true,
+        "rationale": "Expand the schema while preserving A and old-client writes, maintain B compatibly and backfill it idempotently, and delete A only after old-client retirement and measured convergence."
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d3-migration",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "design",
+          "ratings": {
+            "ambiguity": {
+              "level": 3,
+              "evidence": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+            },
+            "reasoning": {
+              "level": 3,
+              "evidence": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+            },
+            "coupling": {
+              "level": 3,
+              "evidence": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 3,
+        "reasons": [
+          "ambiguity: D3: Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence).",
+          "reasoning: D3: Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence).",
+          "coupling: D3: Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "rank": 3,
+        "warnings": [],
+        "override": null,
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b83-b099-7de2-91dd-562b92aac12a",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "f67c2cb0dbddb18f5ffe7b51cbb3de8ae2a6fc05d8bae6d143ba0cf76318c5a4"
+      }
+    },
+    {
+      "fixture": "d3-migration",
+      "band": 3,
+      "variant": "comparison",
+      "requested": {
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      "passed": true,
+      "repair_attempts": 0,
+      "elapsed_observation_upper_bound_seconds": 71.586,
+      "acknowledged": null,
+      "worker_closed": true,
+      "task_resources_created": false,
+      "output": {
+        "choice": "Y",
+        "backfill": "idempotent",
+        "contract_gate": "retirement-and-convergence",
+        "rollback_preserves_A": true,
+        "rationale": "Expanding the schema while preserving A and old-client writes, maintaining compatible writes, and backfilling B idempotently supports safe rollback and permits contraction only after old clients retire and measured convergence is verified."
+      },
+      "decision": {
+        "schema": "codex-work-decision/v1",
+        "status": "completed",
+        "dispatch": null,
+        "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "codex-model-assessment-20261102",
+          "host_build": "com.openai.codex/26.1027.51404/23880"
+        },
+        "target": "worker",
+        "assessment": {
+          "schema": "codex-work-assessment/v1",
+          "objective": "d3-migration",
+          "deliverable": "JSON answer meeting all frozen fixture criteria",
+          "scope": "Supplied synthetic fixture only; no tools or external effects",
+          "work_class": "design",
+          "ratings": {
+            "ambiguity": {
+              "level": 3,
+              "evidence": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+            },
+            "reasoning": {
+              "level": 3,
+              "evidence": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+            },
+            "coupling": {
+              "level": 3,
+              "evidence": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+            }
+          },
+          "effects": {
+            "source_edits": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "consequential": false,
+            "independent_review": false
+          },
+          "reversibility": "read-only",
+          "verification": {
+            "method": "automated",
+            "checks": [
+              {
+                "id": "fixture",
+                "criterion": "All expected fixture fields match; D3 rationale is substantive"
+              }
+            ]
+          },
+          "unknowns": [],
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          }
+        },
+        "band": 3,
+        "reasons": [
+          "ambiguity: D3: Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence).",
+          "reasoning: D3: Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence).",
+          "coupling: D3: Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence)."
+        ],
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "selected": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "rank": 4,
+        "warnings": [
+          "explicit-override"
+        ],
+        "override": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "reason": "User-approved native qualification comparison; not automatic fallback"
+        },
+        "quality_used": 0,
+        "availability_used": 0,
+        "evidence_sha256": "90088a1ddc9b969165099b291987113d986b9434aaaceefa2b9671cbeaa04960",
+        "acknowledged": null,
+        "execution_matches_request": null,
+        "worker_id": "01a19b83-be3d-7491-ad42-a822b2084dd9",
+        "cleanup_verified": true,
+        "checks": {
+          "fixture": true
+        },
+        "diagnosis": null,
+        "record_sha256": "d646474646d0b31e958843b771d0b1b10819d0a20d7008a09ec2a5c81f3221ca"
+      }
+    }
+  ],
+  "native_offers": {
+    "schema": "codex-native-offers/v1",
+    "context": {
+      "host": "codex",
+      "surface": "local-macos-desktop",
+      "session_id": "codex-model-assessment-20261102",
+      "host_build": "com.openai.codex/26.1027.51404/23880"
+    },
+    "tool": "multi_agent_v1.spawn_agent",
+    "origin": "native-tool",
+    "observed_at": "2026-11-02T09:03:53.889460+00:00",
+    "source_sha256": "7e3dfc60e1ee66c71a8bd322f203533501d9ec199339db138dd2c530afd70c49",
+    "contract": {
+      "model": "string",
+      "reasoning_effort": "string",
+      "fork_context": "boolean",
+      "ordinary_agent": true
+    },
+    "models": [
+      {
+        "model": "gpt-6.1-sol",
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max",
+          "ultra"
+        ]
+      },
+      {
+        "model": "gpt-6-astra",
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max",
+          "ultra"
+        ]
+      },
+      {
+        "model": "gpt-6-sol",
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max",
+          "ultra"
+        ]
+      },
+      {
+        "model": "gpt-6-luna",
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      {
+        "model": "gpt-5.6-sol",
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max",
+          "ultra"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+schema: kp-capability/v1
+id: google-kit-doc-styles
+kind: tool
+flavor: 1
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+shape: snapshot
+sync_policy: none
+expose: cursor
+provenance_source: ""
+provenance_ref: ""
+provenance_trust: ""

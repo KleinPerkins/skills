@@ -1,0 +1,213 @@
+{
+  "host": {
+    "application_identifier": "com.openai.codex",
+    "architecture": "arm64",
+    "build": "23880",
+    "surface": "local-macos-desktop",
+    "version": "26.1027.51404"
+  },
+  "limitations": [
+    "Temporary canary only; no retained installation",
+    "No other client or downstream enrollment",
+    "No INT-021 production rollout",
+    "Requested model route is not an attested serving identity or AWA registration",
+    "Synthetic local workload only; no general quality or performance claim",
+    "Raw private traces remain local; this record publishes sanitized observations and artifact digests only",
+    "No downloads, external workload requests, Affirm or work access"
+  ],
+  "local_artifact_verification": {
+    "additional_interaction_theme_viewport_cases": 12,
+    "all_20_screenshots_visually_reviewed": true,
+    "artifact_hashes": [
+      {
+        "bytes": 1922,
+        "name": "isokit-native-canary-retry/CanaryCounter.jsx",
+        "sha256": "6e15728a38cfc30645b6af359186f3ce64453e640ef748de19a9db015f217e4c"
+      },
+      {
+        "bytes": 2393,
+        "name": "isokit-native-canary-retry/native-readback.json",
+        "sha256": "3eb7ecd1440229d2359674c8d8e5cb6035c40cc25d3462d458c1349a4cd50398"
+      },
+      {
+        "bytes": 184646,
+        "name": "isokit-retry-owner-shots/dark-1280-0-pressed.png",
+        "sha256": "682b46a799804694d36bc2cfe28f919bcc4a417df0c19731736a7c6ce88c9013"
+      },
+      {
+        "bytes": 172736,
+        "name": "isokit-retry-owner-shots/dark-1280-0-rest.png",
+        "sha256": "93db92b3510ce50315ac673be065395fa6ac06ae0c12204959d8f96f4ab7316f"
+      },
+      {
+        "bytes": 70921,
+        "name": "isokit-retry-owner-shots/dark-390-0-pressed.png",
+        "sha256": "2a0c5195cbb83a15f8b000eb460157841d0f1bf9634f701040b6f2806fde2cf4"
+      },
+      {
+        "bytes": 67124,
+        "name": "isokit-retry-owner-shots/dark-390-0-rest.png",
+        "sha256": "6bbb847149cd12f274a226c26410a3026fabc049270b41cf73701584f6caa13a"
+      },
+      {
+        "bytes": 200678,
+        "name": "isokit-retry-owner-shots/light-1280-0-pressed.png",
+        "sha256": "d1c4a7733594414d06b2ade132cff4a5623073c67b775800fb00d48a5dfa807a"
+      },
+      {
+        "bytes": 193304,
+        "name": "isokit-retry-owner-shots/light-1280-0-rest.png",
+        "sha256": "21df183ace180f645d89a0a557aaa94f757ea97097ca1296ec09766020c6a349"
+      },
+      {
+        "bytes": 80822,
+        "name": "isokit-retry-owner-shots/light-390-0-pressed.png",
+        "sha256": "654a0c31d6ee1240178f6561ada1a3ee49e1aeedfaac63d2a1716690c0fa1a2c"
+      },
+      {
+        "bytes": 78593,
+        "name": "isokit-retry-owner-shots/light-390-0-rest.png",
+        "sha256": "ccbe116a8e0ce5652e6d768cd237be63ab295f400eb953dfe6673e2cb81806ea"
+      },
+      {
+        "bytes": 294858,
+        "name": "isokit-retry-look-shots/blueprint-dark-1280.png",
+        "sha256": "101384e7becfa63ed8d0e3773212ac082c89e30fea7f2ffe0491513963fc3369"
+      },
+      {
+        "bytes": 96921,
+        "name": "isokit-retry-look-shots/blueprint-dark-390.png",
+        "sha256": "a2a3919daeb792ddd8ac65fbf62da2952aeca135e168d686101b8e9e139950c8"
+      },
+      {
+        "bytes": 283922,
+        "name": "isokit-retry-look-shots/blueprint-light-1280.png",
+        "sha256": "81190ee1cd6984fc4d0bfabeb209be82deafd9d3bf215b9ad35a3d8939f11f44"
+      },
+      {
+        "bytes": 90189,
+        "name": "isokit-retry-look-shots/blueprint-light-390.png",
+        "sha256": "625013805f7c06ba784cba466b631744e871e698a38a8c8491ab8fb98f8dd9c2"
+      },
+      {
+        "bytes": 88301,
+        "name": "isokit-retry-look-shots/paper-dark-1280.png",
+        "sha256": "1abd3b49c8c53f92654d8b3847e4fdcab7b7caa08ed6d2e39a49ad0929b41500"
+      },
+      {
+        "bytes": 36070,
+        "name": "isokit-retry-look-shots/paper-dark-390.png",
+        "sha256": "0888b328ca60d6ee03b4227156937060693479b4d5f4c671b45fa9ec93be3450"
+      },
+      {
+        "bytes": 85558,
+        "name": "isokit-retry-look-shots/paper-light-1280.png",
+        "sha256": "d223776327c23584d6e192aebd5b305145940a6366c4862587a959b2515483f0"
+      },
+      {
+        "bytes": 35717,
+        "name": "isokit-retry-look-shots/paper-light-390.png",
+        "sha256": "1c0be0a6597c622ab33fa20b698d023659959a2af90b54446e32052f8b4e6d37"
+      },
+      {
+        "bytes": 92417,
+        "name": "isokit-retry-look-shots/phosphor-dark-1280.png",
+        "sha256": "3d3e6f23e254dac0b2caa6600e9c54966b44bf38a37455ba71806360e57f5c20"
+      },
+      {
+        "bytes": 37993,
+        "name": "isokit-retry-look-shots/phosphor-dark-390.png",
+        "sha256": "84541ea387d9a9ca2f8f61e8c3329794f11c894626d4ab2dd7ff6cb0182a270e"
+      },
+      {
+        "bytes": 90094,
+        "name": "isokit-retry-look-shots/phosphor-light-1280.png",
+        "sha256": "aedaa23d690e3a330065c17501f8f5db633606ff3f62562505edd1892a4d8f52"
+      },
+      {
+        "bytes": 36885,
+        "name": "isokit-retry-look-shots/phosphor-light-390.png",
+        "sha256": "aaf100b9f800f950a73979953c30b7ebe0bba50156f58f31c2d5f97df766aa19"
+      }
+    ],
+    "build_passed": true,
+    "console_errors": 0,
+    "console_warnings": 0,
+    "control_minimum_pixels": {
+      "height": 16,
+      "width": 24
+    },
+    "external_requests": 0,
+    "framing_readability_opaque_faces_and_credit_passed": true,
+    "keyboard_and_pointer_sequence": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "overflow_cases": 0,
+    "owner_checker_variants": 4,
+    "parent_semantic_edits": false,
+    "synthetic_workload": "Three-box seed counter: visible readout and Add seed control; one silent odd/even lamp; default Plate framing",
+    "worker_figure_lines": 57
+  },
+  "native": {
+    "allowed_artifact_writes": 2,
+    "completed_before_early_stop": true,
+    "duration_ms": 55387,
+    "extra_agents_or_connectors": false,
+    "fresh_context": true,
+    "hard_deadline_ms": 120000,
+    "intended_source_reads": 6,
+    "native_catalog_isokit_entries": 1,
+    "parent_early_wait_ms": 60000,
+    "requested_route": {
+      "fork_turns": "none",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "high"
+    },
+    "serving_model_execution_identity_established": false,
+    "worker_count": 1
+  },
+  "observed_at": "2026-11-02T09:34:20.603264+00:00",
+  "outcome": "pass",
+  "owner": "KleinPerkins/skills",
+  "prior_failed_attempt": {
+    "duration_ms": 120438,
+    "exact_rollback_passed": true,
+    "hard_deadline_ms": 120000,
+    "later_parent_fixture_repair_did_not_requalify_failed_native_attempt": true,
+    "outcome": "fail",
+    "visual_failure": "Plate padding was supplied as pixels instead of a fraction, making the figure too small"
+  },
+  "rollback": {
+    "browsers_closed": true,
+    "completed_at": "2026-11-02T09:21:08.404520+00:00",
+    "named_staging_absent": true,
+    "original_protected_records_unchanged": true,
+    "passed": true,
+    "preserved_paths_and_config_unchanged": true,
+    "target_absent": true,
+    "temporary_server_stopped": true
+  },
+  "schema": "skills/isokit-native-observation/v1",
+  "scope": "Codex-only native discovery and local synthetic seed-counter use; temporary publication with exact rollback",
+  "source": {
+    "checkout_revision": "f2301ce13d50e471ff1e8ae51fb5a41bf47eaf0a",
+    "path": "local/skills/isokit",
+    "repository": "KleinPerkins/skills",
+    "source_changed": false,
+    "tracked_file_count": 123,
+    "tracked_payload_inventory_sha256": "b63d4dd9332d6f6b87c7f879e7efbb1f0f73930f75e2eb2bf35ffe7ba76fce62"
+  },
+  "transaction": {
+    "accepted_revision": "12763b473c66337433def36f2bbdb96261687cb8",
+    "action_sha256": "7a8fa314b07007595f43042499e763601e0e39686ec0eb28191186d0e2de1f47",
+    "approval_packet_sha256": "7cc32571dc6e56dba562b56746083837e260fff40d79c5c87a4973e2cfd28e63",
+    "human_exact_consent_observed": true,
+    "module_sha256": "3969049ba709ff45a0e869dade580d604a67fc7bca98451988d38ca3f4687b95",
+    "other_client_publication": false,
+    "repository": "KleinPerkins/dev",
+    "temporary_link": "~/.codex/skills/isokit"
+  }
+}

@@ -1,0 +1,16 @@
+schema: kp-tool/v1
+id: google-kit-doc-styles
+name: google-kit doc styles local bootstrap
+scope: local
+entrypoint: install.sh
+description: Installs local google-kit document style templates and Laurence bootstrap seeds into the user-level google-kit config directory.
+inputs:
+  config_dir:
+    description: Optional override for the google-kit config directory. Defaults to GOOGLE_KIT_CONFIG_DIR, then the macOS Application Support google-kit directory.
+    required: false
+  dry_run:
+    description: Report planned seed and repair actions without writing files.
+    required: false
+outputs:
+  doc_styles_dir:
+    description: Directory receiving JSON style profile seeds.

@@ -1,0 +1,10 @@
+{
+  "name": "kp-isokit-skill-runtime",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Pinned local runtime dependency for the isokit skill browser checker.",
+  "license": "MIT",
+  "dependencies": {
+    "playwright-core": "1.64.1"
+  }
+}

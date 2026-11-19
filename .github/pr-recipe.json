@@ -1,0 +1,37 @@
+{
+  "canned_refs": [
+    {
+      "digest": "sha256:43d4d6238bad4513a58135cc28b0810aff03921053f3d0a282261c756e8d5189",
+      "id": "canned.repository-contract.v1"
+    }
+  ],
+  "custom_jobs": [
+    {
+      "id": "repo.skills.m3-verify",
+      "argv": [
+        "run-literal",
+        "bash",
+        ".github/scripts/verify-skills.sh"
+      ],
+      "environment": {},
+      "depends_on": ["canned.repository-contract.v1"]
+    }
+  ],
+  "pipeline": {
+    "aggregate": "all_required",
+    "jobs": [
+      {
+        "depends_on": [],
+        "id": "canned.repository-contract.v1"
+      },
+      {
+        "depends_on": ["canned.repository-contract.v1"],
+        "id": "repo.skills.m3-verify"
+      }
+    ],
+    "pipeline_id": "skills-m3-pipeline",
+    "version": "pr-automation-pipeline/v1"
+  },
+  "repository_id": "skills",
+  "schema": "pr-automation-recipe/v1"
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "swarm-offline-marker-fixture/v1",
+  "files": {
+    "contract.txt": "boundary=ALLOW_UNKNOWN_VERSION\n",
+    "delivery.txt": "guard=SKIP_REVISION_CHECK\n",
+    "state.txt": "storage=FOLLOW_STATE_SYMLINK\n",
+    "coverage.txt": "critical=ONE_REVIEWER_FOR_CRITICAL\n",
+    "authority.txt": "parser=MENTION_GRANTS_PUSH\n"
+  },
+  "material_defects": [
+    {
+      "id": "contract-version-drift",
+      "marker": "ALLOW_UNKNOWN_VERSION",
+      "dimension": "D02"
+    },
+    {
+      "id": "stale-revision-shipping",
+      "marker": "SKIP_REVISION_CHECK",
+      "dimension": "D16"
+    },
+    {
+      "id": "unsafe-state-symlink",
+      "marker": "FOLLOW_STATE_SYMLINK",
+      "dimension": "D04"
+    },
+    {
+      "id": "missing-critical-redundancy",
+      "marker": "ONE_REVIEWER_FOR_CRITICAL",
+      "dimension": "D11"
+    },
+    {
+      "id": "implicit-push-authority",
+      "marker": "MENTION_GRANTS_PUSH",
+      "dimension": "D15"
+    }
+  ],
+  "baseline_markers": [
+    "ALLOW_UNKNOWN_VERSION",
+    "SKIP_REVISION_CHECK",
+    "FOLLOW_STATE_SYMLINK"
+  ],
+  "scanner_lenses": [
+    ["ALLOW_UNKNOWN_VERSION", "SKIP_REVISION_CHECK", "FOLLOW_STATE_SYMLINK"],
+    ["ONE_REVIEWER_FOR_CRITICAL"],
+    ["ALLOW_UNKNOWN_VERSION"],
+    ["SKIP_REVISION_CHECK"],
+    ["MENTION_GRANTS_PUSH"],
+    ["FOLLOW_STATE_SYMLINK"],
+    ["ONE_REVIEWER_FOR_CRITICAL"],
+    ["MENTION_GRANTS_PUSH"],
+    ["ALLOW_UNKNOWN_VERSION"],
+    ["SKIP_REVISION_CHECK"],
+    ["FOLLOW_STATE_SYMLINK"],
+    ["MENTION_GRANTS_PUSH"]
+  ]
+}

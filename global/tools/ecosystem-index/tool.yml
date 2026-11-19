@@ -1,0 +1,15 @@
+schema: kp-tool/v1
+id: ecosystem-index
+name: Ecosystem Index
+scope: global
+shape: snapshot
+sync_policy: none
+entrypoint: ecosystem_index.py
+description: >-
+  Builds an explicitly scoped, private observation snapshot from eligible metadata and
+  provides deterministic capability search and bounded context pointers. Source-backed
+  consumers resolve this file within their verified Skills source root. No PATH command,
+  dependency installation, service, enrollment or implicit refresh is provided.
+outputs:
+  snapshot:
+    description: A versioned owner-private JSON cache at the explicitly selected path.

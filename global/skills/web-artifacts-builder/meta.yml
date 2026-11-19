@@ -1,0 +1,13 @@
+schema: kp-capability/v1
+id: web-artifacts-builder
+kind: skill
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude codex
+provenance_source: "github.com/anthropics/skills"
+provenance_ref: "35414756ca55738e050562e272a6bbc6273aa926"
+provenance_trust: "vetted"
+# Flavor-2 verbatim snapshot of anthropics/skills@35414756/skills/web-artifacts-builder.

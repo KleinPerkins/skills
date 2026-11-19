@@ -1,0 +1,49 @@
+{
+  "authoritative_pointers": [
+    {
+      "digest": "d4f4fd3ba4a56e220756e34f29c0462131dab4599ece1ad28aa1f0cf5a27a0b1",
+      "item_or_section": "Scope",
+      "kind": "accepted_plan",
+      "locator": "plan:save-game-global-capability-v2#scope",
+      "observed_at": "2026-08-01T09:00:00Z",
+      "revision": "v2"
+    }
+  ],
+  "blockers": [],
+  "classifications": [
+    {
+      "claim": "active-state digest unchanged since last checkpoint",
+      "result": "MATCH"
+    }
+  ],
+  "created_at": "2026-08-01T09:00:00Z",
+  "decisions_summary": [],
+  "goal": "Ship the save-game schema layer for Phase 1 of the v2 build.",
+  "hygiene_summary": "Transactions finalized; no unclassified delta.",
+  "negative_claims": [
+    "This receipt does not mean any repository file changed."
+  ],
+  "next_actions": [
+    {
+      "description": "Write test_zero_link.py"
+    }
+  ],
+  "receipt_id": "rcpt-abfbcce67b04",
+  "repairs": [],
+  "schema": "save-game-reconcile-receipt/v1",
+  "scope_summary": "Schemas, fixtures, validator, and skeleton only.",
+  "sources_read": [
+    {
+      "digest": "d4f4fd3ba4a56e220756e34f29c0462131dab4599ece1ad28aa1f0cf5a27a0b1",
+      "item_or_section": "Scope",
+      "kind": "git_ref",
+      "locator": "refs/heads/feat/save-game",
+      "observed_at": "2026-08-01T09:00:00Z",
+      "revision": "v2"
+    }
+  ],
+  "triggers": [
+    "resume"
+  ],
+  "workstream_key": "eef8f44c81200799f76ac61c4c7d554256665e510c5f1ae84848f49eb818304b"
+}

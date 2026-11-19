@@ -1,0 +1,9 @@
+config/jobs/
+state/
+*.tmp
+*.bak
+*.rollback
+# Live dashboard render written by the `view` verb — machine-specific, never committed.
+canvases/*.generated.canvas.tsx
+# Cursor Canvas sidecars are machine-local UI state (including Run now requests).
+canvases/*.canvas.data.json

@@ -1,0 +1,12 @@
+schema: kp-capability/v1
+id: continual-learning-consolidate
+kind: skill
+flavor: 1
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: launchd
+expose: cursor
+provenance_source: ""
+provenance_ref: ""
+provenance_trust: ""

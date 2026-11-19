@@ -1,0 +1,306 @@
+{
+  "$defs": {},
+  "$id": "ecosystem-index/config/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bounds": {
+      "additionalProperties": false,
+      "properties": {
+        "entities": {
+          "maximum": 5000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "input_bytes": {
+          "maximum": 262144,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "refresh_seconds": {
+          "maximum": 60,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "roots": {
+          "maximum": 500,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "snapshot_bytes": {
+          "maximum": 20971520,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "roots",
+        "entities",
+        "input_bytes",
+        "snapshot_bytes",
+        "refresh_seconds"
+      ],
+      "type": "object"
+    },
+    "exclude_identities": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "exclude_paths": {
+      "items": {
+        "maxLength": 4096,
+        "pattern": "^/",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "roots": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "aliases": {
+            "items": {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 32,
+            "type": "array"
+          },
+          "git": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "common_dir": {
+                    "maxLength": 4096,
+                    "pattern": "^/",
+                    "type": "string"
+                  },
+                  "git_dir": {
+                    "maxLength": 4096,
+                    "pattern": "^/",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "common_dir",
+                  "git_dir"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "identity": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "provider": {
+                    "anyOf": [
+                      {
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "remote": {
+                    "anyOf": [
+                      {
+                        "maxLength": 2048,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "provider",
+                  "remote"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inventory": {
+            "enum": [
+              "configured",
+              "native",
+              "workspace"
+            ]
+          },
+          "key": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "path": {
+            "maxLength": 4096,
+            "pattern": "^/",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "permitted",
+              "unknown"
+            ]
+          },
+          "sources": {
+            "items": {
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "else": {
+                    "not": {
+                      "required": [
+                        "capability_scope"
+                      ]
+                    }
+                  },
+                  "if": {
+                    "properties": {
+                      "adapter": {
+                        "const": "skill-frontmatter"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "capability_scope"
+                    ]
+                  }
+                }
+              ],
+              "properties": {
+                "adapter": {
+                  "enum": [
+                    "json",
+                    "yaml",
+                    "capability-yaml",
+                    "skill-frontmatter"
+                  ]
+                },
+                "capability_scope": {
+                  "enum": [
+                    "global",
+                    "project"
+                  ]
+                },
+                "fields": {
+                  "items": {
+                    "enum": [
+                      "title",
+                      "description",
+                      "aliases",
+                      "pointers",
+                      "edges"
+                    ]
+                  },
+                  "maxItems": 5,
+                  "type": "array"
+                },
+                "kind": {
+                  "enum": [
+                    "capability",
+                    "workspace",
+                    "native"
+                  ]
+                },
+                "path": {
+                  "maxLength": 512,
+                  "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+                  "type": "string"
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "maxLength": 128,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "path",
+                "adapter",
+                "kind",
+                "revision",
+                "fields"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "storage_fields": {
+            "items": {
+              "enum": [
+                "title",
+                "description",
+                "aliases",
+                "pointers",
+                "edges"
+              ]
+            },
+            "maxItems": 5,
+            "type": "array"
+          },
+          "title": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "path",
+          "identity",
+          "scope",
+          "inventory",
+          "title",
+          "aliases",
+          "storage_fields",
+          "sources",
+          "git"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "type": "array"
+    },
+    "schema": {
+      "const": "ecosystem-index/config/v1"
+    }
+  },
+  "required": [
+    "schema",
+    "roots",
+    "exclude_paths",
+    "exclude_identities",
+    "bounds"
+  ],
+  "type": "object"
+}

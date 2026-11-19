@@ -1,0 +1,37 @@
+{
+  "schema": "codex-work-policy/v1",
+  "routes": [
+    {
+      "model": "gpt-6-luna",
+      "effort": "low"
+    },
+    {
+      "model": "gpt-6.1-sol",
+      "effort": "medium"
+    },
+    {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    {
+      "model": "gpt-6-astra",
+      "effort": "high"
+    },
+    {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    }
+  ],
+  "bands": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "escalations": [
+    1,
+    2,
+    3,
+    4
+  ]
+}

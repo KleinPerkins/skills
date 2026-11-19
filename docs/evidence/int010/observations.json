@@ -1,0 +1,44 @@
+[
+  {
+    "adapter_revision": null,
+    "capability": "swarm-native-codex-roles",
+    "check": "AGT-01-native-role-contract",
+    "evidence_ref": "docs/evidence/int010/assessment.json#disposition",
+    "host": "codex",
+    "host_build": "22943",
+    "limitations": [
+      "native-not-observed",
+      "owner-decision-required",
+      "not-activation"
+    ],
+    "observed_at": "2026-10-31T08:58:00Z",
+    "outcome": "unsupported",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "f2680bf4ea3d4ad640b328d6873eeae653068cef05dc6cf754b69fbd83e04b2c",
+    "rollback_revision": "8fdb02b48ea5c21691b53cb35915a3f4fe75c8ee",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "8fdb02b48ea5c21691b53cb35915a3f4fe75c8ee",
+    "surface": "local-macos-desktop"
+  },
+  {
+    "adapter_revision": null,
+    "capability": "swarm-native-codex-roles",
+    "check": "AGT-02-native-role-lifecycle",
+    "evidence_ref": "docs/evidence/int010/assessment.json#disposition",
+    "host": "codex",
+    "host_build": "22943",
+    "limitations": [
+      "native-not-observed",
+      "owner-decision-required",
+      "not-activation"
+    ],
+    "observed_at": "2026-10-31T08:58:00Z",
+    "outcome": "unknown",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "f2680bf4ea3d4ad640b328d6873eeae653068cef05dc6cf754b69fbd83e04b2c",
+    "rollback_revision": "8fdb02b48ea5c21691b53cb35915a3f4fe75c8ee",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "8fdb02b48ea5c21691b53cb35915a3f4fe75c8ee",
+    "surface": "local-macos-desktop"
+  }
+]

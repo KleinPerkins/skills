@@ -1,0 +1,30 @@
+{
+  "schema": "kp-keep-awake/v1",
+  "platform": "darwin",
+  "backend": {
+    "app": "Amphetamine",
+    "bundleId": "com.if.Amphetamine",
+    "process": "Amphetamine",
+    "autoLaunch": false
+  },
+  "marker": "kp-keep-awake-heartbeat/v1",
+  "durationSeconds": 1200,
+  "throttleSeconds": 300,
+  "timeoutSeconds": 5,
+  "displaySleepAllowed": false,
+  "preventScreenSaver": true,
+  "caffeinateSupplementEnabled": true,
+  "maintenanceEnabled": true,
+  "maintenanceIntervalSeconds": 300,
+  "activityWindowSeconds": 14400,
+  "stateRoot": "~/.local/state/keep-awake",
+  "events": [
+    {
+      "event": "beforeSubmitPrompt",
+      "matcher": "UserPromptSubmit"
+    },
+    {
+      "event": "preToolUse"
+    }
+  ]
+}

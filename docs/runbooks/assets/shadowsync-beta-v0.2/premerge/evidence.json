@@ -1,0 +1,35 @@
+{
+  "initialFrame": {
+    "height": 622.0,
+    "width": 824.0
+  },
+  "nativeAutomation": "System Events AX",
+  "schema": "shadowsync-beta-native-smoke/v2",
+  "screenshots": [
+    {
+      "bytes": 182715,
+      "file": "01-initial.png",
+      "sha256": "552fadf64ee3f6b95e06ed80946ba6512f929810763129442e12cc5ec4b07d4b"
+    },
+    {
+      "bytes": 178192,
+      "file": "02-horizontal.png",
+      "sha256": "c0c6d6318b61e408577c7adbedacb91913e95948717f33133bf92e0cb7fc8007"
+    },
+    {
+      "bytes": 218282,
+      "file": "03-both-axes.png",
+      "sha256": "551b264b67a3b6e0efdd21d220342653e51954ff1c88deaa26dc39ecde733bfa"
+    },
+    {
+      "bytes": 248810,
+      "file": "04-full-screen.png",
+      "sha256": "5a3969f98c49c8065b6576f882b3168c5a1e97f8290128c6a05271c5a11fe657"
+    },
+    {
+      "bytes": 216342,
+      "file": "05-restored.png",
+      "sha256": "8f11dd26b74c60e4b12ed4a9c6d7f01b73f5b41e9bf4e50cccd9c9cd2d78a7da"
+    }
+  ]
+}

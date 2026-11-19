@@ -1,0 +1,180 @@
+{
+  "authority": {
+    "bootstrap_exceptions": "expired; no bootstrap mapping used",
+    "dev_revision": "14fa5f95fe86178f32e966cb747ab9c884f4b92b",
+    "frozen_semantics_changed": false,
+    "int007b_retained_evidence_merge": "98747eef0369b75610754126bfcfb1a148a603c2",
+    "int007b_source_merge": "eb1bb0701d3b3251ae389189e41184a6a1925e9f",
+    "scope": [
+      "INT-005",
+      "INT-006"
+    ]
+  },
+  "canary": {
+    "action_sha256": "f14692fb63b83882aeee5a70a68f73697e474054856bd5d63b937db122aef572",
+    "approval": {
+      "answer": "Approve bounded canary and rollback",
+      "human_reply_verified": true,
+      "parent_chat": "01a1808e-9198-7ff2-9d7f-494bb18cab20",
+      "question_call": "call_X3z4SZaTDB5Pa2ZqoWr25icM"
+    },
+    "catalog_observation": {
+      "actual_reads": "exact injected catalog paths; no substitute path",
+      "before_worker_file_reads": true,
+      "prompt-architect": "~/.codex/skills/prompt-architect/SKILL.md",
+      "unambiguous": true,
+      "verification-before-completion": "~/.codex/skills/verification-before-completion/SKILL.md"
+    },
+    "executor_sha256": "79b5f63301ec635958cc9a6c3a835f6d359c6433f96021af6dce529d23a3fcbd",
+    "host": {
+      "build": "21828",
+      "evidence": "supported check_app_update installed-version response; no update applied",
+      "surface": "local-macos-desktop",
+      "version": "26.1021.31345"
+    },
+    "retained_installation": false,
+    "rollback": {
+      "codex_config_and_instructions_preserved_during_canary": true,
+      "cursor_claude_entries_preserved": true,
+      "four_semantic_preimages_restored": true,
+      "original_alias_modes": "0755",
+      "pre_canary_config_drift": "unrelated configuration changed since preview; no relevant skill override; fresh observation-only preservation baseline captured without changing approved action",
+      "temporary_codex_links_absent": true,
+      "unrelated_skill_entries_preserved": true
+    },
+    "routing": {
+      "acknowledged_execution_identity": null,
+      "contract_sha256": "fd36fd09e88455ab3ca0ed2a2cf4060067b212b07a93fb7b1af3c90b6921875a",
+      "evidence_sha256": "9615d30ef75af0e79dbf7491abb92b7edbe966c4c00327ea244a62f82f2ca2a8",
+      "lifecycle": "started; completed; bounded output retrieved; no worker resources created",
+      "mode": "auto",
+      "requested": {
+        "effort": "max",
+        "family": "gpt-5.6-sol",
+        "fixed_behavior": null,
+        "provider": "openai"
+      },
+      "source_revision": "4c22951ec6c5bc5421accf3c7f1d5b5a78aa36da",
+      "source_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+      "warnings": [
+        "fallback"
+      ],
+      "work_kind": "build",
+      "worker": "/root/int005_int006_native"
+    },
+    "temporary_delta": {
+      "affected_sessions": "all sessions scanning the shared discovery roots; no disposable host isolation claim",
+      "created": "two exact .codex/skills links to the verified candidate export",
+      "removed": "two matching .agents aliases, preserving their original primary-source targets and modes"
+    },
+    "workload": {
+      "fixture_sha256": "7be69754edb941419323d8b08419d1f450af116271e00be7db2b3e37c0d5ec2e",
+      "id": "QW-01",
+      "parent_assessed_actual_output": true,
+      "raw_prompt_or_transcript_persisted": false,
+      "rubric": {
+        "both_skills_discovered_from_managed_root": true,
+        "budget_500_units_preserved": true,
+        "evidence_distinguished_from_assumptions": true,
+        "exactly_five_comparison_rows_requested": true,
+        "exactly_three_alternatives_requested": true,
+        "no_invented_regulations": true
+      },
+      "usage": "one bounded native canary; not a paired measurement run",
+      "worker_checks": "10 constraints passed; an initial checker-only line-layout assumption was corrected without changing the candidate"
+    }
+  },
+  "cleanup": {
+    "canary_executor_and_preview": "removed with the owned temporary root; approval/action/executor/payload digests retained in evidence",
+    "owned_candidate_export": "removed after verified rollback and durable bounded evidence; exact owned root absence verified",
+    "rollback_fixture_resources": "removed",
+    "worker_resources": "none created; result-critical workers joined",
+    "worktree": "retained for source delivery; no native archive or AWA Close"
+  },
+  "delivery": {
+    "broader_INT021_rollout": false,
+    "downstream_distribution": false,
+    "later_evidence": "PR body and final report carry exact-head App checks and verified merge",
+    "merged_revision": null,
+    "pr": null,
+    "retained_installation": false,
+    "source_revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "state": "source committed and pushed; evidence snapshot before ready PR delivery"
+  },
+  "limitations": [
+    "native execution model and effort unacknowledged",
+    "no Cursor-native invocation or cloud/remote/CLI qualification",
+    "no paired performance, quality, token or cost comparison",
+    "no retained installation, INT008 duplicate migration or broader INT021 rollout",
+    "AWA registration/protection remains unsupported"
+  ],
+  "measurements": {
+    "adapter_samples": 0,
+    "cold_starts": 0,
+    "monetary_cost": null,
+    "native_model_identity": null,
+    "native_tokens": null,
+    "paired_baseline_attempts": 0,
+    "paired_candidate_runs": 0,
+    "performance_claim": null
+  },
+  "observed_at": "2026-10-28T08:23:39Z",
+  "owner": "KleinPerkins/skills",
+  "review": {
+    "acknowledged_execution_identity": null,
+    "outcome": "no remaining findings",
+    "relationship": "separate technical review execution; not different-provider proof or repository App approval",
+    "requested_effort": "max",
+    "requested_model": "gpt-5.6-sol",
+    "resources_created": false,
+    "warnings": [
+      "fallback",
+      "same-provider-review"
+    ],
+    "worker": "/root/int005_int006_review"
+  },
+  "schema": "skills-int005-int006-execution/v1",
+  "source": {
+    "base_revision": "315a86270b20a0cbdc0b41c320c96f4661f20762",
+    "capabilities": [
+      "prompt-architect",
+      "verification-before-completion"
+    ],
+    "expose": [
+      "cursor",
+      "codex"
+    ],
+    "mcp_builder_changed": false,
+    "payload_sha256": "d4f67c26afd1ef87b2363d8a4a3cdc150b401184ccfde27798c17d43fbaf9893",
+    "provenance_unchanged": true,
+    "revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "snapshot_files_unchanged": 61,
+    "verification_sync_policy": "none"
+  },
+  "validation": {
+    "cases": [
+      "clean home with Cursor absent",
+      "bootstrap/standalone parity",
+      "exact second-run no-op",
+      "dry-run creates no files or directories",
+      "real paths and foreign/dangling/alias-to-source links preserved and reported",
+      "native opt-out and unmanaged config bytes preserved",
+      "comma/bracket/none exposure grammar"
+    ],
+    "description_regression_tests": 26,
+    "diff_check": "passed",
+    "focused_command": "PYTHONDONTWRITEBYTECODE=1 bash scripts/tests/test_bootstrap_runtime_contract.sh",
+    "focused_outcome": "passed after final review fixes",
+    "lock_parity": "passed",
+    "owner_command": "PYTHONDONTWRITEBYTECODE=1 bash .github/scripts/verify-skills.sh",
+    "owner_outcome": "passed, including macOS runtime acceptance; final affected focused suite also passed",
+    "parser_tests": 12,
+    "review_fixes": [
+      "narrow conflict preservation to the two required skills to preserve legacy upgrades",
+      "exact link target instead of same-inode ownership",
+      "assert directories and conflict diagnostics in preview fixtures"
+    ],
+    "sandbox_attempt": "Swift sandbox-exec/process visibility blocked; unchanged owner command passed with required process access",
+    "shell_syntax": "passed"
+  }
+}

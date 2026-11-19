@@ -1,0 +1,19 @@
+{
+  "schema": "native-model-bindings/v1",
+  "choices": {
+    "claude-opus-5-5-max": {"provider":"anthropic","family":"claude-opus-5-5","effort":"max","fixed_behavior":null,"models":{"cursor":"claude-opus-5-5-max","codex":null}},
+    "claude-opus-5-5-xhigh": {"provider":"anthropic","family":"claude-opus-5-5","effort":"xhigh","fixed_behavior":null,"models":{"cursor":"claude-opus-5-5-xhigh","codex":null}},
+    "claude-opus-5-5-high": {"provider":"anthropic","family":"claude-opus-5-5","effort":"high","fixed_behavior":null,"models":{"cursor":"claude-opus-5-5-high","codex":null}},
+    "gpt-5.6-sol-max": {"provider":"openai","family":"gpt-5.6-sol","effort":"max","fixed_behavior":null,"models":{"cursor":"gpt-5.6-sol-max","codex":"gpt-5.6-sol"}},
+    "claude-sonnet-5-5-high": {"provider":"anthropic","family":"claude-sonnet-5-5","effort":"high","fixed_behavior":null,"models":{"cursor":"claude-sonnet-5-5-high","codex":null}},
+    "composer-2.5-fast": {"provider":"cursor","family":"composer-2.5","effort":null,"fixed_behavior":"fast","models":{"cursor":"composer-2.5-fast","codex":null}}
+  },
+  "override_models": {
+    "codex": [
+      {"provider":"openai","family":"gpt-6-astra","model":"gpt-6-astra","mode":"effort","fixed_behavior":null},
+      {"provider":"openai","family":"gpt-6.1-sol","model":"gpt-6.1-sol","mode":"effort","fixed_behavior":null},
+      {"provider":"openai","family":"gpt-6-luna","model":"gpt-6-luna","mode":"effort","fixed_behavior":null}
+    ],
+    "cursor": []
+  }
+}

@@ -1,0 +1,13 @@
+schema: kp-capability/v1
+id: session-close
+kind: skill
+flavor: 1
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+# Kept in the repo but not installed locally (operator, 2026-10-20; ADR 0007).
+expose: none
+provenance_source: ""
+provenance_ref: ""
+provenance_trust: ""

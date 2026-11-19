@@ -1,0 +1,25 @@
+schema: kp-tool/v1
+id: dev-main-sync
+name: ShadowSync
+scope: global
+shape: snapshot
+sync_policy: none
+entrypoint: install.sh
+description: >-
+  Builds and manages a private native macOS menu utility that groups local clones by GitHub
+  repository, records explicit canonical-root authority, resolves each actual remote default
+  branch, and safely fast-forwards its one verified clean checked-out worktree. Its source-bound
+  installer provides verified install, reconcile, repair, doctor, rollback, and removal with
+  release-bound installed-state admission, preserving canonical-root authority and the latest
+  owner-only run log while safely retiring coordination lock names on uninstall. Ad-hoc signing
+  provides local accidental-tamper integrity, not independent identity against deliberate
+  same-account re-signing.
+outputs:
+  application:
+    description: One source-built ShadowSync application bundle.
+  launch_agent:
+    description: One non-persistent user LaunchAgent rendered by the product installer.
+  latest_log:
+    description: One owner-only current run log under the effective account's state directory.
+  repository_authorities:
+    description: One owner-only canonical-root authority record preserved across lifecycle updates and removal.

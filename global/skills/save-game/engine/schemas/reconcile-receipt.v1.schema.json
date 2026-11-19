@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "save-game-reconcile-receipt/v1",
+  "title": "save-game-reconcile-receipt/v1",
+  "description": "Result of one Reconcile invocation: triggers, exact sources read, classifications, repairs, authoritative goal/scope/plan/decisions, hygiene, blockers, and at most three executable next actions. negative_claims is required on every receipt, same as the Flush receipt. Never replays completed journal history to reconstruct current truth.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "receipt_id", "workstream_key", "created_at", "triggers",
+    "sources_read", "classifications", "goal", "hygiene_summary",
+    "blockers", "next_actions", "negative_claims"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["save-game-reconcile-receipt/v1"] },
+    "receipt_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
+    "workstream_key": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "created_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+    "triggers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "type": "string",
+        "enum": [
+          "post_compaction_evidence", "expected_compaction_command", "new_chat", "resume",
+          "agent_replacement", "root_change", "branch_change", "worktree_change", "head_change",
+          "git_operation_marker_change", "active_state_digest_change", "multiple_checkpoints",
+          "stale_volatile_reference", "incomplete_transaction", "missing_recent_receipt",
+          "pre_first_mutation_after_resume"
+        ]
+      }
+    },
+    "sources_read": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "locator", "observed_at"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["repo_policy", "accepted_plan", "git_ref", "issue", "pr", "task", "ci", "code", "schema", "test", "other"]
+          },
+          "locator": { "type": "string", "maxLength": 500, "pattern": "\\S" },
+          "item_or_section": { "type": "string", "maxLength": 200 },
+          "revision": { "type": "string", "maxLength": 200 },
+          "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" }
+        }
+      }
+    },
+    "classifications": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim", "result"],
+        "properties": {
+          "claim": { "type": "string", "maxLength": 150, "pattern": "\\S" },
+          "result": { "type": "string", "enum": ["MATCH", "ADVANCED", "STALE", "CONFLICT", "UNKNOWN"] }
+        }
+      }
+    },
+    "repairs": { "type": "array", "maxItems": 10, "items": { "type": "string", "maxLength": 150 } },
+    "goal": { "type": "string", "maxLength": 200, "pattern": "\\S" },
+    "scope_summary": { "type": "string", "maxLength": 200 },
+    "authoritative_pointers": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "locator", "observed_at"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["repo_policy", "accepted_plan", "git_ref", "issue", "pr", "task", "ci", "code", "schema", "test", "other"]
+          },
+          "locator": { "type": "string", "maxLength": 500, "pattern": "\\S" },
+          "item_or_section": { "type": "string", "maxLength": 200 },
+          "revision": { "type": "string", "maxLength": 200 },
+          "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" }
+        }
+      }
+    },
+    "decisions_summary": {
+      "type": "array",
+      "maxItems": 10,
+      "items": { "type": "string", "maxLength": 150 }
+    },
+    "hygiene_summary": { "type": "string", "maxLength": 150 },
+    "blockers": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["summary"],
+        "properties": {
+          "summary": { "type": "string", "maxLength": 150, "pattern": "\\S" }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string", "maxLength": 150, "pattern": "\\S" }
+        }
+      }
+    },
+    "negative_claims": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "type": "string", "maxLength": 150, "pattern": "\\S" }
+    }
+  }
+}

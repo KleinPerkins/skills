@@ -1,0 +1,102 @@
+{
+  "schema": "kp-plugin-governor/v1",
+  "marketplace": {
+    "id": "continual-learning",
+    "cacheBase": "~/.cursor/plugins/cache",
+    "pluginJson": ".cursor-plugin/plugin.json",
+    "hooks": "./hooks/hooks.json"
+  },
+  "descriptorMode": "cache_projection",
+  "governedTarget": "agent-learnings.md",
+  "cadence": {
+    "minTurns": 50,
+    "minMinutes": 1440
+  },
+  "cacheDiscovery": {
+    "pluginName": "continual-learning",
+    "pluginJson": ".cursor-plugin/plugin.json",
+    "hooksField": "./hooks/hooks.json"
+  },
+  "behaviorContract": {
+    "files": [
+      "hooks/hooks.json",
+      "hooks/continual-learning-stop.ts",
+      "agents/agents-memory-updater.md",
+      "skills/continual-learning/SKILL.md"
+    ],
+    "normalizeEnvKeys": [
+      "CONTINUAL_LEARNING_MIN_TURNS",
+      "CONTINUAL_LEARNING_MIN_MINUTES",
+      "CONTINUOUS_LEARNING_MIN_TURNS",
+      "CONTINUOUS_LEARNING_MIN_MINUTES"
+    ],
+    "normalizeTargetTokens": [
+      "AGENTS.md",
+      "agent-learnings.md"
+    ]
+  },
+  "retargetTargets": [
+    {
+      "file": "agents/agents-memory-updater.md",
+      "from": "AGENTS.md",
+      "to": "agent-learnings.md",
+      "expectedCount": 7
+    },
+    {
+      "file": "skills/continual-learning/SKILL.md",
+      "from": "AGENTS.md",
+      "to": "agent-learnings.md",
+      "expectedCount": 3
+    },
+    {
+      "file": "hooks/continual-learning-stop.ts",
+      "from": "AGENTS.md",
+      "to": "agent-learnings.md",
+      "expectedCount": 1
+    }
+  ],
+  "patchTargets": [
+    {
+      "hook": "stop",
+      "commandContains": "hooks/continual-learning-stop.ts",
+      "envPrefix": {
+        "CONTINUAL_LEARNING_MIN_TURNS": "50",
+        "CONTINUAL_LEARNING_MIN_MINUTES": "1440"
+      }
+    }
+  ],
+  "neutralize": {
+    "hook": "stop",
+    "commandContains": "hooks/continual-learning-stop.ts",
+    "noopCommand": "echo 'kp-governor: continual-learning stop hook neutralized (INCOMPATIBLE cache; mining paused, no AGENTS.md write)' >&2; exit 0"
+  },
+  "globalExcludes": [
+    "agent-learnings.md",
+    ".cursor/hooks/state/"
+  ],
+  "sessionStart": {
+    "marker": "kp-continual-learning-cache-projection",
+    "timeout": 20,
+    "failClosed": false
+  },
+  "compatibilityMatrix": {
+    "note": "Upstream identity tuple = {marketplaceId, pluginVersion (advisory), cacheRevision (advisory), behaviorFingerprint (safety-bearing = meta.provenance_ref)}. On any behavior-bearing change these MUST change together or a drift bites in CI on both sides.",
+    "retargetCounts": {
+      "agents/agents-memory-updater.md": 7,
+      "skills/continual-learning/SKILL.md": 3,
+      "hooks/continual-learning-stop.ts": 1
+    },
+    "targetTokens": {
+      "from": "AGENTS.md",
+      "to": "agent-learnings.md"
+    },
+    "fanout": [
+      "plugin.json (retargetTargets/counts + neutralize)",
+      "meta.provenance_ref",
+      "meta.descriptor_ref",
+      "tests/test_plugin_governor.py",
+      "SKILL.md",
+      "any downstream governed consumer that pins these counts/token strings (retarget-only guard)"
+    ]
+  }
+}

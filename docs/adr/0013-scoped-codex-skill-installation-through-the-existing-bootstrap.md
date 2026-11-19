@@ -1,0 +1,14 @@
+---
+{"approval":{"actor":"KleinPerkins","basis":"Direct human acceptance of the exact proposal; canonical body preserves its two semantic paragraphs verbatim, with a title and partial-amendment identity wrapper.","date":"2026-11-05","item":0,"question_call":"call_ZoZMUvWskk7EuReR5unC1cgs","review_sha256":"f4fd80402575022ef76553f58f18e3fbcdfb7d3a1adc52b26e019595915a15b7","source_chat_id":"01a1808e-9198-7ff2-9d7f-494bb18cab20","source_proposal_sha256":"a73e3c91474f9a8c53f87bfabca3ad4688ee07f6f278a80b16130aff4a7247a8"},"authority":"semantic","github_repository_id":1275604090,"id":"ADR-f7571d74-f495-5461-ae37-ed0e227347d5-96a875fd-ed02-5d3a-9eb7-b6dd46006ebb","lifecycle":"approved","mutability":"frozen_after_approval","provenance":[],"relations":[],"repository_key":"f7571d74-f495-5461-ae37-ed0e227347d5","schema":"doc-warden/artifact/v2","supersedes":null,"type":"adr","version":1}
+---
+# ADR 0013: Scoped Codex skill installation through the existing bootstrap
+
+Supersedes: ADR0012 Owner package resolution prohibition on new generic installer behavior, only to the extent below. This is a partial amendment; all other ADR0012 choices remain authoritative.
+
+## Decision
+
+Partially amend only the Owner package resolution of Skills ADR0012 concerning new generic installer behavior. Authorize an opt-in scoped transaction inside the existing bootstrap.sh capability/package mechanism solely for the global flavor-1/post_mgmt-none agent-route and ecosystem-search skills and the Codex client. The operation must bind a verified durable standalone Skills source, exact target parent/preimages and a two-link plan, preserve every unselected capability/client and intentional opt-out, refuse conflicts/drift, and support private receipt-based idempotence and guarded rollback. It must perform no cloning, implicit dependency provisioning, fleet reconciliation, legacy retirement, settings/credential copying or downstream changes. Existing unscoped bootstrap behavior and all other ADR0012 semantics remain unchanged. This source authorization does not authorize a live operation or retained activation.
+
+## Delivery boundary
+
+Replace only the prior prohibition on new generic bootstrap behavior to permit the bounded scoped transaction defined by this successor decision. After this exact decision and execution addendum are accepted and verified merged, Skills owns implementation, focused validation, independent technical review and normal ready-PR-to-verified-merge delivery without another implementation, code-review or PR approval request. Implement only the file responsibilities and acceptance checks in this reviewed disposition. The installation/host owner subsequently rebinds the L1 packet to the delivered installer revision, obtains its existing required operation/consequence consent, and executes only qualified cases. Applicable D1 decisions, native capability evidence, writer exclusion, cleanup, L2 and downstream gates remain unchanged.

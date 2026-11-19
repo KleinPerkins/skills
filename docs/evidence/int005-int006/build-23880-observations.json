@@ -1,0 +1,46 @@
+[
+  {
+    "schema": "interoperability/qualification/v1",
+    "capability": "required-skills-codex-discovery",
+    "owner": "KleinPerkins/skills",
+    "source_revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "payload_sha256": "d4f67c26afd1ef87b2363d8a4a3cdc150b401184ccfde27798c17d43fbaf9893",
+    "host": "codex",
+    "surface": "local-macos-desktop",
+    "host_build": "23880",
+    "adapter_revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "check": "SKL-01-native-discovery-and-use",
+    "outcome": "pass",
+    "observed_at": "2026-11-01T20:15:36Z",
+    "evidence_ref": "docs/evidence/int005-int006/build-23880-execution.json#canary",
+    "limitations": [
+      "not-activation",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "source-merge-pending"
+    ],
+    "rollback_revision": "f2301ce13d50e471ff1e8ae51fb5a41bf47eaf0a"
+  },
+  {
+    "schema": "interoperability/qualification/v1",
+    "capability": "required-skills-codex-discovery",
+    "owner": "KleinPerkins/skills",
+    "source_revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "payload_sha256": "d4f67c26afd1ef87b2363d8a4a3cdc150b401184ccfde27798c17d43fbaf9893",
+    "host": "codex",
+    "surface": "local-macos-desktop",
+    "host_build": "23880",
+    "adapter_revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "check": "ROL-01-native-canary-rollback",
+    "outcome": "pass",
+    "observed_at": "2026-11-01T20:15:36Z",
+    "evidence_ref": "docs/evidence/int005-int006/build-23880-execution.json#canary",
+    "limitations": [
+      "not-activation",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "source-merge-pending"
+    ],
+    "rollback_revision": "f2301ce13d50e471ff1e8ae51fb5a41bf47eaf0a"
+  }
+]

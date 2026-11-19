@@ -1,0 +1,152 @@
+{
+  "skill_name": "swarm",
+  "description": "Proportional, cost-bounded /swarm acceptance canaries. Each canary is offline and deterministic: it asserts against the band sizer and budget counter in scripts/swarm_helper.py, never against un-instrumented wall-clock or token claims. Names match tests/test_proportional.py and SKILL.md §Proportionality guarantees.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "trivial-fast-path",
+      "prompt": "Launch the swarm on this one-line cosmetic rename. Review only.",
+      "expected_output": "select_band returns 'trivial'; size_cohort plans 1 reviewer, verifier 'no', second_pass 'no', max_dispatches 2; probe + 1 reviewer route to the economy class; no verifier.",
+      "assertions": [
+        "Band is trivial for 1 root / <=5 files / <=100 lines / max score <40 / cosmetic / no protected axis",
+        "Cohort is exactly 1 reviewer with verifier 'no' and second_pass 'no'",
+        "Probe and reviewer both resolve through the shared catalog's economy tier",
+        "A 2-dispatch plan (probe + reviewer) passes the budget counter"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "small-targeted",
+      "prompt": "Swarm this targeted change touching a couple of hotspots. Review only.",
+      "expected_output": "max score 40-59 selects 'small'; 1-2 reviewers, no verifier, <=3 dispatches; targeted reviewer routes through the shared catalog's standard tier.",
+      "assertions": [
+        "Band is small for a single-root change with max score in 40-59",
+        "Cohort is 1-2 reviewers with verifier 'no'",
+        "A 3-dispatch plan passes and a 4th base dispatch is rejected by the small ceiling"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "standard-specialist",
+      "prompt": "Launch the swarm on this change with a 60-79 driving dimension.",
+      "expected_output": "max score 60-79 selects 'standard'; 2-3 reviewers, specialist on the driving axis, verifier gated (only if a P0/P1 emerges).",
+      "assertions": [
+        "Band is standard for a 60-79 driving dimension",
+        "Cohort is 2-3 reviewers with verifier 'gated' and second_pass 'no'",
+        "Specialist reviewer (score 60-89) routes through the shared catalog's deep tier"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "deep-gated-verifier",
+      "prompt": "Dispatch the swarm on this security-sensitive change (D04 in the 60-79 range).",
+      "expected_output": "D04/D05/D07 in 60-79 (or max 80-89) selects 'deep'; 3-4 reviewers on the deep class, runtime /prompt-architect for the critical charter, gated verifier, second pass gated.",
+      "assertions": [
+        "Band is deep for a protected axis in 60-79 or a max score of 80-89",
+        "Cohort is 3-4 reviewers with verifier 'gated' and second_pass 'gated'",
+        "Deep reviewers resolve through the shared catalog; a 6-dispatch plan passes and a 7th base dispatch is rejected"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "critical-redundancy",
+      "prompt": "Run the swarm on this authorization and persistent-data boundary. Keep security and data-integrity reviews independently redundant.",
+      "expected_output": "a dimension >=90 (or D04/D05/D07 >=80) selects 'critical'; preflight reserves every critical territory, one bounded probe-blind duplicate, and one verifier. A seven-file/9,396-line source is section-packed at <=3,000 lines per assignment or refused before reviewer dispatch.",
+      "assertions": [
+        "Band is critical for any dimension >=90 or a protected axis >=80",
+        "Cohort is 4-5 reviewers with verifier 'yes' and redundancy only on the >=90 axis",
+        "Critical reviewer (score >=90) resolves through the live-runtime-filtered critical tier",
+        "Seven files / 9,396 lines produce bounded evidence packs and exact candidate binding, never all lines per reviewer"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "waiver-visibility",
+      "prompt": "Launch the swarm; most dimensions are low-scored. Show me what was not reviewed.",
+      "expected_output": "low-scored dimensions appear as 'waived' in the coverage matrix with the probe evidence supporting waiver; nothing is silently dropped; a named hotspot or confidence <70 blocks waiver.",
+      "assertions": [
+        "The rendered report's coverage matrix marks each dimension reviewed, waived, or uncovered",
+        "Every waived dimension carries the probe evidence that supports the waiver",
+        "A low score with a named hotspot or confidence <70 is not silently waived"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "dedup-fix-groups",
+      "prompt": "Swarm this; several reviewers will likely flag the same root cause.",
+      "expected_output": "multiple reviewer observations of one root cause collapse to a single curated fix group; the report shows <=10 curated findings and summarizes P3/P4 duplicates by count.",
+      "assertions": [
+        "Findings sharing an evidence lineage and correction merge into one curated fix group",
+        "The curated report shows at most 10 findings",
+        "P3/P4 duplicates are summarized by count rather than listed individually"
+      ],
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "budget-guard",
+      "prompt": "Launch the swarm and keep spending until you cannot.",
+      "expected_output": "accepted workers hard-stop at 9 and no new work starts after 20 minutes. Healthy completion gets a bounded 25-60 minute scope-aware allowance; stalled workers fail coverage; a third pass is refused.",
+      "assertions": [
+        "A 10th total dispatch raises ContractError (absolute ceiling 9)",
+        "A new accepted worker at >1200s raises while a healthy large worker may complete after a small-task target within its allowance",
+        "A pass_index of 3 raises: never start a third pass"
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "fan-out-guard",
+      "prompt": "Launch the swarm; reviewers will ask for git history and test runs.",
+      "expected_output": "evidence requests are fulfilled by the parent and never by a dispatched subagent. Preflight/transport rejection is separate from accepted-worker capacity; every accepted worker counts once.",
+      "assertions": [
+        "The budget counter rejects an 'evidence' dispatch kind (evidence is parent-run)",
+        "Only accepted probe/reviewer/verifier/escalation workers consume capacity; routing and transport attempts are separately bounded",
+        "There is no code path that dispatches a subagent to answer an evidence request"
+      ],
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "routing-no-inheritance",
+      "prompt": "Launch the swarm and show the model routing for every role.",
+      "expected_output": "every dispatch carries a concrete catalog slug filtered through the executing runtime enum. An unavailable preference resolves to a valid configured fallback before dispatch; no valid candidate is a precise zero-launch preflight failure.",
+      "assertions": [
+        "Every resolved role slug is a member of the routing catalog; 'inherit' never appears",
+        "route_probe consumes only root/file/line counts and protected-path presence, never scores",
+        "Runtime filtering never emits an unsupported stale slug; no valid configured candidate raises a precise preflight failure"
+      ],
+      "files": []
+    },
+    {
+      "id": 11,
+      "name": "prompt-architect-coupling",
+      "prompt": "Launch the swarm with a hand-authored charter that skipped /prompt-architect.",
+      "expected_output": "the provenance lint fails a charter that has neither a committed template id in references/charters/PROVENANCE.md nor a recorded runtime /prompt-architect invocation; every committed charter template traces to the registry at version 3.2.2.",
+      "assertions": [
+        "Every references/charters/*.md template id is registered in PROVENANCE.md",
+        "PROVENANCE.md pins /prompt-architect version 3.2.2 and the RISEN / TIDD-EC frameworks",
+        "A charter with no template id and no runtime /prompt-architect record fails the lint"
+      ],
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "runaway-regression",
+      "prompt": "Prove a default swarm run cannot become the ~20-agent, 2-hour runaway.",
+      "expected_output": "the suite fails if a default run could accept >5 reviewers, exceed 9 accepted workers, omit required critical coverage, run an unreserved verifier, auto-start a second pass, or dispatch evidence gathering.",
+      "assertions": [
+        "No band plans more than 5 reviewers (base max) and no band ceiling exceeds the absolute 9",
+        "A verifier dispatched with no P0/P1 gate trigger is a doctrine violation the render/report surfaces as not_evaluated",
+        "The counter refuses a second accepted probe/verifier, a third pass, and an evidence worker; capacity pressure preflight-refuses rather than truncates"
+      ],
+      "files": []
+    }
+  ]
+}

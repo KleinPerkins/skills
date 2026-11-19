@@ -1,0 +1,381 @@
+#!/usr/bin/env python3
+"""Build the machine-local global continual-learning projection.
+
+Candidate roots come only from ``agent-route map --json``. The home seed is
+``~/agent-learnings.md``. ``~/AGENTS.md`` is an output projection and is never
+used as memory input.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import stat
+import subprocess
+import sys
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR / "lib"))
+
+import memory  # noqa: E402
+
+MANAGED_HEADER = "<!-- generated; edit agent-learnings.md sources, not this file -->\n"
+
+
+class ConsolidationError(RuntimeError):
+    """A fail-closed condition that must leave the output unchanged."""
+
+
+@dataclass(frozen=True)
+class Source:
+    path: Path
+    identity: str
+    is_work: bool
+    bullets: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True)
+class Occurrence:
+    source: Source
+    section: str
+    text: str
+    index: int
+
+
+def _read_bullets(path: Path) -> tuple[tuple[str, str], ...]:
+    try:
+        text = path.read_text(encoding="utf-8", errors="strict")
+    except (OSError, UnicodeError) as exc:
+        raise ConsolidationError(f"cannot parse {path}: {exc}") from exc
+    # A valid-UTF8 file with no machine headings (e.g. a fresh clone's
+    # human-readable placeholder) carries no memory yet, so it is skipped like an
+    # empty file rather than failing the whole run. Undecodable bytes still fail
+    # closed above, the home seed is still gated by its own explicit check, and
+    # the final secret scanner still gates the projection.
+    return tuple(memory.learned_bullets(text))
+
+
+def _route_payload(
+    agent_route: Path,
+    runner: Callable[..., Any] = subprocess.run,
+) -> dict[str, Any]:
+    if not agent_route.is_file():
+        raise ConsolidationError(f"agent-route is unavailable at {agent_route}")
+    command = ["/bin/bash", str(agent_route), "map", "--json"]
+    try:
+        completed = runner(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ConsolidationError(f"agent-route failed: {exc}") from exc
+    if completed.returncode != 0:
+        detail = (completed.stderr or "").strip()
+        raise ConsolidationError(
+            f"agent-route failed with exit {completed.returncode}"
+            + (f": {detail}" if detail else "")
+        )
+    try:
+        payload = json.loads(completed.stdout)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ConsolidationError(f"agent-route returned invalid JSON: {exc}") from exc
+    if not isinstance(payload, dict) or not isinstance(payload.get("roots"), list):
+        raise ConsolidationError("agent-route JSON is missing roots[]")
+    return payload
+
+
+def _identity(root: dict[str, Any], path: Path) -> str:
+    origin = root.get("live_origin") or root.get("origin")
+    if isinstance(origin, str) and origin.strip():
+        value = origin.strip().lower()
+        return value[:-4] if value.endswith(".git") else value
+    return f"path:{path}"
+
+
+def _is_within(path: Path, parent: Path) -> bool:
+    try:
+        path.relative_to(parent)
+        return True
+    except ValueError:
+        return False
+
+
+def _workspace_sources(
+    payload: dict[str, Any],
+    home: Path,
+    seed_path: Path,
+) -> tuple[list[Source], int]:
+    affirm_root = (home / "dev" / "affirm").resolve(strict=False)
+    sources: list[Source] = []
+    seen_paths: set[Path] = set()
+    roots = payload["roots"]
+
+    for position, raw_root in enumerate(roots):
+        if not isinstance(raw_root, dict):
+            raise ConsolidationError(
+                f"agent-route roots[{position}] is not an object"
+            )
+        if raw_root.get("exists") is False:
+            continue
+        raw_path = raw_root.get("abs_path")
+        if not isinstance(raw_path, str) or not raw_path:
+            raise ConsolidationError(
+                f"agent-route roots[{position}] is missing abs_path"
+            )
+        root_path = Path(raw_path).expanduser()
+        if not root_path.is_absolute():
+            raise ConsolidationError(
+                f"agent-route roots[{position}] abs_path is not absolute"
+            )
+        root_path = root_path.resolve(strict=False)
+        candidate = root_path / "agent-learnings.md"
+        if candidate == seed_path or candidate in seen_paths:
+            continue
+        seen_paths.add(candidate)
+        if not candidate.is_file():
+            continue
+        bullets = _read_bullets(candidate)
+        if not bullets:
+            continue
+        sources.append(
+            Source(
+                path=candidate,
+                identity=_identity(raw_root, root_path),
+                is_work=_is_within(root_path, affirm_root),
+                bullets=bullets,
+            )
+        )
+
+    sources.sort(key=lambda item: (item.is_work, str(item.path)))
+    return sources, len(roots)
+
+
+def _admit(
+    seed: Source,
+    workspaces: list[Source],
+) -> tuple[list[tuple[str, str]], dict[str, int]]:
+    seed_texts = {text for _, text in seed.bullets}
+    occurrences = [
+        Occurrence(source, section, text, index)
+        for source in workspaces
+        for index, (section, text) in enumerate(source.bullets)
+    ]
+
+    recurring: list[Occurrence] = []
+    matched_seed = 0
+    rejected_work = 0
+    rejected_unconfirmed = 0
+    for occurrence in occurrences:
+        if occurrence.text in seed_texts:
+            matched_seed += 1
+            continue
+        corroborating = [
+            other
+            for other in occurrences
+            if other.source.identity != occurrence.source.identity
+            and memory.near_duplicate(occurrence.text, other.text)
+        ]
+        has_non_work = not occurrence.source.is_work or any(
+            not other.source.is_work for other in corroborating
+        )
+        if corroborating and has_non_work:
+            recurring.append(occurrence)
+        elif occurrence.source.is_work:
+            rejected_work += 1
+        else:
+            rejected_unconfirmed += 1
+
+    # Non-work phrasing wins before the equivalent work phrasing. The same
+    # conservative near-duplicate predicate used for recurrence then removes the
+    # work variant, preventing work-only detail from becoming canonical.
+    recurring.sort(
+        key=lambda item: (
+            item.source.is_work,
+            str(item.source.path),
+            item.index,
+        )
+    )
+    admitted = list(seed.bullets)
+    admitted.extend((item.section, item.text) for item in recurring)
+    return admitted, {
+        "matched_home_seed": matched_seed,
+        "recurring_admitted": len(recurring),
+        "work_only_rejected": rejected_work,
+        "unconfirmed_rejected": rejected_unconfirmed,
+    }
+
+
+def _projection(
+    home: Path,
+    payload: dict[str, Any],
+) -> tuple[bytes, dict[str, Any]]:
+    seed_path = (home / "agent-learnings.md").resolve(strict=False)
+    if not seed_path.is_file():
+        raise ConsolidationError(f"home seed is missing: {seed_path}")
+    seed_bullets = _read_bullets(seed_path)
+    if not seed_bullets:
+        raise ConsolidationError(f"home seed has no Learned bullets: {seed_path}")
+
+    seed = Source(
+        path=seed_path,
+        identity="home-seed",
+        is_work=False,
+        bullets=seed_bullets,
+    )
+    workspaces, discovered_roots = _workspace_sources(payload, home, seed_path)
+    sources = [seed, *workspaces]
+    if not sources:
+        raise ConsolidationError("no readable learning sources")
+
+    admitted, admission = _admit(seed, workspaces)
+    canonical = memory.consolidate(admitted)
+    if not canonical:
+        raise ConsolidationError("consolidation produced no bullets")
+    rendered = MANAGED_HEADER + memory.render_learned(canonical)
+
+    try:
+        findings, blocked = memory.scan(rendered)
+    except Exception as exc:
+        raise ConsolidationError(f"final scanner failed: {exc}") from exc
+    if blocked:
+        rules = sorted(
+            {item["rule"] for item in findings if item.get("severity") == "BLOCK"}
+        )
+        raise ConsolidationError(
+            "final scanner blocked projection: " + ", ".join(rules)
+        )
+
+    report: dict[str, Any] = {
+        "discovered_roots": discovered_roots,
+        "sources": len(sources),
+        "workspace_sources": len(workspaces),
+        "source_paths": [str(item.path) for item in sources],
+        "input_bullets": sum(len(item.bullets) for item in sources),
+        "home_seed_bullets": len(seed.bullets),
+        "canonical_bullets": len(canonical),
+        "deduplicated": len(admitted) - len(canonical),
+        "scanner_warnings": sum(
+            item.get("severity") == "WARN" for item in findings
+        ),
+        **admission,
+    }
+    return rendered.encode("utf-8"), report
+
+
+def _atomic_write(path: Path, content: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    mode = 0o600
+    try:
+        mode = stat.S_IMODE(path.stat().st_mode)
+    except FileNotFoundError:
+        pass
+
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, mode)
+        os.replace(temporary, path)
+    except Exception:
+        temporary.unlink(missing_ok=True)
+        raise
+
+
+def consolidate_home(
+    home: Path,
+    agent_route: Path,
+    *,
+    dry_run: bool = False,
+    runner: Callable[..., Any] = subprocess.run,
+) -> dict[str, Any]:
+    """Consolidate once. All validation and scanning precede the atomic write."""
+    home = home.expanduser().resolve(strict=False)
+    target = home / "AGENTS.md"
+    payload = _route_payload(agent_route.expanduser(), runner=runner)
+    content, report = _projection(home, payload)
+
+    previous = target.read_bytes() if target.is_file() else None
+    changed = previous != content
+    if changed and not dry_run:
+        _atomic_write(target, content)
+    return {
+        **report,
+        "target": str(target),
+        "changed": changed,
+        "dry_run": dry_run,
+    }
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="continual-learning-consolidate")
+    parser.add_argument(
+        "--home",
+        type=Path,
+        default=Path.home(),
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--agent-route",
+        type=Path,
+        default=Path.home()
+        / ".cursor"
+        / "skills"
+        / "agent-route"
+        / "scripts"
+        / "agent-route.sh",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--json", action="store_true")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    try:
+        report = consolidate_home(
+            args.home,
+            args.agent_route,
+            dry_run=args.dry_run,
+        )
+    except ConsolidationError as exc:
+        print(f"continual-learning-consolidate: BLOCKED: {exc}", file=sys.stderr)
+        return 1
+    except Exception as exc:
+        print(
+            f"continual-learning-consolidate: BLOCKED: unexpected failure: {exc}",
+            file=sys.stderr,
+        )
+        return 1
+
+    if args.json:
+        print(json.dumps(report, sort_keys=True))
+    else:
+        state = "would update" if args.dry_run and report["changed"] else (
+            "updated" if report["changed"] else "unchanged"
+        )
+        print(
+            f"continual-learning-consolidate: {state} {report['target']} "
+            f"({report['canonical_bullets']} bullets from "
+            f"{report['sources']} sources)"
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

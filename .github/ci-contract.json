@@ -1,0 +1,91 @@
+{
+  "schema": "skills-ci-contract/v1",
+  "repository_id": 1461925043,
+  "repository_names": [
+    "KleinPerkins/skills"
+  ],
+  "workflow": ".github/workflows/ci.yml",
+  "workflow_name": "CI",
+  "required_check": "ci-required",
+  "actions_app_id": 15368,
+  "reviewer_app_id": 4217367,
+  "shards": [
+    "baseline",
+    "save-game",
+    "capability-tests"
+  ],
+  "commands": {
+    "baseline": [
+      {
+        "id": "full-baseline",
+        "argv": [
+          "bash",
+          ".github/scripts/verify-skills.sh"
+        ]
+      }
+    ],
+    "save-game": [
+      {
+        "id": "save-game-python",
+        "argv": [
+          "make",
+          "-C",
+          "global/skills/save-game",
+          "test"
+        ]
+      }
+    ],
+    "capability-tests": [
+      {
+        "id": "swarm-full",
+        "argv": [
+          "bash",
+          "global/skills/swarm/tests/run_tests.sh"
+        ]
+      },
+      {
+        "id": "keep-awake",
+        "argv": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "global/plugins/keep-awake/tests",
+          "-p",
+          "test_*.py",
+          "-v"
+        ]
+      },
+      {
+        "id": "consolidator",
+        "argv": [
+          "bash",
+          "local/skills/continual-learning-consolidate/tests/run_tests.sh"
+        ]
+      },
+      {
+        "id": "delivery-admission",
+        "argv": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "scripts/tests",
+          "-p",
+          "test_ci_delivery*.py",
+          "-v"
+        ]
+      }
+    ]
+  },
+  "baseline_sha256": "282467e063fdf46804f7fe4e7eacb3f3ae0bd640c97d2a5a0c75fa3c917dfca0",
+  "qualification_limits": [
+    "Linux dev-main-sync portable source contract only; macOS Swift/AppKit/runtime remains separate.",
+    "Source CI never installs or reconciles the operator HOME.",
+    "Full swarm harness intentionally includes its own installer fixture beyond the baseline smoke."
+  ]
+}

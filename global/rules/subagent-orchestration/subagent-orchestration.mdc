@@ -1,0 +1,84 @@
+---
+description: Deliberate, completion-aware subagent orchestration
+alwaysApply: true
+---
+
+# Subagent Orchestration
+
+The orchestrator owns model choice, completion, worker health, and cleanup.
+
+## Model Choice
+
+Never launch a subagent without an explicit model, and never pick one by hand.
+Classify the work by its hardest requirement; when unsure, raise the tier for
+work that writes or decides:
+
+- `design` (`deep`): architecture, planning, design, ambiguous or cross-system
+  work, complex or security-sensitive builds, anything irreversible or shipping.
+- `sign-off` (`critical`): independent review and sign-off of deep work, merge
+  and release gates, `/swarm` adjudication.
+- `build`, `review` (`standard`): clear, well-specified builds, moderate
+  refactors, tests, docs, routine review.
+- `find`, `run` (`economy`): search, mechanical edits, running tests and checks,
+  status polling, log summaries.
+
+Before a work kind's first launch in a session, resolve the
+`~/.cursor/rules/subagent-orchestration.mdc` symlink to its source directory and
+run `python3 verify_model_tiers.py plan` there with that kind and the offered
+models (see `plan --help`). Launch exactly the model it names; reuse that plan
+for the kind all session. A non-zero exit means launch nothing. Choose models,
+not efforts: picker level fixes a model's effort. Outside Cursor, use the
+tier's closest native model.
+
+A launch rejected before the subagent starts is unverified; follow the plan's
+order. If the tool refuses a slug as not offered, re-read the offered list and
+re-plan, not retry. A failure after the subagent started is not a model
+problem; handle it under Fleet Stewardship and never switch models for it. For
+a same-tier batch, launch one first; if rejected, send the rest to the next
+planned model.
+
+At FATAL, launch nothing more for that tier. Let running workers reach a safe
+point and clean up; stop and report the tier, models tried, errors, and times.
+Never do the work yourself or use a model the plan did not name.
+
+Pinned types like Bugbot never count as the tier's review or a
+different-provider review. Report every plan warning and every launch on the
+secondary. A step-down means the operator's picker level is below the catalog's
+first choice. One session's rejection is an outage, not catalog drift; change
+`model-tiers.json` only when the live list drops a model or rejections persist
+across sessions.
+
+Explicit `/swarm` keeps its role-to-tier routing and budgets; only this catalog
+sits underneath it. Re-plan a rejected swarm launch the same way.
+
+## Sync Or Async
+
+Background only when the operator explicitly asks for background/asynchronous/
+multitask/not-waiting behavior, or the runtime requires it. Otherwise run
+synchronously. If a worker affects the answer, wait and incorporate it before
+concluding. If legitimate async work is still pending, say so and make no
+dependent claim.
+
+## Fleet Stewardship
+
+Use direct tools for narrow work. Dispatch the smallest sufficient fleet and
+assess each wave before starting another.
+
+Before another wave, before using a result, and before finalizing, check every
+live worker through native completion/status signals. Silence is unknown. Do not
+blind-poll when the runtime promises completion notification. If a worker is
+hung, broken, or off-track, inspect once, then cancel, narrow, retry once,
+reassign, or finish directly.
+
+Each worker removes temporary state and stops resources it created. The
+orchestrator verifies cleanup at completion and intervenes only when needed.
+
+## Do not
+
+- Background answer-critical work and conclude before it returns.
+- Treat worker silence as evidence of progress.
+- Inherit the parent model instead of assigning a tier and model.
+- Leave worker processes or terminals running after completion.
+
+The planner computes the model choice; compliance stays behavioral, and no
+dispatch or lifecycle enforcement hooks may be created.

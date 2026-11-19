@@ -1,0 +1,8 @@
+Source: https://github.com/cursor/plugins/tree/df3fb154fb982fb83f649de8646d4af6a0cb16b3/continual-learning
+Revision: df3fb154fb982fb83f649de8646d4af6a0cb16b3
+
+The four behaviorContract files are byte-identical copies used to prove the approved behavior
+fingerprint. The upstream SKILL.md is stored as SKILL.md.fixture so repository capability
+inventory does not mistake test data for a live capability; tests restore its canonical name only
+inside their temporary cache. LICENSE is copied from the same upstream revision and applies to the
+fixture files.

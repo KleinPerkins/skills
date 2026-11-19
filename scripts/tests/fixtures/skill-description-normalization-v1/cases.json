@@ -1,0 +1,313 @@
+{
+  "cases": [
+    {
+      "blocked": false,
+      "expected_count": 11,
+      "expected_native": "hello world",
+      "expected_normalized": "hello world",
+      "id": "plain",
+      "raw_base64": "LS0tCm5hbWU6IHBsYWluCmRlc2NyaXB0aW9uOiBoZWxsbyB3b3JsZAotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "it's exact",
+      "expected_normalized": "it's exact",
+      "id": "single-quoted",
+      "raw_base64": "LS0tCm5hbWU6IHNpbmdsZQpkZXNjcmlwdGlvbjogJ2l0JydzIGV4YWN0JwotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 15,
+      "expected_native": "line\nnext\u00a0space",
+      "expected_normalized": "line next space",
+      "id": "double-quoted",
+      "raw_base64": "LS0tCm5hbWU6IGRvdWJsZQpkZXNjcmlwdGlvbjogImxpbmVcbm5leHRcdTAwYTBzcGFjZSIKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": false,
+      "expected_count": 12,
+      "expected_native": "nested shape",
+      "expected_normalized": "nested shape",
+      "id": "nested-and-flow",
+      "raw_base64": "LS0tCm5hbWU6IG5lc3RlZApkZXNjcmlwdGlvbjogbmVzdGVkIHNoYXBlCnRvb2xzOiBbUmVhZCwgJ0dsb2InLCAiR3JlcCJdCm1ldGFkYXRhOgogIGF1dGhvcjogdGVzdGVyCiAgZW5hYmxlZDogdHJ1ZQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 12,
+      "expected_native": "comment-safe",
+      "expected_normalized": "comment-safe",
+      "id": "comments-and-blank-lines",
+      "raw_base64": "LS0tCiMgbGVhZGluZyBjb21tZW50CgpuYW1lOiBjb21tZW50cyAjIGlubGluZQpkZXNjcmlwdGlvbjogY29tbWVudC1zYWZlICMgaW5saW5lCm1ldGFkYXRhOgogICMgbmVzdGVkIGNvbW1lbnQKICBhdXRob3I6IHRlc3RlcgotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 3,
+      "expected_native": "yes",
+      "expected_normalized": "yes",
+      "id": "core-string-yes",
+      "raw_base64": "LS0tCm5hbWU6IGNvcmUKZGVzY3JpcHRpb246IHllcwotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 2,
+      "expected_native": "no",
+      "expected_normalized": "no",
+      "id": "core-string-no",
+      "raw_base64": "LS0tCm5hbWU6IGNvcmUKZGVzY3JpcHRpb246IG5vCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": false,
+      "expected_count": 2,
+      "expected_native": "on",
+      "expected_normalized": "on",
+      "id": "core-string-on",
+      "raw_base64": "LS0tCm5hbWU6IGNvcmUKZGVzY3JpcHRpb246IG9uCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": false,
+      "expected_count": 3,
+      "expected_native": "off",
+      "expected_normalized": "off",
+      "id": "core-string-off",
+      "raw_base64": "LS0tCm5hbWU6IGNvcmUKZGVzY3JpcHRpb246IG9mZgotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha\nbeta",
+      "expected_normalized": "alpha beta",
+      "id": "literal-strip",
+      "raw_base64": "LS0tCm5hbWU6IGxpdGVyYWwKZGVzY3JpcHRpb246IHwtCiAgYWxwaGEKICBiZXRhCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha\nbeta\n",
+      "expected_normalized": "alpha beta",
+      "id": "literal-clip",
+      "raw_base64": "LS0tCm5hbWU6IGxpdGVyYWwKZGVzY3JpcHRpb246IHwKICBhbHBoYQogIGJldGEKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha\nbeta\n\n\n",
+      "expected_normalized": "alpha beta",
+      "id": "literal-keep",
+      "raw_base64": "LS0tCm5hbWU6IGxpdGVyYWwKZGVzY3JpcHRpb246IHwrCiAgYWxwaGEKICBiZXRhCgoKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": false,
+      "expected_count": 16,
+      "expected_native": "alpha beta\ngamma",
+      "expected_normalized": "alpha beta gamma",
+      "id": "folded-strip",
+      "raw_base64": "LS0tCm5hbWU6IGZvbGRlZApkZXNjcmlwdGlvbjogPi0KICBhbHBoYQogIGJldGEKCiAgZ2FtbWEKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha beta\n",
+      "expected_normalized": "alpha beta",
+      "id": "folded-clip",
+      "raw_base64": "LS0tCm5hbWU6IGZvbGRlZApkZXNjcmlwdGlvbjogPgogIGFscGhhCiAgYmV0YQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha beta\n\n\n",
+      "expected_normalized": "alpha beta",
+      "id": "folded-keep",
+      "raw_base64": "LS0tCm5hbWU6IGZvbGRlZApkZXNjcmlwdGlvbjogPisKICBhbHBoYQogIGJldGEKCgotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 5,
+      "expected_native": "A\t\n\u000b\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000B\u200bC",
+      "expected_normalized": "A B\u200bC",
+      "id": "unicode-white-space",
+      "raw_base64": "LS0tCm5hbWU6IHdoaXRlc3BhY2UKZGVzY3JpcHRpb246ICJBXHUwMDA5XHUwMDBBXHUwMDBCXHUwMDBDXHUwMDBEXHUwMDIwXHUwMDg1XHUwMEEwXHUxNjgwXHUyMDAwXHUyMDAxXHUyMDAyXHUyMDAzXHUyMDA0XHUyMDA1XHUyMDA2XHUyMDA3XHUyMDA4XHUyMDA5XHUyMDBBXHUyMDI4XHUyMDI5XHUyMDJGXHUyMDVGXHUzMDAwQlx1MjAwQkMiCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": false,
+      "expected_count": 6,
+      "expected_native": "\u00e9 e\u0301 \ud83d\ude00",
+      "expected_normalized": "\u00e9 e\u0301 \ud83d\ude00",
+      "id": "unicode-no-normalization",
+      "raw_base64": "LS0tCm5hbWU6IHVuaWNvZGUKZGVzY3JpcHRpb246ICLDqSBlXHUwMzAxIPCfmIAiCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": false,
+      "expected_count": 13,
+      "expected_native": "CRLF accepted",
+      "expected_normalized": "CRLF accepted",
+      "id": "crlf",
+      "raw_base64": "LS0tDQpuYW1lOiBjcmxmDQpkZXNjcmlwdGlvbjogQ1JMRiBhY2NlcHRlZA0KLS0tDQojIGJvZHkNCg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 16,
+      "expected_native": "bare CR accepted",
+      "expected_normalized": "bare CR accepted",
+      "id": "bare-cr",
+      "raw_base64": "LS0tDW5hbWU6IGNyDWRlc2NyaXB0aW9uOiBiYXJlIENSIGFjY2VwdGVkDS0tLQ0jIGJvZHkN"
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha   beta",
+      "expected_normalized": "alpha beta",
+      "id": "duplicate-a",
+      "raw_base64": "LS0tCm5hbWU6IGR1cC1hCmRlc2NyaXB0aW9uOiAiYWxwaGEgICBiZXRhIgotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 10,
+      "expected_native": "alpha beta",
+      "expected_normalized": "alpha beta",
+      "id": "duplicate-b",
+      "raw_base64": "LS0tCm5hbWU6IGR1cC1iCmRlc2NyaXB0aW9uOiBhbHBoYSBiZXRhCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": true,
+      "id": "missing-open-delimiter",
+      "raw_base64": "bmFtZTogYmFkCmRlc2NyaXB0aW9uOiBiYWQKLS0tCg=="
+    },
+    {
+      "blocked": true,
+      "id": "missing-close-delimiter",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogYmFkCg=="
+    },
+    {
+      "blocked": true,
+      "id": "extra-document-marker",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogYmFkCi4uLgotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "missing-description",
+      "raw_base64": "LS0tCm5hbWU6IGJhZAotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "duplicate-description",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogb25lCmRlc2NyaXB0aW9uOiB0d28KLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": true,
+      "id": "duplicate-nested-key",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogZHVwbGljYXRlIG5lc3RlZAptZXRhZGF0YToKICBhdXRob3I6IG9uZQogIGF1dGhvcjogdHdvCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": true,
+      "id": "invalid-argument-flow",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogYmFkIGZsb3cKYXJndW1lbnQtaGludDogW29wdGlvbmFsOiAic2tpbGxzIG9ubHkiIG9yICJydWxlcyBvbmx5Il0KLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": true,
+      "id": "malformed-flow",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogZmxvdwp0b29sczogW1JlYWQsIEdsb2IKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": true,
+      "id": "bad-indentation",
+      "raw_base64": "LS0tCm5hbWU6IGJhZAogZGVzY3JpcHRpb246IHdyb25nbHkgaW5kZW50ZWQKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": true,
+      "id": "bad-double-escape",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogImJhZFxxZXNjYXBlIgotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "alias",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogKnNoYXJlZAotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "anchor",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogJnNoYXJlZCB2YWx1ZQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "tag",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogIWN1c3RvbSB2YWx1ZQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "directive",
+      "raw_base64": "LS0tCiVZQU1MIDEuMgpuYW1lOiBiYWQKZGVzY3JpcHRpb246IGRpcmVjdGl2ZQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "description-true",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogdHJ1ZQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "description-false",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogZmFsc2UKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": true,
+      "id": "description-null",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogbnVsbAotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "description-number",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogNDIKLS0tCiMgYm9keQo="
+    },
+    {
+      "blocked": true,
+      "id": "description-sequence",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogW29uZSwgdHdvXQotLS0KIyBib2R5Cg=="
+    },
+    {
+      "blocked": true,
+      "id": "description-mapping",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjoKICBuZXN0ZWQ6IHZhbHVlCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": true,
+      "id": "tab-indentation",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogdGFicwptZXRhZGF0YToKCWF1dGhvcjogYmFkCi0tLQojIGJvZHkK"
+    },
+    {
+      "blocked": true,
+      "id": "invalid-utf8",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjog/wotLS0K"
+    },
+    {
+      "blocked": false,
+      "expected_count": 14,
+      "expected_native": "quoted # value",
+      "expected_normalized": "quoted # value",
+      "id": "quoted-comment",
+      "raw_base64": "LS0tCm5hbWU6IHF1b3RlZApkZXNjcmlwdGlvbjogInF1b3RlZCAjIHZhbHVlIiAjIGNvbW1lbnQKLS0tCg=="
+    },
+    {
+      "blocked": false,
+      "expected_count": 16,
+      "expected_native": "operator's voice",
+      "expected_normalized": "operator's voice",
+      "id": "plain-apostrophe-comment",
+      "raw_base64": "LS0tCm5hbWU6IGFwb3N0cm9waGUKZGVzY3JpcHRpb246IG9wZXJhdG9yJ3Mgdm9pY2UgIyBjb21tZW50Ci0tLQo="
+    },
+    {
+      "blocked": true,
+      "id": "more-indented-block",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogPi0KICBhbHBoYQogICAgbW9yZSBpbmRlbnRlZAotLS0K"
+    },
+    {
+      "blocked": true,
+      "id": "explicit-block-indent",
+      "raw_base64": "LS0tCm5hbWU6IGJhZApkZXNjcmlwdGlvbjogfDItCiAgdmFsdWUKLS0tCg=="
+    }
+  ],
+  "duplicate_case_ids": [
+    "duplicate-a",
+    "duplicate-b"
+  ],
+  "schema": "skill-description-normalization-fixtures/v1"
+}

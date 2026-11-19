@@ -1,0 +1,18 @@
+schema: kp-capability/v1
+id: keep-awake
+kind: plugin
+flavor: 1
+# Global-scope but deliberately excluded from downstream capability sync (see
+# ecosystem-orchestrator's config/registry.yml keep-awake entry): Darwin/Amphetamine desktop
+# keep-awake; user-hook + GUI-app bound; kind plugin not in enabled_kinds; no downstream target.
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+# Kept in the repo but not installed locally (operator, 2026-10-20; ADR 0007). The machine-local
+# opt-out entry its uninstall recorded is now redundant and harmless.
+expose: none
+# sha256 of canonical (key-sorted) plugin.json. doctor recomputes this hash and reports drift if it
+# no longer matches, catching an edited-but-not-reinstalled plugin.json before it silently diverges
+# from the installed hooks/state it describes.
+descriptor_ref: "e0a168e598ae6dae3721a6bcbe941bf4f77f850293a994732daa65bf3a2c1234"

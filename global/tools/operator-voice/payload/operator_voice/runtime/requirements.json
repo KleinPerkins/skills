@@ -1,0 +1,7 @@
+{
+  "schema": "runtime-requirements/v1",
+  "install_requires": [
+    "cryptography>=50.0.0,<51.0",
+    "mcp>=1.2.0,<2.0.0"
+  ]
+}

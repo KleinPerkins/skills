@@ -1,0 +1,12 @@
+schema: kp-capability/v1
+id: agent-route
+kind: skill
+flavor: 1
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: codex
+provenance_source: ""
+provenance_ref: ""
+provenance_trust: ""

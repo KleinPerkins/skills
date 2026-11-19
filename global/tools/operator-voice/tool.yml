@@ -1,0 +1,46 @@
+schema: kp-tool/v1
+id: operator-voice
+name: Operator Voice Toolkit (portable-payload snapshot binding)
+scope: global
+shape: snapshot
+sync_policy: portable-payload-snapshot
+entrypoint: install.sh
+description: >-
+  Global Capability Binding (GCB) to the Operator Voice Toolkit (OVT) Standalone System Package
+  (SSP). OVT lives in the private KleinPerkins/operator-voice repo. Unlike a release-descriptor
+  binding (e.g. global/tools/awa, which clones its SSP repo at install time), this shelf is
+  `shape: snapshot`: payload/ carries a deterministic, personal-data-free snapshot of the SSP's
+  operator_voice source tree at release provenance_ref, built by
+  operator_voice.runtime.payload.build_portable_payload. install.sh here installs directly from
+  that embedded snapshot — no access to the private SSP repo is required or performed. This is
+  what lets a future downstream-governed-repository generic kind:tool reconciler (invoked by that
+  repository's own sync/bootstrap, never by this repo) install a working OVT runtime without ever
+  cloning KleinPerkins/operator-voice.
+release:
+  repo: github.com/KleinPerkins/operator-voice
+  ref: main
+  commit: 3f787926467c5e0314f21c4e6bb5d2984ac651b8
+outputs:
+  venv:
+    description: >-
+      A private virtualenv with the OVT runtime dependencies (cryptography, mcp), under
+      ${XDG_DATA_HOME:-$HOME/.local/share}/operator-voice/venv.
+  runtime_current:
+    description: >-
+      The atomically-installed runtime slot the wrapper executes, under
+      ${XDG_DATA_HOME:-$HOME/.local/share}/operator-voice/runtime/current (symlink to a versioned
+      slot; see operator_voice.runtime.install).
+  install_receipt:
+    description: >-
+      The durable install-receipt/v1 record (version + content digest + source) under
+      ${XDG_STATE_HOME:-$HOME/.local/state}/operator-voice/install-receipt.json. Home installs (from
+      an SSP checkout) and this shelf's snapshot-based install converge on an identical digest for
+      identical release content — proved by KleinPerkins/operator-voice's own hermetic
+      distributor-fixture tests.
+  cli_wrapper:
+    description: >-
+      The operator-voice CLI wrapper placed at ${XDG_BIN_HOME:-$HOME/.local/bin}/operator-voice.
+  skill:
+    description: >-
+      SKILL.md installed into supported agent skill roots (Cursor/Claude/Codex, per meta.yml's
+      expose list) so agents can discover OVT's CLI/MCP surface.

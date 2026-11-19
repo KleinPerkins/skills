@@ -1,0 +1,22 @@
+{
+  "canonical_pointers": [
+    {
+      "digest": "d4f4fd3ba4a56e220756e34f29c0462131dab4599ece1ad28aa1f0cf5a27a0b1",
+      "item_or_section": "Scope",
+      "kind": "accepted_plan",
+      "locator": "plan:save-game-global-capability-v2#scope",
+      "observed_at": "2026-08-01T09:00:00Z",
+      "revision": "v2"
+    }
+  ],
+  "clone_key": "4c46197bd185b4a87aaeb75fae79fdf3afaaa8fb8ef84018e664a19004ed252b",
+  "created_at": "2026-08-01T09:00:00Z",
+  "notes": "Adopted during Phase 1 dogfooding.",
+  "repo_key": "d8cea97e56e8669fb5c4cceda43c1a7b83fbbe3be084d46735853e485ae767dd",
+  "retention_policy": {
+    "checkpoint_retention_days": 7,
+    "gc_watermark_bytes": 104857600
+  },
+  "schema": "save-game-registration/v1",
+  "updated_at": "2026-08-01T09:00:00Z"
+}

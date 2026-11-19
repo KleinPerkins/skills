@@ -1,0 +1,10 @@
+{
+  "completed": true,
+  "created_at": "2026-08-01T09:00:00Z",
+  "reason": "gc_unreferenced_snapshot",
+  "schema": "save-game-tombstone/v1",
+  "target_digest": "a86344f693c5c07d98b4b453283625328b04abbc196fdabd68424eb883b78b49",
+  "target_kind": "database_row",
+  "tombstone_id": "tomb-c5c72c5a47b7",
+  "workstream_key": "eef8f44c81200799f76ac61c4c7d554256665e510c5f1ae84848f49eb818304b"
+}

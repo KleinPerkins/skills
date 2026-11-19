@@ -1,0 +1,16 @@
+schema: kp-capability/v1
+id: algorithmic-art
+kind: skill
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+# Kept in the repo but not installed locally or distributed downstream (operator, 2026-10-20;
+# ADR 0007; ecosystem-orchestrator registry: excluded).
+expose: none
+sync_policy: none
+provenance_source: "github.com/anthropics/skills"
+provenance_ref: "35414756ca55738e050562e272a6bbc6273aa926"
+provenance_trust: "vetted"
+# Flavor-2 verbatim snapshot of anthropics/skills@35414756/skills/algorithmic-art.

@@ -1,0 +1,127 @@
+{
+  "schema": "skills-int005-int006-build-execution/v1",
+  "owner": "KleinPerkins/skills",
+  "observed_at": "2026-11-01T20:15:36Z",
+  "scope": [
+    "INT-005",
+    "INT-006"
+  ],
+  "host": {
+    "build": "23880",
+    "version": "26.1027.51404",
+    "surface": "local-macos-desktop",
+    "embedded_cli_sha256": "58a91f6ea19bea477ae3a2ec48d619f0039afe75d3476260747e11d201fa7cea",
+    "evidence": "Installed ChatGPT Info.plist build rechecked immediately before publication; actual local desktop native parent/child history inspected. No update installed."
+  },
+  "source": {
+    "candidate_revision": "be481379a91c7c4efc26d5c2731afb1dbbc60700",
+    "merged_payload_revision": "f646697751e41f01894187f1a4e7470df67a60c4",
+    "destination_checkout_pin": "f2301ce13d50e471ff1e8ae51fb5a41bf47eaf0a",
+    "payload_sha256": "d4f67c26afd1ef87b2363d8a4a3cdc150b401184ccfde27798c17d43fbaf9893",
+    "file_count": 65,
+    "payload_modified": false
+  },
+  "canary": {
+    "approval": {
+      "answer": "Approve this canary and model override",
+      "human_reply_verified": true,
+      "parent_chat": "01a196a4-3682-7932-8f39-8e0f0875e218",
+      "question_call": "call_9e563b8702e04216969a2b678787fbcd",
+      "preview_sha256": "f0af6750fb55ebbdbfc4875c9ed0b26d533b04aa44c71075af6b996ea9d6d164"
+    },
+    "controller_sha256": "da3462afafdce49a61c52aadcbea6159efdf2167153a1c4a509fd0926bfa6986",
+    "controller_fixture_tests_passed": 6,
+    "temporary_delta": {
+      "created_links": [
+        "~/.codex/skills/prompt-architect",
+        "~/.codex/skills/verification-before-completion"
+      ],
+      "four_alias_preimages": "absent",
+      "retained_installation": false,
+      "affected_sessions": "All sessions scanning the shared skill root during the temporary publication; no isolation claim."
+    },
+    "workload": {
+      "id": "QW-01",
+      "fixture_sha256": "7be69754edb941419323d8b08419d1f450af116271e00be7db2b3e37c0d5ec2e",
+      "task_sha256": "91e068a1591e11885c510287f56c925d44717b17cf9748b5c07679d2274c7bde",
+      "rubric": {
+        "both_skills_reported_in_initial_catalog_before_file_reads": true,
+        "exact_injected_paths_read": true,
+        "three_alternatives_requested": true,
+        "five_comparison_rows_requested": true,
+        "budget_500_units_preserved": true,
+        "no_invented_local_regulations": true,
+        "evidence_distinguished_from_assumptions": true,
+        "parent_assessed_actual_output": true
+      },
+      "worker_self_checks_passed": 8,
+      "parent_assessed_actual_output": true,
+      "raw_output_or_transcript_copied": false
+    },
+    "catalog": {
+      "worker_initial_context_report_before_tools": true,
+      "exact_path_reads_confirmed_from_native_history": true,
+      "paths": [
+        "~/.codex/skills/verification-before-completion/SKILL.md",
+        "~/.codex/skills/prompt-architect/SKILL.md"
+      ]
+    },
+    "native": {
+      "parent_thread": "01a196a4-3682-7932-8f39-8e0f0875e218",
+      "child_thread": "01a198ba-8eff-7cd0-97b4-3da0ce1349f2",
+      "child_turn": "01a198ba-8f14-7560-901b-530fe9b6ccaf",
+      "worker": "/root/personal_skills_23880_canary",
+      "status": "completed",
+      "duration_ms": 81210,
+      "deadline_seconds": 120,
+      "commands": 3,
+      "all_commands_terminal_exit_zero": true,
+      "history_page_complete": true,
+      "no_extra_native_calls_in_history": true,
+      "requested_model": "gpt-6.1-sol",
+      "requested_effort": "max",
+      "fork_turns": "none",
+      "mode": "force",
+      "source_dispatch_digest": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+      "native_contract_sha256": "7c37b95e8dc784313428d0b1d542ed456fb036f6405edde0b819bd77546bc15c",
+      "explicit_user_override": true,
+      "acknowledged_execution_identity": null,
+      "lifecycle": "succeeded",
+      "joined": true,
+      "interrupts": 0,
+      "resubmissions": 0,
+      "extra_workers": 0
+    },
+    "rollback": {
+      "status": "rolled-back",
+      "four_alias_preimages_restored": true,
+      "unrelated_guards_unchanged": true
+    }
+  },
+  "validation": {
+    "closed_qualification_schema": "pass",
+    "publication_controller_fixture_tests": "6 passed",
+    "payload_file_digest_map": "65 verified",
+    "same_native_contract_refreshed_before_launch": true,
+    "owner_command": "PYTHONDONTWRITEBYTECODE=1 bash .github/scripts/verify-skills.sh",
+    "owner_outcome": "PASS: full owner gate including macOS runtime acceptance, using Python 3.13 and Node 24.",
+    "owner_log_sha256": "13f270955e1769e638ed564617423753d3d13fdf4a6e00bd322f3a04c7c85bdd",
+    "initial_environment_attempt": "First attempt selected Apple Python 3.9 through an incomplete explicit PATH and lacked sandbox/process access; final unchanged owner gate passed with Python 3.13 and required macOS fixture process access."
+  },
+  "limitations": [
+    "Not retained activation or an INT-008 bypass.",
+    "Requested gpt-6.1-sol/max remains distinct from unacknowledged execution identity.",
+    "No performance, cost, isolation or AWA qualification claim.",
+    "Initial catalog observation is the worker report before tools; native readback corroborates ordering, exact file reads and lifecycle, not a full system-prompt dump.",
+    "Native chat history is platform-managed; no raw model output/transcript is copied into migration artifacts."
+  ],
+  "normalization_caller_repair": "The terminal observe packet initially repeated the worker handle, which the source contract refused. Corrected to null for terminal feedback; no native retry or extra worker occurred.",
+  "delivery": {
+    "state": "candidate evidence for governed owner review",
+    "retained_activation": false,
+    "INT008_host_gate_changed": false,
+    "broader_rollout": false,
+    "downstream_distribution": false,
+    "source_pins_or_model_preferences_changed": false
+  }
+}

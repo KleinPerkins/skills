@@ -1,0 +1,174 @@
+{
+  "name": "CI",
+  "on": {
+    "pull_request": {
+      "types": [
+        "opened",
+        "reopened",
+        "synchronize",
+        "ready_for_review"
+      ]
+    },
+    "push": {
+      "branches": [
+        "main"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "ci-${{ github.event.pull_request.number || github.ref }}",
+    "cancel-in-progress": true
+  },
+  "jobs": {
+    "baseline": {
+      "name": "baseline",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 35,
+      "outputs": {
+        "receipt": "${{ steps.verify.outputs.receipt }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "uses": "actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c",
+          "with": {
+            "python-version": "3.12.12"
+          }
+        },
+        {
+          "name": "Install locked source test dependency",
+          "run": "python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/ci-requirements.txt"
+        },
+        {
+          "name": "Run baseline",
+          "id": "verify",
+          "env": {
+            "CI_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+            "CI_BASE_SHA": "${{ github.event.pull_request.base.sha }}"
+          },
+          "run": "python3 -I -B scripts/verify.py shard --shard baseline"
+        }
+      ],
+      "if": "${{ github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main' }}"
+    },
+    "save-game": {
+      "name": "save-game",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 35,
+      "outputs": {
+        "receipt": "${{ steps.verify.outputs.receipt }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "uses": "actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c",
+          "with": {
+            "python-version": "3.12.12"
+          }
+        },
+        {
+          "name": "Run save-game",
+          "id": "verify",
+          "env": {
+            "CI_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+            "CI_BASE_SHA": "${{ github.event.pull_request.base.sha }}"
+          },
+          "run": "python3 -I -B scripts/verify.py shard --shard save-game"
+        }
+      ],
+      "if": "${{ github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main' }}"
+    },
+    "capability-tests": {
+      "name": "capability-tests",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 35,
+      "outputs": {
+        "receipt": "${{ steps.verify.outputs.receipt }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "uses": "actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c",
+          "with": {
+            "python-version": "3.12.12"
+          }
+        },
+        {
+          "name": "Install locked source test dependency",
+          "run": "python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/ci-requirements.txt"
+        },
+        {
+          "name": "Run capability-tests",
+          "id": "verify",
+          "env": {
+            "CI_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+            "CI_BASE_SHA": "${{ github.event.pull_request.base.sha }}"
+          },
+          "run": "python3 -I -B scripts/verify.py shard --shard capability-tests"
+        }
+      ],
+      "if": "${{ github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main' }}"
+    },
+    "ci-required": {
+      "name": "ci-required",
+      "needs": [
+        "baseline",
+        "save-game",
+        "capability-tests"
+      ],
+      "if": "${{ always() }}",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 5,
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "uses": "actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c",
+          "with": {
+            "python-version": "3.12.12"
+          }
+        },
+        {
+          "name": "Require every exact-run shard",
+          "env": {
+            "CI_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+            "CI_BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+            "CI_NEEDS": "${{ toJSON(needs) }}"
+          },
+          "run": "python3 -I -B scripts/verify.py aggregate"
+        }
+      ]
+    }
+  }
+}

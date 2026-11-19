@@ -1,0 +1,13 @@
+schema: kp-capability/v1
+id: plan-refine
+kind: skill
+flavor: 1
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude codex
+# Flavor-1 homegrown plan-hardening framework (RISEN + TIDD-EC + CO-STAR). Sibling of
+# prompt-architect (its framework library) and stacks with swarm (which consumes the
+# four-test methodology as review doctrine). Ambient auto-trigger retained (no
+# disable-model-invocation). Related capabilities are declared in SKILL.md "Related skills".

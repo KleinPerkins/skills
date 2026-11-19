@@ -1,0 +1,17 @@
+schema: kp-capability/v1
+id: prompt-architect
+kind: skill
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor codex
+provenance_source: "github.com/ckelsoe/prompt-architect"
+provenance_ref: "v3.2.2"
+provenance_trust: "vetted"
+# Flavor-2 snapshot model: working copy = upstream@v3.2.2 with local modifications
+# (chaos-labs subscription frontmatter in SKILL.md + locally-authored MAP.md). The
+# tracked snapshot is the SOT for what the orchestrator vendors downstream.
+# `install.sh --refresh` fetches upstream and reports drift but does NOT auto-apply
+# (would clobber local mods). Exposure follows the `expose:` field above.

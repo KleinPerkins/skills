@@ -1,0 +1,106 @@
+{
+  "schema": "codex-work-qualification-fixtures/v1",
+  "max_started_workers": 16,
+  "fixtures": [
+    {
+      "id": "d0-extract",
+      "band": 0,
+      "prompt": "From rows [{id:7,status:pass},{id:2,status:fail},{id:9,status:fail},{id:1,status:pass}], return the failing ids in ascending order. Output JSON with key ids only.",
+      "expected": {
+        "ids": [
+          2,
+          9
+        ]
+      },
+      "allow_rationale": false
+    },
+    {
+      "id": "d0-count",
+      "band": 0,
+      "prompt": "Apply the supplied rule: total = sum(count) only for enabled rows. Rows: (enabled=true,count=4),(enabled=false,count=20),(enabled=true,count=6),(enabled=true,count=0). Output JSON with key total only.",
+      "expected": {
+        "total": 10
+      },
+      "allow_rationale": false
+    },
+    {
+      "id": "d1-boundary",
+      "band": 1,
+      "prompt": "A reservation is active at time t when start <= t < end. Rows A:[0,5), B:[5,10), C:[3,7). Return active ids in alphabetic order at t=5 and t=10. Output JSON with keys at5 and at10.",
+      "expected": {
+        "at5": [
+          "B",
+          "C"
+        ],
+        "at10": []
+      },
+      "allow_rationale": false
+    },
+    {
+      "id": "d1-normalize",
+      "band": 1,
+      "prompt": "Design and apply stable deduplication for labels: strip surrounding ASCII spaces, lowercase ASCII letters, discard empty results, preserve first normalized occurrence. Inputs: [\"  Bee\", \"ant \", \"BEE\", \" \", \"Ant\", \"cat\"]. Return JSON with key labels only.",
+      "expected": {
+        "labels": [
+          "bee",
+          "ant",
+          "cat"
+        ]
+      },
+      "allow_rationale": false
+    },
+    {
+      "id": "d2-race",
+      "band": 2,
+      "prompt": "Diagnose this synthetic lost-update trace: counter=0; worker A reads 0; B reads 0; A writes 1; B writes 1. Choose every fix that guarantees a final counter of 2 for both increments: lock-read-modify-write, lock-write-only, atomic-increment, retry-on-CAS-failure, sleep-before-write. CAS retries the full read/compute/compare exchange. Return JSON: observed (number), expected (number), fixes (alphabetically sorted chosen labels).",
+      "expected": {
+        "observed": 1,
+        "expected": 2,
+        "fixes": [
+          "atomic-increment",
+          "lock-read-modify-write",
+          "retry-on-CAS-failure"
+        ]
+      },
+      "allow_rationale": false
+    },
+    {
+      "id": "d2-transaction",
+      "band": 2,
+      "prompt": "An at-least-once delivery can crash after applying a debit but before recording its deduplication key. Choose all required properties for exactly-once durable debit effect on retry: atomic-debit-and-key, unique-dedup-key, transactional-retry-check, random-new-key-per-retry, acknowledge-before-commit. Every retry carries the original key and the database supports serializable transactions. Return JSON with requirements sorted alphabetically and duplicate_effect_possible_without_atomicity as boolean.",
+      "expected": {
+        "requirements": [
+          "atomic-debit-and-key",
+          "transactional-retry-check",
+          "unique-dedup-key"
+        ],
+        "duplicate_effect_possible_without_atomicity": true
+      },
+      "allow_rationale": false
+    },
+    {
+      "id": "d3-consistency",
+      "band": 3,
+      "prompt": "Choose a design for a synthetic inventory allocator across two regions. Requirements: never allocate the same last unit twice; partitions must not invent stock; completed allocation survives one node failure; requests may be refused during a partition; cross-region latency is secondary. Candidate P: independent regional last-writer-wins counters. Q: linearizable consensus-backed allocation, idempotency key and durable quorum commit. R: asynchronous replication with retries and no deduplication. Return JSON with choice (P/Q/R), partition_policy (refuse-without-quorum/always-accept), acknowledgement (after-durable-quorum/before-replication), retry_identity (stable/new), plus rationale (one sentence).",
+      "expected": {
+        "choice": "Q",
+        "partition_policy": "refuse-without-quorum",
+        "acknowledgement": "after-durable-quorum",
+        "retry_identity": "stable"
+      },
+      "allow_rationale": true
+    },
+    {
+      "id": "d3-migration",
+      "band": 3,
+      "prompt": "Choose a safe migration strategy for a synthetic service: old clients require field A; new clients need B derived from A; deployment and backfill are not atomic; rollback must preserve old-client writes; deletion of A is forbidden until old clients retire and convergence is measured. Candidate X deletes A immediately after deploying new readers. Y expands schema, deploys compatible writes, backfills idempotently, verifies convergence and old-client retirement, then contracts. Z overwrites the database from a snapshot while live writes continue. Return JSON: choice (X/Y/Z), backfill (idempotent/overwrite), contract_gate (retirement-and-convergence/deploy-complete), rollback_preserves_A (boolean), plus rationale (one sentence).",
+      "expected": {
+        "choice": "Y",
+        "backfill": "idempotent",
+        "contract_gate": "retirement-and-convergence",
+        "rollback_preserves_A": true
+      },
+      "allow_rationale": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "save-game-journal-aborted/v1",
+  "title": "save-game-journal-aborted/v1",
+  "description": "Append-only recovery-journal phase file written when recovery finds a prepared operation whose expected old digest no longer matches current state. current.json is left untouched; the caller rebuilds from live state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "operation_id", "workstream_key", "created_at", "reason", "old_digest", "attempted_new_digest"],
+  "properties": {
+    "schema": { "type": "string", "enum": ["save-game-journal-aborted/v1"] },
+    "operation_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
+    "workstream_key": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "created_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+    "reason": {
+      "type": "string",
+      "enum": ["stale_current_digest", "recovery_conflict", "privacy_block", "authority_conflict", "other"]
+    },
+    "old_digest": { "type": "string", "pattern": "^([a-f0-9]{64}|none)$" },
+    "attempted_new_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

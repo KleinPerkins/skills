@@ -1,0 +1,12 @@
+schema: kp-capability/v1
+id: update-skills
+kind: skill
+flavor: 1
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude
+provenance_source: ""
+provenance_ref: ""
+provenance_trust: ""

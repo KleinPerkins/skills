@@ -1,0 +1,245 @@
+{
+  "authority": {
+    "adr_sha256": "61fb64d013d247e1135de53f8712ca76390e3c7f9671217a48097a7ecf356b86",
+    "dev_revision": "14fa5f95fe86178f32e966cb747ab9c884f4b92b",
+    "prerequisite_reconciliation": "Dev PR 376 merged the source-pending ledger prerequisites; this skills-project native managed worktree resolves its earlier attachment blocker. Frozen acceptance records unchanged.",
+    "source_owner_assignment": "explicit native skills-project implementation assignment"
+  },
+  "cleanup": {
+    "active_worktree": "retained for delivery; no archive or AWA Close",
+    "delegated_resources": "none created; all result-critical workers joined",
+    "generated_native_dispatch_cache": "removed",
+    "native_test_fixture": "owner cleanup gate passed",
+    "owned_temporary_roots_removed": [
+      "/private/tmp/int009-canary",
+      "/private/tmp/int009-test-privacy"
+    ],
+    "primary_and_concurrent_work": "preserved; final live status check still required",
+    "temporary_canary_inputs": "removed; exact owned directory absence verified",
+    "test_privacy_shim": "removed; exact owned directory absence verified"
+  },
+  "delivery": {
+    "activation": "not performed",
+    "downstream_distribution": "not performed",
+    "followup_record": "PR body and final report carry later exact-head checks and verified merge evidence",
+    "merged_revision": null,
+    "model_bootstrap_exception": "canary passed for request acceptance/result; INT-009 source merge pending before expiry",
+    "pr": null,
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "state": "source committed; evidence snapshot before PR delivery",
+    "workspace_bootstrap_exception": "remains until INT-007B plus native workspace canary"
+  },
+  "handoff": {
+    "activation_authority": "INT-007B and later owner gates remain separate; no AWA qualification follows",
+    "interface": "Pin the observed merged skills revision; invoke global/rules/subagent-orchestration/native_dispatch.py source-digest, plan --input PATH, observe --input PATH, and refresh --input PATH. NATIVE-DISPATCH.md documents the closed input contracts. Supply fresh native evidence each session/contract change.",
+    "owner": "KleinPerkins/dev",
+    "remaining_limits": [
+      "Default economy unavailable without an explicit approved override",
+      "Execution model/effort and active host build not independently acknowledged",
+      "Historical evidence with unknown build is not a current qualification under the shared current() predicate; collect fresh host evidence at activation",
+      "No actual native model-availability rejection or worker/server failure observed; corresponding transition paths covered by fixtures",
+      "No Cursor-native canary in this Codex chat",
+      "No paired performance/quality measurements",
+      "After model-bootstrap expiry, those temporary pairs are no longer independent authority for force mode; new forced choices require an actual user override or owner-approved mapping."
+    ],
+    "task": "INT-007B"
+  },
+  "measurement": {
+    "adapter_samples": 0,
+    "baseline_attempts": 0,
+    "candidate_runs": 0,
+    "cold_start_samples": 0,
+    "host_build": null,
+    "monetary_cost": null,
+    "native_execution_model": null,
+    "native_tokens": null,
+    "performance_outcome": "unavailable; not measured; frozen methodology unchanged"
+  },
+  "native_canary": {
+    "acknowledged_execution_identity": null,
+    "acknowledged_worker": "/root/native_canary",
+    "default_economy": "unavailable; no current policy candidate offered; no automatic preference change",
+    "duplicate_name_outcome": "native tool rejected: agent path already exists; no worker started",
+    "duplicate_rejection_class": "invalid-request, not model availability",
+    "execution_matches_request": null,
+    "failure_observation_has_model_retry": false,
+    "fixture_case": "QW-03 data used for standalone canary only; not a paired workload attempt",
+    "frozen_fixture_sha256": "7be69754edb941419323d8b08419d1f450af116271e00be7db2b3e37c0d5ec2e",
+    "native_dispatch": {
+      "fork_turns": "none",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low"
+    },
+    "offered_evidence": {
+      "contract_sha256": "fd36fd09e88455ab3ca0ed2a2cf4060067b212b07a93fb7b1af3c90b6921875a",
+      "host": "codex",
+      "host_build": null,
+      "models": [
+        {
+          "efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra"
+          ],
+          "fixed_behavior": null,
+          "model": "gpt-6.1-sol"
+        },
+        {
+          "efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra"
+          ],
+          "fixed_behavior": null,
+          "model": "gpt-6-astra"
+        },
+        {
+          "efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra"
+          ],
+          "fixed_behavior": null,
+          "model": "gpt-6-sol"
+        },
+        {
+          "efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "fixed_behavior": null,
+          "model": "gpt-6-luna"
+        },
+        {
+          "efforts": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra"
+          ],
+          "fixed_behavior": null,
+          "model": "gpt-5.6-sol"
+        }
+      ],
+      "observed_at": "2026-10-28T02:15:46.867225+00:00",
+      "origin": "native-tool",
+      "schema": "native-offers/v1",
+      "session_id": "01a18033-14be-7b52-87d8-7449cdb11adb",
+      "source_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+      "surface": "local-macos-desktop",
+      "tool": "collaboration.spawn_agent"
+    },
+    "positive_result_matches": true,
+    "positive_result_sha256": "589ef243338d13aa94f3aa8fa050c6c0c003313338b60cc5828844778eeae6c1",
+    "post_start_command_exit": 23,
+    "post_start_outcome": "synthetic task-command failure; native worker/server failure not observed",
+    "preview": {
+      "account_bound": "existing native Codex task account; no service/API account access",
+      "affected_sessions": [
+        "current chat",
+        "one mechanical child worker"
+      ],
+      "authorization": "approved INT-009 bounded canary and Appendix A mechanical override; no destructive or service-write operation",
+      "owned_temporary_root": "/private/tmp/int009-canary",
+      "registration_delta": [],
+      "request_bound": "one successful spawn, one follow-up command, one duplicate-name request rejected before launch",
+      "resource_bound": "synthetic computation and one immediate failing Python command; no child files/services",
+      "rollback": "remove only owned temporary inputs after durable non-secret evidence; no settings postimages to restore",
+      "user_setting_delta": []
+    },
+    "requested": {
+      "effort": "low",
+      "family": "gpt-6-luna",
+      "fixed_behavior": null,
+      "provider": "openai"
+    },
+    "warning": "explicit-override",
+    "worker_completion": "joined; completed; no temporary resources created"
+  },
+  "observed_at": "2026-10-28T02:21:09+00:00",
+  "owner": "KleinPerkins/skills",
+  "review": {
+    "acknowledged_execution_identity": null,
+    "evidence_outcome": "independently reviewed; bounded functional canary sufficient after merge/cleanup; unknown-build record cannot become current host qualification",
+    "outcome": "no remaining blocking source findings; 81 tests independently passed",
+    "relationship": "independent agent, same provider; not different-provider proof or repository App approval",
+    "requested_effort": "high",
+    "requested_model": "gpt-6.1-sol",
+    "resources_created": false,
+    "worker": "/root/independent_review"
+  },
+  "schema": "skills-int009-execution/v1",
+  "scope": "INT-009 source and bounded native dispatch canary",
+  "source": {
+    "binding_schema": "native-model-bindings/v1",
+    "catalog_preferences_changed": false,
+    "installed_rule_changed": false,
+    "installer_changed": false,
+    "interface": "global/rules/subagent-orchestration/native_dispatch.py",
+    "metadata_changed": false,
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "protected_automation_changed": false,
+    "revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "swarm_changed": false,
+    "tree": "4bcc0dee02e2cd9e1cb65e1b39aba5cc378f6a61"
+  },
+  "validation": {
+    "doc_warden": {
+      "accepted_adrs": "CONFORMANT; unchanged",
+      "command": "doc-warden.sh check active-skills-worktree",
+      "overall": "DRIFTED",
+      "preexisting_unchanged_plans": [
+        "docs/plans/agent-route-feedback-loop-v1.md",
+        "docs/plans/dev-main-sync-global-capability-v5.md",
+        "docs/plans/subagent-orchestration-sibling-assets-v1.md"
+      ],
+      "semantic_changes": false
+    },
+    "full_owner_gate": {
+      "adaptation": "Disposable Python subprocess shim replaces only /bin/ps -axo pid=,ppid=,command= with pid=,ppid=. Existing native fixture consumes only those first two fields; assertions unchanged. Final routing edits were then rerun with 81 passing tests.",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/private/tmp/int009-test-privacy bash .github/scripts/verify-skills.sh",
+      "exit_code": 0,
+      "initial_restricted_run": "failed only at the existing macOS native gate because nested sandbox execution was denied",
+      "result": "verify-skills: OK (global + local + lock + capability-local)"
+    },
+    "normal_precommit_hooks": "passed for source commit",
+    "red_green": "Independent review defects reproduced by failing regression tests before fixes, then passed.",
+    "routing_tests": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s global/rules/subagent-orchestration/tests -p 'test_*.py'",
+      "includes": "44 unchanged legacy cases; 37 native cases, including all nonempty synthetic Cursor offered-list subsets",
+      "passed": 81
+    },
+    "swarm_tests": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s global/skills/swarm/tests -p 'test_*.py'",
+      "passed": 122
+    }
+  },
+  "workspace": {
+    "awa_protection": "unqualified",
+    "awa_registration": false,
+    "base_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "branch": "feat/int009-native-model-dispatch",
+    "common_dir": "/Users/laurence.duggan/dev/capabilities/skills/.git",
+    "entry": "approved scoped bootstrap",
+    "git_dir": "/Users/laurence.duggan/dev/capabilities/skills/.git/worktrees/skills",
+    "remote_identity": "KleinPerkins/skills",
+    "repository_id": 1275604090,
+    "root": "/Users/laurence.duggan/.codex/worktrees/83a6/skills",
+    "writer_control": "sole source writer, distinct index, explicit lock; all delegated design/review work read-only",
+    "writer_session": "codex-int009-01a18033-root"
+  }
+}

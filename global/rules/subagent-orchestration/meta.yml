@@ -1,0 +1,13 @@
+schema: kp-capability/v1
+id: subagent-orchestration
+kind: rule
+flavor: 1
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor
+# Cursor consumes the rule directly; other clients use their host's rule mirror.
+# Runtime sibling assets co-installed beside the rule payload (kp-capability/v1 optional `assets:`,
+# ADR 0002). Consumers read the catalog from the installed rules dir or source co-location.
+assets: [model-tiers.json]

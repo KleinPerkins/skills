@@ -1,0 +1,39 @@
+schema: kp-capability/v1
+id: operator-voice
+kind: tool
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+shape: snapshot
+sync_policy: portable-payload-snapshot
+expose: cursor claude codex
+provenance_source: "github.com/KleinPerkins/operator-voice"
+provenance_ref: "367ced95195d16a1722f167a1866af9cb03d6c24"
+provenance_trust: "vetted"
+# Flavor-2 snapshot binding (SSP + GCB) — build plan (`operator-voice-toolkit-build-plan.md`)
+# §8.1: "not an AWA-style pointer-only downstream package. It pins the release and carries a
+# deterministic, personal-data-free portable runtime payload generated from that same release so
+# the orchestrator can vendor working bytes into a downstream governed repository without exposing
+# the private SSP repo or any operator data." Unlike `global/tools/awa` (`shape:
+# release-descriptor`, clones the SSP repo at install time), this shelf is `shape: snapshot`
+# because its `payload/` directory below carries the ACTUAL runtime bytes: a deterministic
+# snapshot of `operator_voice`'s source tree at `provenance_ref`, produced by
+# `operator_voice.runtime.payload.build_portable_payload` (allowlist .py/.md/.json/.toml only;
+# hard-refuses if a database/keychain/env/key file is present anywhere in the source tree). Its
+# content digest is recorded in `payload/payload-manifest.json` and MUST match `payload_digest`
+# below — `install.sh --check` verifies this without any network access. `sync_policy` is a
+# free-text descriptive label here (verify-skills.sh does not constrain its values); it exists so
+# eco-orchestrator tooling can distinguish this shelf's real-bytes-embedded distribution model from
+# a pointer-only or record-only one at a glance.
+#
+# OVT carries `scope: global` from M1 (operator-voice-toolkit-build-plan.md, decision D22). As of
+# M5-B this shelf's release/receipt contract is GA and the WF1 registry record
+# (personal/ecosystem-orchestrator/config/registry.yml) is `enrolled` — see that repo's own
+# registry entry for the live enrollment reason/digest, never mirrored here to avoid a second,
+# driftable copy of the same fact. This binding itself performs no downstream write of any kind;
+# vendoring into any enrolled downstream repository is exclusively the sync orchestrator's own
+# governed job.
+payload_digest: "2cf212bd228a52336bbf926ea342182d4d738274fc29ae3cefec256a6638d163"
+payload_version: "0.1.15"

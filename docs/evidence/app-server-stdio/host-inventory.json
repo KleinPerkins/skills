@@ -1,0 +1,51 @@
+{
+  "app_build": "22943",
+  "binary_kind": "MACH_O_ARM64",
+  "binary_path": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+  "binary_sha256": "58a91f6ea19bea477ae3a2ec48d619f0039afe75d3476260747e11d201fa7cea",
+  "binary_version": "codex-cli 0.166.0-alpha.5.1",
+  "launcher_kind": "POSIX_SHELL_WRAPPER",
+  "launcher_path": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+  "launcher_sha256": "50ab38ba21d0d9f8346f32f41848382f15b556190f3c7a07e885a4fb73e379c8",
+  "limitations": [
+    "SCHEMA_ONLY",
+    "NATIVE_OFFERS_NOT_OBSERVED",
+    "PROVIDER_PROVENANCE_UNQUALIFIED",
+    "EXECUTION_NOT_STARTED",
+    "NO_ERROR_OR_ACK_MAPPING"
+  ],
+  "model_action": "NOT_STARTED",
+  "native_discovery": "NOT_OBSERVED",
+  "observed_on": "2026-10-31",
+  "profile_status": "UNQUALIFIED",
+  "protocol_manifest_sha256": "cc97e518bfce14f02a94a727ec2d2346014c5dad864ee8c61dcfcc29bc949a56",
+  "resolved_binary_schema_match": "BYTE_IDENTICAL_320_FILES",
+  "schema": "skills-app-server-read-only-inventory/v1",
+  "schema_files": 320,
+  "schema_generation": "PASSED_WITH_PATH_ALIAS_PERMISSION_WARNING",
+  "supported_fields": {
+    "model_rerouted": [
+      "threadId",
+      "turnId",
+      "fromModel",
+      "toModel",
+      "reason"
+    ],
+    "thread_start": [
+      "model",
+      "modelProvider",
+      "ephemeral"
+    ],
+    "thread_start_response": [
+      "model",
+      "modelProvider",
+      "thread"
+    ],
+    "turn_start": [
+      "threadId",
+      "input",
+      "model",
+      "effort"
+    ]
+  }
+}

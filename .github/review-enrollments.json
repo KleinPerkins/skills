@@ -1,0 +1,46 @@
+{
+  "schema": "g1-review-enrollments/v1",
+  "repository_id": 1461925043,
+  "enabled": false,
+  "producers": [
+    {
+      "id": "enrollment-24c0a5f2",
+      "enabled": true,
+      "origin_account": "origin-7612de79",
+      "github_user_id": 49759187,
+      "instructions_sha256": "7efd718dd897e06155b8e49eca37d18b15fb1e47610d9cf4b2d26e294a99e10b",
+      "cli_version": "codex-cli 0.148.0",
+      "credential_store": "keyring",
+      "allowed_startup_notice_sha256": [
+        "b2fc6975a5637afa2ac999a3260fc7980db0be97b0474c7a8a14c57e18d4a6e1",
+        "de8c81bdbcbc27db4d16d6ea11b6463544d5351492a5b397d3d31af1fbc78ca3"
+      ],
+      "creation_adapter_sha256": "e3f4f9b46e102fdf174600a7dabe2298eae184ca6b41631f799398debf1b0127",
+      "capture_adapter_sha256": "c7078177e64c373a3fafaa03462708b8c89bffe3517973abe8268dc820efbb07"
+    },
+    {
+      "id": "enrollment-e876e8eb",
+      "enabled": true,
+      "origin_account": "origin-6a644d43",
+      "github_user_id": 49759187,
+      "instructions_sha256": "7efd718dd897e06155b8e49eca37d18b15fb1e47610d9cf4b2d26e294a99e10b",
+      "cli_version": "codex-cli 0.148.0",
+      "credential_store": "file",
+      "allowed_startup_notice_sha256": [
+        "b2fc6975a5637afa2ac999a3260fc7980db0be97b0474c7a8a14c57e18d4a6e1"
+      ],
+      "creation_adapter_sha256": "e3f4f9b46e102fdf174600a7dabe2298eae184ca6b41631f799398debf1b0127",
+      "capture_adapter_sha256": "c7078177e64c373a3fafaa03462708b8c89bffe3517973abe8268dc820efbb07"
+    }
+  ],
+  "governance": {
+    "phase": "clean-successor-preparation-writer-off",
+    "repository": "KleinPerkins/skills",
+    "authority": "Prepared combined existing WORK/PERSONAL source mapping; no new account qualification. Global enrollment and App writer remain disabled.",
+    "publication": "Empty private identity only; no source upload, visibility/name swap, downstream pin or runtime authorization.",
+    "future_name": "KleinPerkins/skills only after separately accepted consumer reconciliation and cutover."
+  },
+  "repository_names": [
+    "KleinPerkins/skills"
+  ]
+}

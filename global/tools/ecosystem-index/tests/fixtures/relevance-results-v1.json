@@ -1,0 +1,15 @@
+{
+  "baseline": {
+    "reason": "No ecosystem-index implementation existed when the corpus was frozen.",
+    "status": "unavailable"
+  },
+  "candidate": {
+    "cases": 27,
+    "implementation_scope": "Includes authorization-binding, observed-exclusion, tombstone, clock and owner-context review fixes. Corpus/ranking rubric unchanged.",
+    "passed": 27,
+    "rubric": "All exact IDs, expected top-three owners and ambiguity/none labels pass."
+  },
+  "corpus_sha256": "22307e06c568b4e20d2a5d7fe422209713d18ace1e22a44040691ac4e64feb72",
+  "schema": "ecosystem-index/relevance-results/v1",
+  "scope": "Synthetic fixture relevance only. No real-world ranking, latency or quality claim. Recompute through test_frozen_corpus_candidate."
+}

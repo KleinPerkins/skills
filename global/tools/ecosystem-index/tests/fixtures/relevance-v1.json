@@ -1,0 +1,278 @@
+{
+  "cases": [
+    {
+      "query": "bookkeeper",
+      "status": "matches",
+      "top3": [
+        "repository:atlas"
+      ]
+    },
+    {
+      "query": "pager",
+      "status": "matches",
+      "top3": [
+        "repository:beacon"
+      ]
+    },
+    {
+      "query": "scratchpad",
+      "status": "matches",
+      "top3": [
+        "repository:local"
+      ]
+    },
+    {
+      "query": "old-vault",
+      "status": "matches",
+      "top3": [
+        "repository:renamed"
+      ]
+    },
+    {
+      "query": "rainwatch",
+      "status": "matches",
+      "top3": [
+        "capability:forecast"
+      ]
+    },
+    {
+      "query": "billdesk",
+      "status": "matches",
+      "top3": [
+        "capability:invoice"
+      ]
+    },
+    {
+      "query": "snapcopy",
+      "status": "matches",
+      "top3": [
+        "capability:backup-a"
+      ]
+    },
+    {
+      "query": "mirrorcopy",
+      "status": "matches",
+      "top3": [
+        "capability:backup-b"
+      ]
+    },
+    {
+      "query": "ledger reconciliation",
+      "status": "matches",
+      "top3": [
+        "repository:atlas"
+      ]
+    },
+    {
+      "query": "alert delivery",
+      "status": "matches",
+      "top3": [
+        "repository:beacon"
+      ]
+    },
+    {
+      "query": "offline notes",
+      "status": "matches",
+      "top3": [
+        "repository:local"
+      ]
+    },
+    {
+      "query": "archive restoration",
+      "status": "matches",
+      "top3": [
+        "repository:renamed"
+      ]
+    },
+    {
+      "query": "billing receipts",
+      "status": "matches",
+      "top3": [
+        "capability:invoice"
+      ]
+    },
+    {
+      "exact": "repository:atlas",
+      "query": "repository:atlas",
+      "status": "matches"
+    },
+    {
+      "exact": "repository:local",
+      "query": "repository:local",
+      "status": "matches"
+    },
+    {
+      "exact": "repository:renamed",
+      "query": "repository:renamed",
+      "status": "matches"
+    },
+    {
+      "exact": "clone:atlas-a",
+      "query": "clone:atlas-a",
+      "status": "matches"
+    },
+    {
+      "exact": "clone:atlas-b",
+      "query": "clone:atlas-b",
+      "status": "matches"
+    },
+    {
+      "exact": "worktree:atlas-main",
+      "query": "worktree:atlas-main",
+      "status": "matches"
+    },
+    {
+      "exact": "worktree:atlas-topic",
+      "query": "worktree:atlas-topic",
+      "status": "matches"
+    },
+    {
+      "exact": "capability:backup-a",
+      "query": "capability:backup-a",
+      "status": "matches"
+    },
+    {
+      "query": "Backup",
+      "status": "ambiguous",
+      "top3": []
+    },
+    {
+      "query": "snapshot archive backup",
+      "status": "ambiguous",
+      "top3": []
+    },
+    {
+      "query": "weather prediction tool",
+      "status": "ambiguous",
+      "top3": []
+    },
+    {
+      "query": "quantum giraffe",
+      "status": "none",
+      "top3": []
+    },
+    {
+      "query": "zzzzzz",
+      "status": "none",
+      "top3": []
+    },
+    {
+      "query": "",
+      "status": "none",
+      "top3": []
+    }
+  ],
+  "entities": [
+    {
+      "aliases": [
+        "bookkeeper"
+      ],
+      "description": "Ledger reconciliation and settlement",
+      "id": "repository:atlas",
+      "kind": "repository",
+      "title": "Atlas Ledger"
+    },
+    {
+      "aliases": [
+        "pager"
+      ],
+      "description": "Alert delivery and notification policy",
+      "id": "repository:beacon",
+      "kind": "repository",
+      "title": "Beacon Alerts"
+    },
+    {
+      "aliases": [
+        "scratchpad"
+      ],
+      "description": "Offline notes without a remote",
+      "id": "repository:local",
+      "kind": "repository",
+      "title": "Local Notes"
+    },
+    {
+      "aliases": [
+        "old-vault"
+      ],
+      "description": "Archive restoration engine",
+      "id": "repository:renamed",
+      "kind": "repository",
+      "title": "Archive Engine"
+    },
+    {
+      "aliases": [
+        "rainwatch"
+      ],
+      "description": "Weather prediction tool",
+      "id": "capability:forecast",
+      "kind": "capability",
+      "title": "Forecast"
+    },
+    {
+      "aliases": [
+        "billdesk"
+      ],
+      "description": "Billing invoices and receipts",
+      "id": "capability:invoice",
+      "kind": "capability",
+      "title": "Invoice"
+    },
+    {
+      "aliases": [
+        "snapcopy"
+      ],
+      "description": "Snapshot archive backup",
+      "id": "capability:backup-a",
+      "kind": "capability",
+      "title": "Backup"
+    },
+    {
+      "aliases": [
+        "mirrorcopy"
+      ],
+      "description": "Snapshot archive backup",
+      "id": "capability:backup-b",
+      "kind": "capability",
+      "title": "Backup"
+    },
+    {
+      "aliases": [
+        "incidental"
+      ],
+      "description": "Weather prediction tool",
+      "id": "capability:decoy",
+      "kind": "capability",
+      "title": "Unrelated"
+    },
+    {
+      "aliases": [],
+      "description": "Ledger location",
+      "id": "clone:atlas-a",
+      "kind": "clone",
+      "title": "Atlas Clone A"
+    },
+    {
+      "aliases": [],
+      "description": "Ledger location",
+      "id": "clone:atlas-b",
+      "kind": "clone",
+      "title": "Atlas Clone B"
+    },
+    {
+      "aliases": [],
+      "description": "Ledger location",
+      "id": "worktree:atlas-main",
+      "kind": "worktree",
+      "title": "Atlas Main"
+    },
+    {
+      "aliases": [],
+      "description": "Ledger location",
+      "id": "worktree:atlas-topic",
+      "kind": "worktree",
+      "title": "Atlas Topic"
+    }
+  ],
+  "rubric": "Every expected ID in top three; exact IDs first; every status exact. Synthetic relevance only.",
+  "schema": "ecosystem-index/relevance/v1"
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "swarm-offline-fixture-result/v1",
+  "classification": "offline-deterministic",
+  "agent_evaluation": false,
+  "semantics": "Marker-scanner fixture only; runtime and serialized bytes are local harness measurements, not agent latency or token cost.",
+  "fixture": "benchmark_cases.json",
+  "cohorts": [
+    {
+      "name": "baseline-only",
+      "scanner_sets": 0,
+      "matched_material_markers": [
+        "contract-version-drift",
+        "stale-revision-shipping",
+        "unsafe-state-symlink"
+      ],
+      "material_marker_recall": 0.6,
+      "fixture_mutations": 0,
+      "observed_runtime_ms": 0.6514,
+      "serialized_scan_bytes": 372
+    },
+    {
+      "name": "1-scanner-sets",
+      "scanner_sets": 1,
+      "matched_material_markers": [
+        "contract-version-drift",
+        "stale-revision-shipping",
+        "unsafe-state-symlink"
+      ],
+      "material_marker_recall": 0.6,
+      "fixture_mutations": 0,
+      "observed_runtime_ms": 0.8784,
+      "serialized_scan_bytes": 747
+    },
+    {
+      "name": "4-scanner-sets",
+      "scanner_sets": 4,
+      "matched_material_markers": [
+        "contract-version-drift",
+        "missing-critical-redundancy",
+        "stale-revision-shipping",
+        "unsafe-state-symlink"
+      ],
+      "material_marker_recall": 0.8,
+      "fixture_mutations": 0,
+      "observed_runtime_ms": 1.5389,
+      "serialized_scan_bytes": 1217
+    },
+    {
+      "name": "8-scanner-sets",
+      "scanner_sets": 8,
+      "matched_material_markers": [
+        "contract-version-drift",
+        "implicit-push-authority",
+        "missing-critical-redundancy",
+        "stale-revision-shipping",
+        "unsafe-state-symlink"
+      ],
+      "material_marker_recall": 1.0,
+      "fixture_mutations": 0,
+      "observed_runtime_ms": 3.1602,
+      "serialized_scan_bytes": 1836
+    },
+    {
+      "name": "12-scanner-sets",
+      "scanner_sets": 12,
+      "matched_material_markers": [
+        "contract-version-drift",
+        "implicit-push-authority",
+        "missing-critical-redundancy",
+        "stale-revision-shipping",
+        "unsafe-state-symlink"
+      ],
+      "material_marker_recall": 1.0,
+      "fixture_mutations": 0,
+      "observed_runtime_ms": 3.3199,
+      "serialized_scan_bytes": 2448
+    }
+  ]
+}

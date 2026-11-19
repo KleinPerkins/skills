@@ -1,0 +1,143 @@
+[
+  {
+    "adapter_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "capability": "native-model-dispatch",
+    "check": "MOD-01-source-fixtures",
+    "evidence_ref": "docs/evidence/int009/execution.json",
+    "host": "fixture",
+    "host_build": null,
+    "limitations": [
+      "host-build-unavailable",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "not-activation",
+      "source-merge-pending",
+      "fixture-only"
+    ],
+    "observed_at": "2026-10-28T02:21:09+00:00",
+    "outcome": "pass",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "rollback_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "surface": "fixture"
+  },
+  {
+    "adapter_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "capability": "native-model-dispatch",
+    "check": "MOD-02-native-request-and-result",
+    "evidence_ref": "docs/evidence/int009/execution.json",
+    "host": "codex",
+    "host_build": null,
+    "limitations": [
+      "host-build-unavailable",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "not-activation",
+      "source-merge-pending"
+    ],
+    "observed_at": "2026-10-28T02:21:09+00:00",
+    "outcome": "pass",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "rollback_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "surface": "local-macos-desktop"
+  },
+  {
+    "adapter_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "capability": "native-model-dispatch",
+    "check": "MOD-02-native-invalid-request-rejection",
+    "evidence_ref": "docs/evidence/int009/execution.json",
+    "host": "codex",
+    "host_build": null,
+    "limitations": [
+      "host-build-unavailable",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "not-activation",
+      "source-merge-pending"
+    ],
+    "observed_at": "2026-10-28T02:21:09+00:00",
+    "outcome": "pass",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "rollback_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "surface": "local-macos-desktop"
+  },
+  {
+    "adapter_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "capability": "native-model-dispatch",
+    "check": "MOD-02-post-start-task-command-failure",
+    "evidence_ref": "docs/evidence/int009/execution.json",
+    "host": "codex",
+    "host_build": null,
+    "limitations": [
+      "host-build-unavailable",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "not-activation",
+      "source-merge-pending"
+    ],
+    "observed_at": "2026-10-28T02:21:09+00:00",
+    "outcome": "pass",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "rollback_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "surface": "local-macos-desktop"
+  },
+  {
+    "adapter_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "capability": "native-model-dispatch",
+    "check": "MOD-02-native-model-availability-rejection",
+    "evidence_ref": "docs/evidence/int009/execution.json",
+    "host": "codex",
+    "host_build": null,
+    "limitations": [
+      "host-build-unavailable",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "not-activation",
+      "source-merge-pending",
+      "native-not-observed"
+    ],
+    "observed_at": "2026-10-28T02:21:09+00:00",
+    "outcome": "unknown",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "rollback_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "surface": "local-macos-desktop"
+  },
+  {
+    "adapter_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "capability": "native-model-dispatch",
+    "check": "MOD-02-native-worker-server-failure",
+    "evidence_ref": "docs/evidence/int009/execution.json",
+    "host": "codex",
+    "host_build": null,
+    "limitations": [
+      "host-build-unavailable",
+      "model-execution-unverified",
+      "metrics-unavailable",
+      "not-activation",
+      "source-merge-pending",
+      "native-not-observed"
+    ],
+    "observed_at": "2026-10-28T02:21:09+00:00",
+    "outcome": "unknown",
+    "owner": "KleinPerkins/skills",
+    "payload_sha256": "2e355af2666b52a56d7dd8d19c3c925dcede36b666b9c0a15426b8f9bb546ed2",
+    "rollback_revision": "709adf8ae565ae36a668f514f795158213635fa1",
+    "schema": "interoperability/qualification/v1",
+    "source_revision": "77f3336449feaefe88124bce4c46c43701eb0bb0",
+    "surface": "local-macos-desktop"
+  }
+]

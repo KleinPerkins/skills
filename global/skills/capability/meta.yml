@@ -1,0 +1,13 @@
+schema: kp-capability/v1
+id: capability
+kind: skill
+flavor: 1
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude codex
+# Flavor-1 homegrown playbook: the canonical, environment-agnostic PM loop for operating
+# capabilities through an agent (intent -> confirm -> act via the environment's verbs ->
+# verify -> narrate -> self-repair -> escalate). Names no specific downstream consumer
+# (INV-zero-link); environment-specific verb bindings live on the consumer side.

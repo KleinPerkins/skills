@@ -1,0 +1,165 @@
+{
+  "schema": "skills/native-xlsx-provider-observation/v1",
+  "observed_at": "2026-11-02T17:11:30.808Z",
+  "capability": "xlsx",
+  "destination_scope": "personal Codex only",
+  "host": {
+    "build": "23880",
+    "version": "26.1027.51404",
+    "cli_sha256": "58a91f6ea19bea477ae3a2ec48d619f0039afe75d3476260747e11d201fa7cea"
+  },
+  "original_contract": {
+    "repository": "KleinPerkins/skills",
+    "revision": "f2301ce13d50e471ff1e8ae51fb5a41bf47eaf0a",
+    "path": "global/skills/xlsx",
+    "git_subtree": "f2dd23f2083b77376080e7c8cb2185b9ea9e3e1c",
+    "tracked_payload_files": 55,
+    "inventory_sha256": "f2b68bde49ba592ec16f7197b6afac15349eadc533671f98a390e5af84229bba",
+    "source_clean": true
+  },
+  "provider": {
+    "plugin_id": "spreadsheets@openai-primary-runtime",
+    "version": "26.1026.10807",
+    "skill_name": "spreadsheets:Spreadsheets",
+    "skill_sha256": "25da47cec10100f2a08df9feaa252864a738816aca30562ae6ba111d7b1eb48e",
+    "module": "@oai/artifact-tool",
+    "already_installed": true,
+    "enabled_native_discovery": true,
+    "extra_roots": false
+  },
+  "functional_observation": {
+    "synthetic_inputs_only": true,
+    "operation_groups_passed": 10,
+    "tests": [
+      {
+        "operation": "create_typed_inputs_formulas_and_chart",
+        "passed": true,
+        "details": {
+          "sheets": 2,
+          "chartSeries": 1,
+          "synthetic": true
+        }
+      },
+      {
+        "operation": "keyed_cross_sheet_calculation",
+        "passed": true,
+        "details": {
+          "total": 92,
+          "details": [
+            40,
+            36,
+            16
+          ],
+          "input_order_differs_from_output": true
+        }
+      },
+      {
+        "operation": "input_change_recalculates",
+        "passed": true,
+        "details": {
+          "initial": 92,
+          "changed": 116
+        }
+      },
+      {
+        "operation": "zero_input_is_valid",
+        "passed": true,
+        "details": {
+          "total": 56
+        }
+      },
+      {
+        "operation": "blank_input_remains_visible",
+        "passed": true,
+        "details": {
+          "result": "Missing input"
+        }
+      },
+      {
+        "operation": "second_driver_recalculates",
+        "passed": true,
+        "details": {
+          "total": 98
+        }
+      },
+      {
+        "operation": "restored_inputs_and_unchanged_formulas",
+        "passed": true,
+        "details": {
+          "total": 92
+        }
+      },
+      {
+        "operation": "CSV_quoted_fields_and_typed_calculation",
+        "passed": true,
+        "details": {
+          "total": 5
+        }
+      },
+      {
+        "operation": "export_import_and_narrow_input_edit",
+        "passed": true,
+        "details": {
+          "changed": 100,
+          "restored": 92,
+          "formulas_preserved": true,
+          "chart_preservation": "pending independent saved-package verification"
+        }
+      },
+      {
+        "operation": "formula_error_scan_and_independent_expected_results",
+        "passed": true,
+        "details": {
+          "formulaCellsChecked": 13,
+          "errors": 0,
+          "total": 92
+        }
+      }
+    ],
+    "formula_cells": 13,
+    "saved_formula_cached_values_verified": true,
+    "zero_saved_formula_errors": true,
+    "typed_numeric_and_date_values_preserved": true,
+    "input_formatting_validation_and_conditional_formatting_preserved": true,
+    "native_chart_internal_relationship_chain_verified": true,
+    "native_chart_source_references_and_colors_preserved": true,
+    "native_chart_point_caches_populated": false,
+    "actual_saved_file_reopened_recalculated_and_rendered": true,
+    "both_sheets_visually_reviewed": true,
+    "final_fixture_sha256": "f45d082e151d8d0e6177681d2f777a892fadb9fa8276b4d47d0a9daa68ec5457",
+    "image_sha256": {
+      "seed-plan.png": "68a391265517512c44c1029e19277e8d10cf2ea2d98b279c030182b6aef178a7",
+      "seed-inputs.png": "e62e88f3f00613d9ab1be227066d03530547b4b1264fc0491a9ef40075401da8",
+      "saved-seed-plan.png": "68a391265517512c44c1029e19277e8d10cf2ea2d98b279c030182b6aef178a7",
+      "saved-seed-inputs.png": "e62e88f3f00613d9ab1be227066d03530547b4b1264fc0491a9ef40075401da8"
+    },
+    "private_initial_driver_sha256": "febd308b77fc113540ed4f3755b1c1b459790373014f444e0b3e81c9ddb9a054",
+    "private_saved_file_verifier_sha256": "6788b35064377f8ed1c6674de6abe04abc8c19e1918c33c3dc19d7213abde132"
+  },
+  "checker_correction": {
+    "mistake": "Assumed conventional xl/charts directory instead of following package relationships.",
+    "correction": "Followed worksheet-to-drawing-to-chart relationships to the actual valid xl/drawings/charts/chart1.xml part.",
+    "missing_chart_conclusion_withdrawn": true,
+    "fixture_was_not_modified": true
+  },
+  "safety": {
+    "new_installations": 0,
+    "configuration_or_link_changes": 0,
+    "new_model_workers": 0,
+    "threads_or_turns_created": 0,
+    "external_requests": 0,
+    "real_workbooks_or_live_Excel_access": false,
+    "Affirm_or_work_access": false,
+    "source_pin_or_original_migration_records_modified": false
+  },
+  "unqualified_operations": [
+    "Artifact Tool calculation and XLSX interchange only; desktop Excel/LibreOffice recalculation is unqualified.",
+    "Macros, external workbook links, native Data Tables, PivotTables, signatures and legacy XLS binary formats are unqualified.",
+    "Chart point caches are empty. Exact source-cell references and rendering after reopening the actual final XLSX file passed; desktop chart calculation is unqualified."
+  ],
+  "authority_limits": [
+    "Observation does not authorize installing or enabling an absent or disabled provider.",
+    "Source acceptance supports only the bounded personal Codex alternative; destination matching and functional acceptance remain separate.",
+    "No other capability, client, service, model routing or whole migration completion is established."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "entrypoint_module": "operator_voice.interfaces.cli",
+  "package": "operator_voice",
+  "python_min": "3.12",
+  "requirements_file": "operator_voice/runtime/requirements.json",
+  "runtime": "python",
+  "schema": "tool-runtime-contract/v1"
+}

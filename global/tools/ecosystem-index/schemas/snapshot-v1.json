@@ -1,0 +1,559 @@
+{
+  "$defs": {
+    "edge": {
+      "additionalProperties": false,
+      "properties": {
+        "classification": {
+          "enum": [
+            "declared",
+            "observed",
+            "inferred"
+          ]
+        },
+        "pointer": {
+          "maxLength": 512,
+          "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "type": "string"
+        },
+        "predicate": {
+          "enum": [
+            "belongs_to",
+            "depends_on",
+            "related_to"
+          ]
+        },
+        "target": {
+          "maxLength": 256,
+          "pattern": "^(repository|capability|clone|worktree):[A-Za-z0-9._:/-]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "predicate",
+        "target",
+        "classification",
+        "pointer"
+      ],
+      "type": "object"
+    },
+    "entity": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "repository"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "pattern": "^repository:"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "capability"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "pattern": "^capability:"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "clone"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "pattern": "^clone:"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "worktree"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "pattern": "^worktree:"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "conflicts": {
+          "items": {
+            "enum": [
+              "title",
+              "description",
+              "aliases",
+              "pointers",
+              "edges",
+              "identity",
+              "location",
+              "parent"
+            ]
+          },
+          "maxItems": 7,
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 256,
+          "pattern": "^(repository|capability|clone|worktree):[A-Za-z0-9._:/-]+$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "repository",
+            "clone",
+            "worktree",
+            "capability"
+          ]
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 1000,
+          "type": "array"
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "pattern": "^(repository|capability|clone|worktree):[A-Za-z0-9._:/-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "parent",
+        "observations",
+        "conflicts"
+      ],
+      "type": "object"
+    },
+    "observation": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "title"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "description"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "maxLength": 512,
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "aliases"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "items": {
+                  "maxLength": 256,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "pointers"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "items": {
+                  "$ref": "#/$defs/pointer"
+                },
+                "maxItems": 100,
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "edges"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "items": {
+                  "$ref": "#/$defs/edge"
+                },
+                "maxItems": 100,
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "identity"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "field": {
+                "const": "location"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "declared",
+            "observed",
+            "inferred"
+          ]
+        },
+        "digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "field": {
+          "enum": [
+            "title",
+            "description",
+            "aliases",
+            "pointers",
+            "edges",
+            "identity",
+            "location"
+          ]
+        },
+        "observed_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "pointer": {
+          "maxLength": 512,
+          "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "type": "string"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_kind": {
+          "enum": [
+            "configured",
+            "native",
+            "workspace",
+            "capability",
+            "git"
+          ]
+        },
+        "state": {
+          "enum": [
+            "current",
+            "stale",
+            "unverified",
+            "missing"
+          ]
+        },
+        "value": {}
+      },
+      "required": [
+        "field",
+        "value",
+        "classification",
+        "source_kind",
+        "pointer",
+        "revision",
+        "digest",
+        "observed_at",
+        "state"
+      ],
+      "type": "object"
+    },
+    "pointer": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "owner",
+            "instruction",
+            "decision",
+            "check"
+          ]
+        },
+        "path": {
+          "maxLength": 512,
+          "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/]+(?:/[^/]+)*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "path"
+      ],
+      "type": "object"
+    },
+    "record": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array"
+        },
+        "description": {
+          "maxLength": 512,
+          "type": "string"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/edge"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 256,
+          "pattern": "^(repository|capability|clone|worktree):[A-Za-z0-9._:/-]+$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "capability"
+          ]
+        },
+        "pointers": {
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "title": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "ecosystem-index/snapshot/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "coverage": {
+      "enum": [
+        "complete",
+        "partial"
+      ]
+    },
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/entity"
+      },
+      "maxItems": 5000,
+      "type": "array"
+    },
+    "generation": {
+      "maximum": 9007199254740992,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "inputs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "authorization_digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "key": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/$defs/entity"
+            },
+            "maxItems": 5000,
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "current",
+              "stale",
+              "unverified",
+              "missing"
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "digest",
+          "state",
+          "records",
+          "authorization_digest"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50000,
+      "type": "array"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "reasons": {
+      "items": {
+        "enum": [
+          "invalid_input",
+          "unavailable",
+          "busy",
+          "unsafe_path",
+          "excluded",
+          "unknown_scope",
+          "source_failed",
+          "parser_unavailable",
+          "ineligible_value",
+          "bound_exceeded",
+          "interrupted"
+        ]
+      },
+      "maxItems": 20,
+      "type": "array"
+    },
+    "schema": {
+      "const": "ecosystem-index/snapshot/v1"
+    }
+  },
+  "required": [
+    "schema",
+    "generation",
+    "observed_at",
+    "coverage",
+    "reasons",
+    "entities",
+    "inputs"
+  ],
+  "type": "object"
+}

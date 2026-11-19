@@ -1,0 +1,13 @@
+schema: kp-capability/v1
+id: continual-learning
+kind: plugin
+flavor: 2
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: launchd
+expose: cursor
+provenance_source: cursor-public/continual-learning
+provenance_ref: "4a70bef5fce38a872256f6afc7d4d5f52b3f8c0c1c94070dd07b43fcdebff517"
+provenance_trust: marketplace-cache-normalized
+descriptor_ref: "72a5dd0ce0956d75a6f3932b3b7104266fb44b674595ee4eae6ada479e8822bf"

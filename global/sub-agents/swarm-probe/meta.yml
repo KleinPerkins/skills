@@ -1,0 +1,11 @@
+schema: kp-capability/v1
+id: swarm-probe
+kind: sub-agent
+flavor: 1
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude
+# Internal read-only reconnaissance role. Other runtimes use the swarm skill's
+# parent-led fallback until their native agent contract is proven.

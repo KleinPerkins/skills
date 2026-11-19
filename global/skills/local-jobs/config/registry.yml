@@ -1,0 +1,17 @@
+# local-jobs registry (registry/v1)
+# Base registry is generic. Operator-private types are merged from
+# $LOCAL_JOBS_STATE/registry.d/*.yml.
+schema: registry/v1
+version: 1
+
+discovery:
+  label_root: com.local-jobs
+
+job_types:
+  incremental-git-fetch:
+    description: Incremental filtered git fetch for configured reference repos
+    handler: handlers/incremental-git-fetch.sh
+
+  command:
+    description: Generic scheduled command (arbitrary program + schedule, self-managed plist)
+    handler: handlers/command.sh

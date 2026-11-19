@@ -1,0 +1,12 @@
+{
+  "archived_at": "2026-08-01T09:00:00Z",
+  "checkpoint_ids": [],
+  "final_active_state_digest": "035436275604dcc12f25c0aa3e70252b52db8a90dd971f65a84f70a92522c434",
+  "hygiene_confirmed": true,
+  "journal_operation_ids": [
+    "op-46d96e8ab5df"
+  ],
+  "manifest_digest": "37204e9216a5fb59cad0f91aee9c4e1ab2906165b4d62be2a0e62434e304e3d0",
+  "schema": "save-game-archive-manifest/v1",
+  "workstream_key": "eef8f44c81200799f76ac61c4c7d554256665e510c5f1ae84848f49eb818304b"
+}

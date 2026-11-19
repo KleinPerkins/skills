@@ -1,0 +1,265 @@
+"""Slack export materialization — OVT Slack Adapter v1 (agent-driven, MCP-sourced, no token).
+
+Turns an agent-submitted JSON envelope of the operator's own Slack messages (captured agent-side
+via the Slack MCP; this module never calls Slack itself — no network, no SDK, no token) into
+per-channel Markdown files under the operator's fixed ``slack_export_dir``, ready for the
+``slack_export`` adapter to scan like any other file-tree source.
+
+**The one hard security invariant**: every message's own ``author_id`` is re-verified HERE, server-
+side, against the call's top-level self-asserted ``author_id`` — never trusted from the calling
+agent's own "these are all mine" filtering. A mismatch is dropped and counted under
+``skipped_mismatched_author``, never silently accepted. This verifies records against the identity
+asserted for this call; it does not pin identity across calls. Gmail and Drive apply the same
+per-call authorship boundary in their materializers.
+
+Text cleaning and channel slugging are ported from the local harvesting
+prototype (``local-sources/slack-voice-drops/parse_slack_harvest.py``), generalized to be operator-
+ID-agnostic (no hardcoded Slack user id).
+"""
+
+from __future__ import annotations
+
+from operator_voice.persistence.atomic import atomic_text
+
+import json
+import re
+from decimal import Decimal, InvalidOperation
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+MATERIALIZE_VERSION = "slack-materialize/v3"
+
+_STATE_FILENAME = ".import-state.json"
+_VERSIONS_FILENAME = ".message-versions.json"
+
+
+def read_message_versions(export_dir: Path) -> dict[str, str]:
+    path = export_dir / _VERSIONS_FILENAME
+    if not path.exists():
+        return {}
+    value = json.loads(path.read_text())
+    if not isinstance(value, dict) or any(not isinstance(v, str) for v in value.values()):
+        raise ValueError("invalid Slack revision sidecar")
+    return value
+
+
+def _timestamp(value):
+    try:
+        number = Decimal(value)
+        return number if number.is_finite() and number > 0 else None
+    except (ValueError, InvalidOperation):
+        return None
+
+_MENTION_RE = re.compile(r"<@[^>]+>")
+_CHANNEL_REF_RE = re.compile(r"<#[^>]+>")
+_LINK_LABELLED_RE = re.compile(r"<https?://[^>|]+\|([^>]+)>")
+_LINK_BARE_RE = re.compile(r"<(https?://[^>]+)>")
+_BOLD_RE = re.compile(r"\*+")
+
+# Every materialized message block starts with a machine-parseable HTML-comment marker carrying
+# Slack's own `message_ts` (never re-derived, never guessed) so re-imports can dedupe by parsing
+# the file that already exists on disk, and the `slack_export` adapter can recover it verbatim as
+# `source_native_id`. The human-readable "## <time>" heading beneath it reuses the harvest
+# prototype's own visual shape.
+_MESSAGE_BLOCK_RE = re.compile(
+    r"<!-- ovt:message ts=(?P<ts>[^\s]+) -->\n##[^\n]*\n\n(?P<body>.*?)(?=\n<!-- ovt:message |\Z)",
+    re.DOTALL,
+)
+
+
+def clean_text(text: str) -> str:
+    """Strip Slack's own markup (user/channel refs, links, bold) — ported verbatim from
+    ``local-sources/slack-voice-drops/parse_slack_harvest.py``."""
+    text = _MENTION_RE.sub("", text)
+    text = _CHANNEL_REF_RE.sub("", text)
+    text = _LINK_LABELLED_RE.sub(r"\1", text)
+    text = _LINK_BARE_RE.sub(r"\1", text)
+    text = _BOLD_RE.sub("", text)
+    return text.strip()
+
+
+def slug_channel(name: str) -> str:
+    """Filesystem-safe channel slug — ported verbatim from the local prototype."""
+    name = (name or "").strip()
+    if name.startswith("#"):
+        return name[1:].lower().replace(" ", "-")
+    if name.startswith("DM"):
+        return "dm-misc"
+    if "Group DM" in name:
+        return "group-dm-misc"
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "slack"
+
+
+@dataclass(slots=True)
+class MaterializeResult:
+    imported: int = 0
+    skipped_duplicate: int = 0
+    skipped_mismatched_author: int = 0
+    skipped_short: int = 0
+    skipped_invalid: int = 0
+    channels: set[str] = field(default_factory=set)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "imported": self.imported,
+            "skipped_duplicate": self.skipped_duplicate,
+            "skipped_mismatched_author": self.skipped_mismatched_author,
+            "skipped_short": self.skipped_short,
+            "skipped_invalid": self.skipped_invalid,
+            "channels": sorted(self.channels),
+        }
+
+
+def _parse_existing_ts(text: str) -> set[str]:
+    return {m.group("ts") for m in _MESSAGE_BLOCK_RE.finditer(text)}
+
+
+def _format_block(ts: str, time_label: str, text: str) -> str:
+    heading = time_label.strip() or ts
+    return f"<!-- ovt:message ts={ts} -->\n## {heading}\n\n{text}\n"
+
+
+def _channel_header(channel_slug: str) -> str:
+    return (
+        f"# Slack voice harvest — {channel_slug}\n\n"
+        "Operator-authored messages only. Server-verified authorship "
+        "(see `operator_voice.slack.materialize`). Generated by `operator-voice slack-import`.\n\n"
+    )
+
+
+def materialize(export_dir: Path, *, author_id: str, messages: list[Any]) -> MaterializeResult:
+    """Write server-verified Slack messages into ``export_dir`` as per-channel Markdown files.
+
+    ``author_id`` is the operator's own Slack user id, self-asserted by the caller for this call
+    (never persisted; re-supplied fresh every time — see ``domain/operations.py``'s ``slack.import``
+    docstring). Every entry in ``messages`` MUST carry its own ``author_id`` (extracted by the
+    calling agent from the Slack MCP output's own sender field, never inferred from text); an entry
+    whose ``author_id`` does not match is dropped and counted under ``skipped_mismatched_author`` —
+    this check is the whole point of this module and cannot be bypassed by the caller.
+
+    Each message dict is expected to carry: ``channel`` (display name or ``#channel``),
+    ``channel_id`` (optional, unused beyond channel-slug fallback), ``message_ts`` (Slack's own
+    message timestamp — the dedup/ordering key), ``time`` (optional human-readable label),
+    ``text`` (raw Slack markdown), ``author_id``.
+
+    Idempotent: re-materializing the same message (same channel slug + ``message_ts``) is detected
+    by parsing the channel file that already exists on disk and counted under
+    ``skipped_duplicate`` — never appended twice."""
+    result = MaterializeResult()
+    by_channel: dict[str, list[tuple[str, str, str, str]]] = {}
+    versions = read_message_versions(export_dir)
+
+    for raw_msg in messages:
+        if not isinstance(raw_msg, dict):
+            result.skipped_invalid += 1
+            continue
+        message_ts = str(raw_msg.get("message_ts") or "").strip()
+        msg_author_id = str(raw_msg.get("author_id") or "").strip()
+        text = raw_msg.get("text")
+        if not message_ts or not msg_author_id or not isinstance(text, str):
+            result.skipped_invalid += 1
+            continue
+        if msg_author_id != author_id:
+            result.skipped_mismatched_author += 1
+            continue
+        cleaned = clean_text(text)
+        revision = str(raw_msg.get("edited_ts") or message_ts)
+        if raw_msg.get("edited_ts") and (_timestamp(revision) is None or _timestamp(message_ts) is None
+                                        or _timestamp(revision) < _timestamp(message_ts)):
+            result.skipped_invalid += 1
+            continue
+        if not cleaned and not raw_msg.get("edited_ts"):
+            continue
+        channel_label = str(raw_msg.get("channel") or raw_msg.get("channel_id") or "")
+        channel_slug = slug_channel(channel_label)
+        time_label = str(raw_msg.get("time") or "").strip()
+        by_channel.setdefault(channel_slug, []).append((message_ts, time_label, cleaned, revision))
+
+    export_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    for channel_slug, items in by_channel.items():
+        path = export_dir / f"{channel_slug}.md"
+        existing_text = path.read_text(encoding="utf-8") if path.exists() else ""
+        existing_ts = _parse_existing_ts(existing_text)
+        blocks: dict[str, str] = {}
+        for ts, time_label, text, revision in items:
+            key = channel_slug + ":" + ts
+            if ts in existing_ts:
+                previous = _timestamp(versions.get(key, ts))
+                incoming = _timestamp(revision)
+                if previous is None or incoming is None or incoming <= previous:
+                    result.skipped_duplicate += 1
+                    continue
+            existing_ts.add(ts)  # de-dup WITHIN this same batch too, not just against disk
+            blocks[ts] = _format_block(ts, time_label, text)
+            if _timestamp(revision) is not None:
+                versions[key] = revision
+            result.imported += 1
+        if not blocks:
+            continue
+        result.channels.add(channel_slug)
+        header = existing_text if existing_text.strip() else _channel_header(channel_slug)
+        # Replace existing blocks without changing their compatible marker format.
+        def replace_block(match):
+            return blocks.pop(match.group("ts"), match.group(0))
+        header = _MESSAGE_BLOCK_RE.sub(replace_block, header)
+        appended = "\n".join(block for _, block in sorted(blocks.items()))
+        atomic_text(path, header.rstrip("\n") + "\n\n" + appended)
+    if versions:
+        atomic_text(export_dir / _VERSIONS_FILENAME, json.dumps(versions, sort_keys=True))
+    return result
+
+
+def parse_channel_file(text: str) -> list[tuple[str, str]]:
+    """Parse a materialized channel Markdown file back into ``(message_ts, cleaned_text)`` pairs,
+    in file order. Shared by the ``slack_export`` adapter (re-scan) and ``slack.status`` (message
+    counts) so the on-disk wire format has exactly one parser."""
+    return [(m.group("ts"), m.group("body").strip()) for m in _MESSAGE_BLOCK_RE.finditer(text)]
+
+
+def count_messages_by_channel(export_dir: Path) -> dict[str, int]:
+    """Content-free per-channel message counts for ``slack.status`` — reads only counts, never
+    surfaces text. Missing ``export_dir`` (setup not yet run) is an empty result, not an error."""
+    if not export_dir.exists():
+        return {}
+    counts: dict[str, int] = {}
+    for path in sorted(export_dir.glob("*.md")):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        counts[path.stem] = len(parse_channel_file(text))
+    return counts
+
+
+def read_import_state(export_dir: Path) -> dict[str, Any]:
+    """Lean sidecar (not a SQLite table — this is purely a cosmetic freshness signal for
+    ``slack.status``, co-located with the content it describes). Missing/corrupt is empty, never
+    an error — status reporting must never fail because of its own watermark file."""
+    path = export_dir / _STATE_FILENAME
+    if not path.exists():
+        return {}
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
+
+def write_import_state(export_dir: Path, state: dict[str, Any]) -> None:
+    export_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    path = export_dir / _STATE_FILENAME
+    atomic_text(path, json.dumps(state))
+
+
+__all__ = [
+    "MATERIALIZE_VERSION",
+    "MaterializeResult",
+    "materialize",
+    "parse_channel_file",
+    "count_messages_by_channel",
+    "read_import_state",
+    "write_import_state",
+    "clean_text",
+    "slug_channel",
+]

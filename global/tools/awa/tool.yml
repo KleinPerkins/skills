@@ -1,0 +1,34 @@
+schema: kp-tool/v1
+id: awa
+name: Agent Worktree Automation (standalone-release binding)
+scope: global
+shape: release-descriptor
+sync_policy: standalone-release
+entrypoint: install.sh
+description: >-
+  Global Capability Binding (GCB) to the AWA Standalone System Package (SSP). AWA is a
+  self-contained product — a generic kernel (worktree CLI + guard/detector hooks + policy
+  resolver + render-only dashboard) and an engine (durable state, recovery, single-instance
+  daemon, MCP server) — that lives in KleinPerkins/awa and installs itself from a fresh clone via
+  its own install.sh, with no sibling-repo dependency. This shelf entry pins that release and binds
+  it: install.sh clones the pinned commit (provenance_source @ provenance_ref) into a per-user
+  checkout, then hands off to the checkout's own install.sh to place the runtime. The shelf carries
+  the pinned release pointer — never the runtime bytes.
+release:
+  repo: github.com/KleinPerkins/awa
+  ref: v1.8.2
+  commit: cfe9437739d2928014c2156532d1986a8511fd30
+outputs:
+  checkout:
+    description: >-
+      A per-user clone of KleinPerkins/awa pinned to the release commit, under
+      ${XDG_DATA_HOME:-$HOME/.local/share}/awa/checkout.
+  standalone_install:
+    description: >-
+      The standalone SSP installer (the checkout's own install.sh) places the runtime, config env,
+      Cursor hooks, add-only MCP server, and the authoritative awa-release-pointer/v1 record under
+      ${XDG_DATA_HOME:-$HOME/.local/share}/awa/ (all HOME / XDG-relative).
+  gcb_pointer:
+    description: >-
+      A per-user binding record (awa-gcb-pointer/v1 JSON) noting the pinned source + ref + checkout,
+      written under ${XDG_DATA_HOME:-$HOME/.local/share}/awa/gcb-pointer.json.

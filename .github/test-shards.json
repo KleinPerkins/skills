@@ -1,0 +1,62 @@
+{
+  "schema": "skills-test-sharding/v1",
+  "state": "configured",
+  "aggregate": "ci-required",
+  "shards": [
+    {
+      "id": "baseline",
+      "coverage": [
+        ".github/scripts/verify-skills.sh"
+      ],
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "save-game",
+      "coverage": [
+        "global/skills/save-game/tests/test_adapters.py",
+        "global/skills/save-game/tests/test_behavior.py",
+        "global/skills/save-game/tests/test_behavior_evals.py",
+        "global/skills/save-game/tests/test_canonical.py",
+        "global/skills/save-game/tests/test_cli.py",
+        "global/skills/save-game/tests/test_compact_decision.py",
+        "global/skills/save-game/tests/test_curation.py",
+        "global/skills/save-game/tests/test_doctor.py",
+        "global/skills/save-game/tests/test_durability.py",
+        "global/skills/save-game/tests/test_end_to_end.py",
+        "global/skills/save-game/tests/test_flush.py",
+        "global/skills/save-game/tests/test_full_lifecycle_end_to_end.py",
+        "global/skills/save-game/tests/test_identity.py",
+        "global/skills/save-game/tests/test_ids.py",
+        "global/skills/save-game/tests/test_index.py",
+        "global/skills/save-game/tests/test_lifecycle.py",
+        "global/skills/save-game/tests/test_lock.py",
+        "global/skills/save-game/tests/test_paths.py",
+        "global/skills/save-game/tests/test_privacy.py",
+        "global/skills/save-game/tests/test_reconcile.py",
+        "global/skills/save-game/tests/test_schemas.py",
+        "global/skills/save-game/tests/test_schemas_validate.py",
+        "global/skills/save-game/tests/test_snapshot.py",
+        "global/skills/save-game/tests/test_transaction.py",
+        "global/skills/save-game/tests/test_zero_link.py"
+      ],
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "capability-tests",
+      "coverage": [
+        "global/plugins/keep-awake/tests/test_manage.py",
+        "global/plugins/keep-awake/tests/test_runtime.py",
+        "global/skills/swarm/tests/test_benchmark.py",
+        "global/skills/swarm/tests/test_proportional.py",
+        "global/skills/swarm/tests/test_repository_verifier.py",
+        "global/skills/swarm/tests/test_static.py",
+        "local/skills/continual-learning-consolidate/tests/test_consolidator.py",
+        "scripts/tests/test_ci_delivery_create_review_pr.py",
+        "scripts/tests/test_ci_delivery_dispatch.py",
+        "scripts/tests/test_ci_delivery_local_review.py",
+        "scripts/tests/test_ci_delivery_reviewer_app.py"
+      ],
+      "timeout_seconds": 1800
+    }
+  ]
+}

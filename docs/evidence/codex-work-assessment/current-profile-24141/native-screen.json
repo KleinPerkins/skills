@@ -1,0 +1,4757 @@
+{
+  "schema": "codex-work-native-screen/v2",
+  "observed_on": "2026-11-05",
+  "native_tool": "collaboration.spawn_agent",
+  "source_revision": "1d6bb65ff127a717ccf047cc9f31405f7bbc2bd2",
+  "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+  "fixture_sha256": "41093f6deeb403a7c71398280953c08bdc03242c18cb5fa26b46c02de523b627",
+  "host_build": "26.1027.61615-24141",
+  "host_build_basis": "Running /Applications/ChatGPT.app; Info.plist com.openai.codex version 26.1027.61615 build 24141",
+  "started_workers": 16,
+  "maximum_started_workers": 16,
+  "preferred_passes": 8,
+  "comparison_passes": 8,
+  "activated": false,
+  "limitations": [
+    "Caller observations are not signed attestations.",
+    "Actual execution model and effort were not exposed; requested settings are not acknowledgement.",
+    "No performance, cost or general model-quality inference.",
+    "Native terminal completion was observed; this profile exposes no close-agent operation or closure receipt. Workers were instructed to use no tools and create no resources; none were observed.",
+    "Lifecycle records were saved after terminal results; no native launch-time or elapsed-time attestation is claimed.",
+    "This screen qualifies only the tested current native profile and source payload on the observed build; installation and Dev activation remain separate."
+  ],
+  "runs": [
+    {
+      "fixture": "d0-extract",
+      "band": 0,
+      "variant": "preferred",
+      "requested": {
+        "effort": "low",
+        "model": "gpt-6-luna"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "ids": [
+          2,
+          9
+        ]
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.531549+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-extract",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-luna",
+            "reasoning_effort": "low"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "8710cb5b3c87309935ee89523e156df73fc4c4dd61662efe981334d653fadd4d",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 0,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises coupling"
+        ],
+        "record_sha256": "f3de7e48ffa73976a26ad656c9e090c464262d561992a00fa1f69e67b65d0e3d",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "low",
+          "model": "gpt-6-luna"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-extract",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "8710cb5b3c87309935ee89523e156df73fc4c4dd61662efe981334d653fadd4d",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 0,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises coupling"
+        ],
+        "record_sha256": "78269365d05235805ca5b2cc727a3d3fdb3c9af60d933b2cea5e32ffc4a83a0b",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "low",
+          "model": "gpt-6-luna"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d0_extract_preferred"
+      }
+    },
+    {
+      "fixture": "d0-extract",
+      "band": 0,
+      "variant": "comparison",
+      "requested": {
+        "effort": "medium",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "ids": [
+          2,
+          9
+        ]
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.591532+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-extract",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "medium"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "2a18dcbf2c5b16834fefacc3d9b41ef47af904104ad4b9474131aba9b71b8c59",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises coupling"
+        ],
+        "record_sha256": "8baa9063b83913a8a6a2f3aa07a48a51fa131dcf1c41a4241058145bd3bee8f6",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-extract",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "2a18dcbf2c5b16834fefacc3d9b41ef47af904104ad4b9474131aba9b71b8c59",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-extract exercises coupling"
+        ],
+        "record_sha256": "4e5ccfccfa5b7bc82d86910deffbaa55830a0e34ed4bd6aea75f6aa40316885b",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d0_extract_comparison"
+      }
+    },
+    {
+      "fixture": "d0-count",
+      "band": 0,
+      "variant": "preferred",
+      "requested": {
+        "effort": "low",
+        "model": "gpt-6-luna"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "total": 10
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.652842+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-count",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-luna",
+            "reasoning_effort": "low"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "d4ecb73bd06899f7f20066b9528334bfc5e6a6977f1d65f1edcfd1bc72e0389d",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 0,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-count exercises coupling"
+        ],
+        "record_sha256": "dd2275870e2dc016e07f288ea6ed07d2fce56063a00b6a7d65d050ca3fa240b9",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "low",
+          "model": "gpt-6-luna"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-count",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "d4ecb73bd06899f7f20066b9528334bfc5e6a6977f1d65f1edcfd1bc72e0389d",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 0,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-count exercises coupling"
+        ],
+        "record_sha256": "c01a2ee20d0907370f3c375648e3ba275c7347f91405caed77112e31106f0528",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "low",
+          "model": "gpt-6-luna"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d0_count_preferred"
+      }
+    },
+    {
+      "fixture": "d0-count",
+      "band": 0,
+      "variant": "comparison",
+      "requested": {
+        "effort": "medium",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "total": 10
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.712309+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-count",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "medium"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "6a6d1cdbedaaefb4a146494c006943944338095bc389891e1acfc0573970cb4c",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-count exercises coupling"
+        ],
+        "record_sha256": "293a5f77676e716e8b92ac6e49837ac4744fb516eba143a9667b3f33bd67bf2d",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d0-count",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+              "level": 0
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises coupling",
+              "level": 0
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+              "level": 0
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 0,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "6a6d1cdbedaaefb4a146494c006943944338095bc389891e1acfc0573970cb4c",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D0: Owner-approved frozen difficulty-band fixture d0-count exercises ambiguity",
+          "reasoning: D0: Owner-approved frozen difficulty-band fixture d0-count exercises reasoning",
+          "coupling: D0: Owner-approved frozen difficulty-band fixture d0-count exercises coupling"
+        ],
+        "record_sha256": "028e561a069c2ad5fc3ccc77db65df332d3e5b48baef3faf846990391f5aabf4",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d0_count_comparison"
+      }
+    },
+    {
+      "fixture": "d1-boundary",
+      "band": 1,
+      "variant": "preferred",
+      "requested": {
+        "effort": "medium",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "at5": [
+          "B",
+          "C"
+        ],
+        "at10": []
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.772901+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-boundary",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "medium"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "a6f5a35a480879ae32fc96bbb84f51a162314c31490360e9216cbbf4430114c3",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling"
+        ],
+        "record_sha256": "9dac3b419612e5cfeb24d93b7ada2cce9e8f1ac3e42e4b4d9a9bd509e73283d3",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-boundary",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "a6f5a35a480879ae32fc96bbb84f51a162314c31490360e9216cbbf4430114c3",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling"
+        ],
+        "record_sha256": "3caf3efec03264682c0a59db728ebe19881a34918eef8c8c8d2a73bda0c5dd12",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d1_boundary_preferred"
+      }
+    },
+    {
+      "fixture": "d1-boundary",
+      "band": 1,
+      "variant": "comparison",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "at5": [
+          "B",
+          "C"
+        ],
+        "at10": []
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.834659+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-boundary",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "b2a58855c361a2b263109c2735bd4c666337f421a44ce5d23082d760522d6949",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling"
+        ],
+        "record_sha256": "b03f6dd5d69e43fa73d27870ac63156024821c6ca314ebb7a4fc3942f590185a",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-boundary",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "b2a58855c361a2b263109c2735bd4c666337f421a44ce5d23082d760522d6949",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-boundary exercises coupling"
+        ],
+        "record_sha256": "c8f42f6976ba79e075e6d2a7108f27de07c575644374cb1cf6fa1787c221fa42",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d1_boundary_comparison"
+      }
+    },
+    {
+      "fixture": "d1-normalize",
+      "band": 1,
+      "variant": "preferred",
+      "requested": {
+        "effort": "medium",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "labels": [
+          "bee",
+          "ant",
+          "cat"
+        ]
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.896243+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-normalize",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "medium"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "20cb969ea1df22592662195e74ca69e2c71f5524ced1c484190bf6c95e06ad65",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling"
+        ],
+        "record_sha256": "b53f85809cc55691ceb65d724b907068e4c8615bd27e729dee990f4ded7816ca",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-normalize",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "20cb969ea1df22592662195e74ca69e2c71f5524ced1c484190bf6c95e06ad65",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 1,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling"
+        ],
+        "record_sha256": "24aee84a4d367bb49b561cfab86857376458ae40ccf0cc005f0c04e10766f290",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "medium",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d1_normalize_preferred"
+      }
+    },
+    {
+      "fixture": "d1-normalize",
+      "band": 1,
+      "variant": "comparison",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "labels": [
+          "bee",
+          "ant",
+          "cat"
+        ]
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:56.955197+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-normalize",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "9ade7c0376976216418598c3f928bc221233249ef3833282284efe81102eb685",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling"
+        ],
+        "record_sha256": "438cfa5d02795aff3456a6cdc285cdbf4a77a138d48f9afe9b2df98e6af20fb5",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d1-normalize",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+              "level": 1
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling",
+              "level": 1
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+              "level": 1
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 1,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "9ade7c0376976216418598c3f928bc221233249ef3833282284efe81102eb685",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6.1-sol",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises ambiguity",
+          "reasoning: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises reasoning",
+          "coupling: D1: Owner-approved frozen difficulty-band fixture d1-normalize exercises coupling"
+        ],
+        "record_sha256": "0edf8afef37ab6f1d216050593bd89f5836befd36dbc11072fe74235676b0d68",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d1_normalize_comparison"
+      }
+    },
+    {
+      "fixture": "d2-race",
+      "band": 2,
+      "variant": "preferred",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "observed": 1,
+        "expected": 2,
+        "fixes": [
+          "atomic-increment",
+          "lock-read-modify-write",
+          "retry-on-CAS-failure"
+        ]
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:57.016005+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-race",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "66acb680be192a7ddccd4ae6d5522f1f302064c7706a20a747006f41d8a5907b",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-race exercises coupling"
+        ],
+        "record_sha256": "6ad97263c70c085c2055ba5eba2dfbacd8fb95b12dc82627372e96edb7310b67",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-race",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "66acb680be192a7ddccd4ae6d5522f1f302064c7706a20a747006f41d8a5907b",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-race exercises coupling"
+        ],
+        "record_sha256": "a54eadd75be3f2689511efefd5119cdf73f4a531e5d12c9ba9b3f3a5011747c0",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d2_race_preferred"
+      }
+    },
+    {
+      "fixture": "d2-race",
+      "band": 2,
+      "variant": "comparison",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6-astra"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "observed": 1,
+        "expected": 2,
+        "fixes": [
+          "atomic-increment",
+          "lock-read-modify-write",
+          "retry-on-CAS-failure"
+        ]
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:57.077497+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-race",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "94a371b5c8e31519b3fbc60c0c176c2ab3f5541fe009bd940291124cf73c6683",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-race exercises coupling"
+        ],
+        "record_sha256": "5c3becdd298221eb8f6be92166c8293e1f5a33d574fa6c929186cc8ecf6a5586",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-race",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "94a371b5c8e31519b3fbc60c0c176c2ab3f5541fe009bd940291124cf73c6683",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-race exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-race exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-race exercises coupling"
+        ],
+        "record_sha256": "a1a7fb3e3e91e28754ed2aea8a459083733dc71854dd6a703704d4f9fc6c4e25",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d2_race_comparison"
+      }
+    },
+    {
+      "fixture": "d2-transaction",
+      "band": 2,
+      "variant": "preferred",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6.1-sol"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "requirements": [
+          "atomic-debit-and-key",
+          "transactional-retry-check",
+          "unique-dedup-key"
+        ],
+        "duplicate_effect_possible_without_atomicity": true
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:57.138741+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-transaction",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6.1-sol",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "9496f446203b0795be8e465efe0e6fc6baa8236ab2f4401b75afda13aa486c26",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling"
+        ],
+        "record_sha256": "c62fc2e46fbc48f799c1cfbc3d2ef5ba35d60d5ed2d9da69632f453d757302b7",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-transaction",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "9496f446203b0795be8e465efe0e6fc6baa8236ab2f4401b75afda13aa486c26",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 2,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling"
+        ],
+        "record_sha256": "4a85828c26b9c1779c9b19349dd653586905b4977803731b31b22a4a45c5dc46",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6.1-sol"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d2_transaction_preferred"
+      }
+    },
+    {
+      "fixture": "d2-transaction",
+      "band": 2,
+      "variant": "comparison",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6-astra"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "requirements": [
+          "atomic-debit-and-key",
+          "transactional-retry-check",
+          "unique-dedup-key"
+        ],
+        "duplicate_effect_possible_without_atomicity": true
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:28:57.199975+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-transaction",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "d5ea3e9fc87298c36e2b03d463d59636a8b6a673ad20e68a85ecc6c9f439323f",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling"
+        ],
+        "record_sha256": "a79a0784cfdd2483ff08246258d13e9a4d67b74553576a47d12d45882c3f724c",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d2-transaction",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+              "level": 2
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling",
+              "level": 2
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+              "level": 2
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 2,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "d5ea3e9fc87298c36e2b03d463d59636a8b6a673ad20e68a85ecc6c9f439323f",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "high",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises ambiguity",
+          "reasoning: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises reasoning",
+          "coupling: D2: Owner-approved frozen difficulty-band fixture d2-transaction exercises coupling"
+        ],
+        "record_sha256": "7427a0b9e7989a2413dcba186d2376e050ea9967ae27dfc3119d1838db3c7422",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d2_transaction_comparison"
+      }
+    },
+    {
+      "fixture": "d3-consistency",
+      "band": 3,
+      "variant": "preferred",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6-astra"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "choice": "Q",
+        "partition_policy": "refuse-without-quorum",
+        "acknowledgement": "after-durable-quorum",
+        "retry_identity": "stable",
+        "rationale": "Linearizable allocation prevents double allocation and invented stock, durable quorum commits preserve completed allocations through one node failure, and stable idempotency keys prevent retries from allocating twice."
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:36:02.700854+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-consistency",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "ea5a084608417eca245aebb801753ed3270ea77144d4ab81efbf833ef62538c9",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling"
+        ],
+        "record_sha256": "bb4b32aee2c1a262f624ada713099b697d7acff6b2a119de98f8d4b3f4a044e2",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-consistency",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "ea5a084608417eca245aebb801753ed3270ea77144d4ab81efbf833ef62538c9",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling"
+        ],
+        "record_sha256": "5c89bcace54247a17e693e6264587be3b6cb4b5ae3da2b394c211901bcddd97f",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d3_consistency_preferred"
+      }
+    },
+    {
+      "fixture": "d3-consistency",
+      "band": 3,
+      "variant": "comparison",
+      "requested": {
+        "effort": "xhigh",
+        "model": "gpt-6-astra"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "choice": "Q",
+        "partition_policy": "refuse-without-quorum",
+        "acknowledgement": "after-durable-quorum",
+        "retry_identity": "stable",
+        "rationale": "Linearizable allocation prevents double allocation, refusing requests without quorum prevents invented stock during partitions, durable quorum commits survive one node failure, and stable idempotency keys prevent retries from allocating twice."
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:36:02.755870+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-consistency",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "xhigh"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "6ec40da935ff004c5f6166e48a5aade57dd8f185292485b22da280c122aab218",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 4,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling"
+        ],
+        "record_sha256": "99820a2f120d7c7acb5c3194659831382fe9e0a49b613a91093da7fb4f48008b",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-consistency",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "6ec40da935ff004c5f6166e48a5aade57dd8f185292485b22da280c122aab218",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 4,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-consistency exercises coupling"
+        ],
+        "record_sha256": "ded47b34502ac0174b69f469e32e6681a7b893dc66238241c914e88becd4b8ba",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d3_consistency_comparison"
+      }
+    },
+    {
+      "fixture": "d3-migration",
+      "band": 3,
+      "variant": "preferred",
+      "requested": {
+        "effort": "high",
+        "model": "gpt-6-astra"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "choice": "Y",
+        "backfill": "idempotent",
+        "contract_gate": "retirement-and-convergence",
+        "rollback_preserves_A": true,
+        "rationale": "Expanding the schema with compatible writes and an idempotent backfill preserves A and old-client writes during rollback, while delaying contraction until old clients retire and convergence is measured."
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:36:02.811379+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-migration",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "high"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "4317c6eb572c687c4fc3bc97756b2bfe0115350acf4b6a5ee250281cfd425a81",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises coupling"
+        ],
+        "record_sha256": "7b1048562edcc91dd0a9beb55aacbdce602140f6731b22cf83fb9a2ded32cb66",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-migration",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "4317c6eb572c687c4fc3bc97756b2bfe0115350acf4b6a5ee250281cfd425a81",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": null,
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 3,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises coupling"
+        ],
+        "record_sha256": "c4e6e41fa77d40dce9dc288ba08098615f39982205fc68225418f773e55a479b",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "high",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [],
+        "worker_id": "/root/q_d3_migration_preferred"
+      }
+    },
+    {
+      "fixture": "d3-migration",
+      "band": 3,
+      "variant": "comparison",
+      "requested": {
+        "effort": "xhigh",
+        "model": "gpt-6-astra"
+      },
+      "acknowledged": null,
+      "passed": true,
+      "repair_attempts": 0,
+      "native_terminal_observed": true,
+      "native_close_receipt": null,
+      "task_resources_observed": false,
+      "output": {
+        "choice": "Y",
+        "backfill": "idempotent",
+        "contract_gate": "retirement-and-convergence",
+        "rollback_preserves_A": true,
+        "rationale": "Expanding the schema, preserving A and compatible writes, and backfilling idempotently supports rollback without losing old-client writes while delaying contraction until old clients retire and convergence is measured."
+      },
+      "native_offers": {
+        "schema": "codex-native-offers/v1",
+        "context": {
+          "host": "codex",
+          "surface": "local-macos-desktop",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "host_build": "26.1027.61615-24141"
+        },
+        "tool": "collaboration.spawn_agent",
+        "origin": "native-tool",
+        "observed_at": "2026-11-05T05:36:02.866211+00:00",
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "contract": {
+          "model": "string",
+          "reasoning_effort": "string",
+          "fork_turns": "string",
+          "fork_turns_fresh_value": "none",
+          "task_name": "string",
+          "message": "string",
+          "ordinary_agent": true
+        },
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-astra",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "gpt-6-luna",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "efforts": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      "plan": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-migration",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": null,
+        "cleanup_verified": false,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": {
+          "arguments": {
+            "fork_turns": "none",
+            "model": "gpt-6-astra",
+            "reasoning_effort": "xhigh"
+          },
+          "caller_fields": [
+            "task_name",
+            "message"
+          ],
+          "tool": "collaboration.spawn_agent"
+        },
+        "evidence_sha256": "4a5ffd6ca577296a795e52973498c14982250d3cabd0bc8c2fb651d616705b2e",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 4,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises coupling"
+        ],
+        "record_sha256": "c23b6eabe59fcef522e8f70f82023aa3fbb181128986c3417a6c9df2fbb4870d",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "ready",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": null
+      },
+      "completed": {
+        "acknowledged": null,
+        "assessment": {
+          "deliverable": "Exact fixture JSON result with only permitted rationale",
+          "effects": {
+            "consequential": false,
+            "independent_review": false,
+            "security_judgment": false,
+            "sign_off": false,
+            "source_edits": false
+          },
+          "objective": "Answer approved synthetic qualification fixture d3-migration",
+          "ratings": {
+            "ambiguity": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+              "level": 3
+            },
+            "coupling": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises coupling",
+              "level": 3
+            },
+            "reasoning": {
+              "evidence": "Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+              "level": 3
+            }
+          },
+          "reversibility": "read-only",
+          "review": {
+            "author_model": null,
+            "requirement": "none"
+          },
+          "schema": "codex-work-assessment/v1",
+          "scope": "Frozen fixture; no tools, external data, source changes or created resources",
+          "unknowns": [],
+          "verification": {
+            "checks": [
+              {
+                "criterion": "Exact expected JSON keys/values; rationale permitted only when fixture allows it",
+                "id": "correct"
+              },
+              {
+                "criterion": "No tool use, files, processes or external data",
+                "id": "no_resources"
+              }
+            ],
+            "method": "automated"
+          },
+          "work_class": "inspect"
+        },
+        "availability_used": 0,
+        "band": 3,
+        "checks": {
+          "correct": true,
+          "no_resources": true
+        },
+        "cleanup_verified": true,
+        "context": {
+          "host": "codex",
+          "host_build": "26.1027.61615-24141",
+          "session_id": "01a1a9e2-d3c8-7be0-a1d8-6322951fde0e",
+          "surface": "local-macos-desktop"
+        },
+        "diagnosis": null,
+        "dispatch": null,
+        "evidence_sha256": "4a5ffd6ca577296a795e52973498c14982250d3cabd0bc8c2fb651d616705b2e",
+        "execution_matches_request": null,
+        "native_tool": "collaboration.spawn_agent",
+        "override": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra",
+          "reason": "Operator-approved bounded current-profile native qualification: frozen fixture comparison route, not a quality escalation"
+        },
+        "policy_sha256": "ad2cf522a478f6cc97bea93412635ccd8cf6167893b2a8c494b1482f8a8bf7bd",
+        "quality_used": 0,
+        "rank": 4,
+        "reasons": [
+          "ambiguity: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises ambiguity",
+          "reasoning: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises reasoning",
+          "coupling: D3: Owner-approved frozen difficulty-band fixture d3-migration exercises coupling"
+        ],
+        "record_sha256": "797fbf1c2eccdcbb7a8d368863c96fbc8429732baf85345e74e85cb405c1db52",
+        "required_checks": [
+          "predefined-acceptance-checks"
+        ],
+        "schema": "codex-work-decision/v2",
+        "selected": {
+          "effort": "xhigh",
+          "model": "gpt-6-astra"
+        },
+        "source_sha256": "4cfb6f107e5a26dbea73c83bf35d4c918dbc73e0ba26498d2605de9ac71a5ba3",
+        "status": "completed",
+        "target": "worker",
+        "warnings": [
+          "explicit-override"
+        ],
+        "worker_id": "/root/q_d3_migration_comparison"
+      }
+    }
+  ]
+}

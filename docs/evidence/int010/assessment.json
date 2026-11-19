@@ -1,0 +1,172 @@
+{
+  "authority": {
+    "acceptance": [
+      "REQ-INT-007",
+      "AGT-01",
+      "AGT-02"
+    ],
+    "accepted_ADR_PRD_SPEC_PLAN_and_sidecar_unchanged": true,
+    "authorization_chat": "01a1808e-9198-7ff2-9d7f-494bb18cab20",
+    "authorization_turn": "01a19125-dd07-70f3-8026-6c151297a5ac",
+    "current_dev_observation": "dd4ce0d2d110ff38dbe0cdfe6f03cc8b1b38a985",
+    "dev_accepted_revision": "14fa5f95fe86178f32e966cb747ab9c884f4b92b",
+    "frozen_semantics_changed": false,
+    "standing_authorization_verified": true
+  },
+  "boundaries": {
+    "INT008_no_copy_preserved": true,
+    "bootstrap_exceptions_used": false,
+    "installation": false,
+    "installed_settings_read_or_copied": false,
+    "native_agent_files_written": 0,
+    "paired_workload_or_performance_claim": false,
+    "protected_automation_changed": false,
+    "raw_prompts_transcripts_work_data_persisted": false,
+    "role_payloads_or_metadata_changed": false,
+    "routing_preferences_changed": false
+  },
+  "delivery": {
+    "later_evidence": "PR description and final report bind final head, checks and merge; evidence merge does not qualify or activate roles",
+    "merge_revision": null,
+    "pr": null,
+    "state": "reviewed pre-commit assessment snapshot; observe repository delivery separately"
+  },
+  "disposition": {
+    "AGT-01": "unsupported; native load and restriction behavior not observed",
+    "AGT-02": "unknown for excluded custom roles; no native lifecycle qualification attempted",
+    "INT-010": "unsupported-current-native-restriction-contract; preparation evidence only",
+    "INT-012": "dependency not ready",
+    "fallback": "existing parent-led-fallback with degraded isolation; preserve coverage and shipping-clearance gates",
+    "permanent_exception_accepted": false,
+    "required_outcome_satisfied": false,
+    "revisit": "supported host contract preserving the exact read/search-only charter, then owner renderer decision and bounded native positive/negative qualification"
+  },
+  "host": {
+    "build": "22943",
+    "evidence": "supported check_app_update installed-version response",
+    "kind": "codex",
+    "surface": "local-macos-desktop",
+    "update_applied": false,
+    "version": "26.1027.30824"
+  },
+  "native_surface": {
+    "agent_types": [
+      "gsd-advisor-researcher",
+      "gsd-nyquist-auditor",
+      "gsd-pattern-mapper",
+      "gsd-phase-researcher",
+      "gsd-plan-checker",
+      "gsd-planner",
+      "gsd-project-researcher",
+      "gsd-research-synthesizer",
+      "gsd-roadmapper",
+      "default",
+      "explorer",
+      "worker"
+    ],
+    "existing_project_or_user_swarm_md_toml_paths": "all twelve exact paths absent; no installed file contents read",
+    "native_custom_role_invocation_attempted": false,
+    "negative_restriction_probe_attempted": false,
+    "per_role_permission_argument": false,
+    "per_role_tool_allowlist_argument": false,
+    "swarm_roles_offered": false,
+    "tool": "collaboration.spawn_agent"
+  },
+  "observed_at": "2026-10-31T08:58:00Z",
+  "official_contract": {
+    "checked_at": "2026-10-31T08:58:00Z",
+    "custom_sandbox_approval_MCP_override_supported": false,
+    "documented_capability_disable_keys": [
+      "features.shell_tool",
+      "features.apps",
+      "features.plugins",
+      "features.memories",
+      "features.request_permissions_tool"
+    ],
+    "documented_role_tool_allowlist": false,
+    "format": "standalone TOML",
+    "parent_permissions_and_MCP_inherited": true,
+    "supports_format_not_qualification": true,
+    "url": "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+  },
+  "owner": "KleinPerkins/skills",
+  "schema": "skills-int010-assessment/v1",
+  "scope": [
+    "INT-010",
+    "INT-012-dependency-disposition"
+  ],
+  "source": {
+    "codex_renderer_revision": null,
+    "digest_definition": "SHA-256 of UTF-8 json.dumps(payload_files, sort_keys=True, separators=(comma,colon)), no newline; keys are exact repository-relative paths and values are lowercase SHA-256 of exact bytes. This binds the eight listed assessment inputs, not a rendered native payload.",
+    "exposure": [
+      "cursor",
+      "claude"
+    ],
+    "payload_files": {
+      "global/skills/swarm/references/fallback.md": "2efef628548165552dc9c34c8c2c104b22d0c9934d722871890f20a5e6b9f151",
+      "global/skills/swarm/references/routing.md": "4582ebc355216d2deae52bf53ac6ffcf264de29ae171a05e5c1a0c86d203ebd2",
+      "global/sub-agents/swarm-probe/meta.yml": "74de5b54f39fc445d9673ea82aeed8bd095e20d32e55aa3f63cae2ab8c601dc9",
+      "global/sub-agents/swarm-probe/swarm-probe.md": "071d8d0344b31458acbac7a87f0c3ead8363782719b4c2add39050144ee62131",
+      "global/sub-agents/swarm-reviewer/meta.yml": "dc84e46722a27bc9c60f488e71237719bb1c7ddba3a251502075e4b5b4abebff",
+      "global/sub-agents/swarm-reviewer/swarm-reviewer.md": "5bfbbc84290ac0663043a3dd68f1c79b16bf08ac019dff8fee13b6d7ee8e86f3",
+      "global/sub-agents/swarm-verifier/meta.yml": "48500ae2660c69b505802a2285e13f049fdf773a46e736b523cf34ab20e77cf8",
+      "global/sub-agents/swarm-verifier/swarm-verifier.md": "59e6e6cdf74966fd2e8e73cf939209beeb6d890b30cf75951976ca1105a6bb6c"
+    },
+    "payload_sha256": "f2680bf4ea3d4ad640b328d6873eeae653068cef05dc6cf754b69fbd83e04b2c",
+    "source_revision": "8fdb02b48ea5c21691b53cb35915a3f4fe75c8ee",
+    "source_tree": "5d575eb5f8e792e49466fadd79e526246dfed9a0"
+  },
+  "validation": {
+    "contract_assessment": {
+      "acknowledged_execution_identity": null,
+      "files_or_resources_created": false,
+      "outcome": "completed; supports unsupported disposition and preserving fallback",
+      "requested_effort": "max",
+      "requested_model": "gpt-5.6-sol",
+      "selection_warnings": [
+        "fallback"
+      ],
+      "worker": "/root/int010_contract_assessment"
+    },
+    "independent_review": {
+      "acknowledged_execution_identity": null,
+      "broad_suites_rerun": false,
+      "completed_at": "2026-10-31T09:12:39.563815+00:00",
+      "files_or_resources_created": false,
+      "limitations": [
+        "no native role installation, loading, restriction or lifecycle proof",
+        "no implemented renderer"
+      ],
+      "outcome": "no blocking findings",
+      "provider_independence_claimed": false,
+      "requested_effort": "max",
+      "requested_model": "gpt-5.6-sol",
+      "scope": "three evidence files; accepted authority, exact source digests, closed observation schema and current official contract",
+      "selection_warnings": [
+        "fallback",
+        "same-provider-review"
+      ],
+      "worker": "/root/int010_evidence_review"
+    },
+    "owner_gate": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 bash .github/scripts/verify-skills.sh",
+      "exit_code": 0,
+      "outcome": "pass",
+      "result": "verify-skills: OK (global + local + lock + capability-local); existing isokit suite reported one skipped case"
+    },
+    "schema_validation": "two observations validated by the accepted qualification.py closed schema",
+    "swarm_unit_contract_authority_fault_tests": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s global/skills/swarm/tests -p 'test_*.py'",
+      "outcome": "pass",
+      "tests": 122
+    }
+  },
+  "workspace": {
+    "branch": "feat/int010-role-qualification",
+    "native_restore": "restored archived native worktree, then created a new delivery branch from fetched main",
+    "primary_checkout_changed": false,
+    "sandbox_guard_attempt": "reported ownership-unverified fail-open; not used as exclusion proof; subsequent unsandboxed check/status confirmed MINE",
+    "writer_guard": "acquired and confirmed MINE through the source-owned guard with Git metadata access",
+    "writer_id": "codex-int010-01a18150-20261031"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "attempted_new_digest": "035436275604dcc12f25c0aa3e70252b52db8a90dd971f65a84f70a92522c434",
+  "created_at": "2026-08-01T09:00:00Z",
+  "old_digest": "0ed6030ba5d130a3226afe1f8b92272b540fdf9ff1f5ad3b74331b51a780a3f6",
+  "operation_id": "op-3718665fd64e",
+  "reason": "stale_current_digest",
+  "schema": "save-game-journal-aborted/v1",
+  "workstream_key": "eef8f44c81200799f76ac61c4c7d554256665e510c5f1ae84848f49eb818304b"
+}

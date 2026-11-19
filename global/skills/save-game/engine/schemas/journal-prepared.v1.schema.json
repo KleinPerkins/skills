@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "save-game-journal-prepared/v1",
+  "title": "save-game-journal-prepared/v1",
+  "description": "Append-only recovery-journal phase file written durably (O_EXCL) before the atomic current.json replace. Records operation ID, old/new digest, expected generation, observed root/ref/HEAD, and the sanitized-snapshot pointer. Recovery-only metadata: never loaded during normal continuation except to repair an incomplete operation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "operation_id", "workstream_key", "created_at",
+    "old_digest", "new_digest", "expected_generation", "observed_root", "snapshot_digest"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["save-game-journal-prepared/v1"] },
+    "operation_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
+    "workstream_key": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "created_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+    "old_digest": { "type": "string", "pattern": "^([a-f0-9]{64}|none)$" },
+    "new_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "expected_generation": { "type": "integer" },
+    "observed_root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref_kind", "observed_head", "operation_marker"],
+      "properties": {
+        "ref_kind": { "type": "string", "enum": ["branch", "detached", "bare", "non_git"] },
+        "branch": { "type": "string", "maxLength": 200 },
+        "observed_head": { "type": "string", "maxLength": 64 },
+        "common_dir_key": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "operation_marker": {
+          "type": "string",
+          "enum": ["none", "merge", "rebase", "cherry_pick", "revert", "bisect"]
+        }
+      }
+    },
+    "snapshot_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

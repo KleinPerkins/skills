@@ -1,0 +1,30 @@
+{
+  "jobs": [
+    {
+      "argv": [
+        "repository-contract"
+      ],
+      "discovery": {
+        "kind": "literal_stdout",
+        "literal": "PR_AUTOMATION_VERIFY_OK"
+      },
+      "environment": {
+        "CI": "true"
+      },
+      "id": "verify-repository-contract",
+      "image": "buildpack-deps@sha256:877e9e4d949edfbcbedabc3a2d7ab593955fee5d6d0777adf3a991eb30c750d8",
+      "limits": {
+        "cpus_millis": 500,
+        "disk_mib": 128,
+        "inodes": 4096,
+        "memory_mib": 512,
+        "output_bytes": 32768,
+        "pids": 64,
+        "timeout_seconds": 120
+      },
+      "network": "none"
+    }
+  ],
+  "secondary_sources": [],
+  "version": "pr-automation-verification/v1"
+}

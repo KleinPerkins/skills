@@ -1,0 +1,15 @@
+schema: kp-capability/v1
+id: doc-coauthoring
+kind: skill
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude codex
+provenance_source: "github.com/anthropics/skills"
+provenance_ref: "35414756ca55738e050562e272a6bbc6273aa926"
+provenance_trust: "vetted"
+# Flavor-2 verbatim snapshot of anthropics/skills@35414756/skills/doc-coauthoring.
+# NOTE: upstream ships this skill with no LICENSE.txt and no `license:` frontmatter;
+# reproduced faithfully. Third-party attribution is in global/THIRD_PARTY_NOTICES-anthropic-skills.md.

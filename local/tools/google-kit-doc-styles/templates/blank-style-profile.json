@@ -1,0 +1,13 @@
+{
+  "description": "Generic blank-slate starter profile for google-kit document styles. Populate through google-kit styles verbs before using for real authoring.",
+  "document_style": {
+    "documentFormat": {
+      "documentMode": "PAGES"
+    }
+  },
+  "name": "blank-style-profile",
+  "named_styles": {},
+  "schema": 1,
+  "source_doc_id": null,
+  "template_doc_id": null
+}

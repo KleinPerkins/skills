@@ -1,0 +1,16 @@
+schema: kp-capability/v1
+id: isokit
+kind: skill
+flavor: 2
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+runtime_contract: installer-doctor/v1
+expose: cursor claude codex
+provenance_source: "github.com/aadilghani1/isokit"
+provenance_ref: "e25dfc82681628dfb5240cddc9f07081042fe348"
+provenance_trust: "community"
+# Flavor-2 reviewed snapshot of aadilghani1/isokit@e25dfc82:
+# upstream skills/isokit plus the compact examples/demo/src/figures source library.
+# Local adaptations are documented in LOCAL-ADAPTATIONS.md.

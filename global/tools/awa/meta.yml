@@ -1,0 +1,21 @@
+schema: kp-capability/v1
+id: awa
+kind: tool
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+shape: release-descriptor
+sync_policy: standalone-release
+expose: cursor claude codex
+provenance_source: "github.com/KleinPerkins/awa"
+provenance_ref: "cfe9437739d2928014c2156532d1986a8511fd30"
+provenance_trust: "vetted"
+# Flavor-2 standalone-release binding (SSP + GCB). AWA is a Standalone System Package: a
+# self-contained product (generic kernel + engine + dashboard + frozen contract) that installs
+# itself from a fresh clone of KleinPerkins/awa via its own install.sh, with no sibling-repo
+# dependency. This shelf entry is the Global Capability Binding to that release: install.sh clones
+# the pinned commit (provenance_source @ provenance_ref) into a per-user checkout and hands off to
+# the checkout's own install.sh. The shelf carries the pinned release pointer — never the runtime
+# bytes (which live in that standalone repo; pin tracks AWA v1.8.2 @ provenance_ref).

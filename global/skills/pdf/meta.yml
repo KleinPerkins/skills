@@ -1,0 +1,15 @@
+schema: kp-capability/v1
+id: pdf
+kind: skill
+flavor: 2
+scope: global
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+expose: cursor claude codex
+provenance_source: "github.com/anthropics/skills"
+provenance_ref: "2c5958ecac7cee2b583967a2c4981d0f4a75c579"
+provenance_trust: "vetted"
+# Fresh Apache-2.0 import: anthropics/skills@2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/pdf.
+# Modified by KleinPerkins: local description.
+# install.sh and this metadata are owner-maintained integration additions.

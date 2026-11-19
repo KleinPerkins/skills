@@ -1,0 +1,214 @@
+{
+  "schema": "skills/native-pdf-provider-observation/v1",
+  "observed_at": "2026-11-02T16:56:52.466863+00:00",
+  "capability": "pdf",
+  "destination_scope": "personal Codex only",
+  "host": {
+    "build": "23880",
+    "version": "26.1027.51404",
+    "cli_sha256": "58a91f6ea19bea477ae3a2ec48d619f0039afe75d3476260747e11d201fa7cea"
+  },
+  "original_contract": {
+    "repository": "KleinPerkins/skills",
+    "revision": "f2301ce13d50e471ff1e8ae51fb5a41bf47eaf0a",
+    "path": "global/skills/pdf",
+    "payload_file_sha256": {
+      "LICENSE.txt": "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa",
+      "SKILL.md": "bfc9ab76c2ac9b67d2ff0de462eeda318b3e05450eacb9596638c346b9c74577",
+      "forms.md": "9530b3f57034792e0242a3abfe8b3c296466329551916f2ff6c5a70db78f7e44",
+      "install.sh": "843d8635ac29ee34e46f0b8efcd178af6f0d02e0e7ae3641c8cc1a9ada416dac",
+      "meta.yml": "9816f8c496d940e77adfb33e332339f5e713cb6cf82cbff3a67e4a83cb6f8941",
+      "reference.md": "03a5f964f8abecbbe156f363356e927e864d7ee964f1012c84ee1bfc8acbeb95",
+      "scripts/check_bounding_boxes.py": "0ced522402dd7b3c82a0be9518cf4e485fa9cc0467d7beab6ddb04cb36fcc3e1",
+      "scripts/check_fillable_fields.py": "1fe10b9980a5493c9bbec8c20630c603eaa475b45403751c08f26738736647b8",
+      "scripts/convert_pdf_to_images.py": "7f58e292a67e18a8ff000d30bad2469389546731f7e8a698cc1d0aed001ea15d",
+      "scripts/create_validation_image.py": "8fa9fd7962c9f940045b81cf6b991e7c1057c1838e3f9cc6d305007a222ffebf",
+      "scripts/extract_form_field_info.py": "bb235b36f497bbb1c7c6821cecf527bbba7213520de11219da99f7b13a38c109",
+      "scripts/extract_form_structure.py": "6814e3fe8f78c2b16d766c132b5a727ff7a31b71d76a7d46bd6e40fe50bc97c5",
+      "scripts/fill_fillable_fields.py": "d140872c2e92e41b1e05370ae8d270c5b7f5ebdf55d9905f03bc974a9c708ff5",
+      "scripts/fill_pdf_form_with_annotations.py": "8a56e063a49ed53c0b0e1d312ecf8023af76816ed139486ec3b539873de202fd"
+    }
+  },
+  "provider": {
+    "plugin_id": "pdf@openai-primary-runtime",
+    "version": "26.1026.10807",
+    "skill_name": "pdf:pdf",
+    "skill_sha256": "a6e20f4ae66364a06d577dd51e0ce66ee2ef955be129cbe195e0a27f403daaf8",
+    "already_installed": true,
+    "fresh_enabled_native_discovery": true,
+    "extra_roots": false
+  },
+  "functional_observation": {
+    "synthetic_local_inputs_only": true,
+    "operation_groups_passed": 15,
+    "tests": [
+      {
+        "operation": "create_and_extract_text",
+        "passed": true,
+        "checks": {
+          "two_pages": true,
+          "title_found": true,
+          "second_page_found": true
+        }
+      },
+      {
+        "operation": "read_metadata",
+        "passed": true,
+        "checks": {
+          "title": true,
+          "author": true
+        }
+      },
+      {
+        "operation": "extract_table",
+        "passed": true,
+        "checks": {
+          "exact_cells": true
+        }
+      },
+      {
+        "operation": "split",
+        "passed": true,
+        "checks": {
+          "one_page": true,
+          "correct_page": true
+        }
+      },
+      {
+        "operation": "merge",
+        "passed": true,
+        "checks": {
+          "three_pages": true,
+          "order": true
+        }
+      },
+      {
+        "operation": "rotate",
+        "passed": true,
+        "checks": {
+          "rotation": true
+        }
+      },
+      {
+        "operation": "watermark",
+        "passed": true,
+        "checks": {
+          "retained_original": true,
+          "overlay": true
+        }
+      },
+      {
+        "operation": "encrypt_and_unlock",
+        "passed": true,
+        "checks": {
+          "encrypted": true,
+          "wrong_rejected": true,
+          "correct_accepted": true,
+          "text_preserved": true
+        }
+      },
+      {
+        "operation": "decrypt_output",
+        "passed": true,
+        "checks": {
+          "unencrypted": true,
+          "two_pages": true
+        }
+      },
+      {
+        "operation": "extract_image",
+        "passed": true,
+        "checks": {
+          "one_image": true,
+          "original_dimensions": true,
+          "original_pixel": true
+        }
+      },
+      {
+        "operation": "interactive_form_fill",
+        "passed": true,
+        "checks": {
+          "canonical_text": true,
+          "canonical_checkbox": true,
+          "two_widgets": true,
+          "widget_text": true,
+          "widget_checkbox": true,
+          "appearance_streams": true
+        }
+      },
+      {
+        "operation": "repair_genuinely_orphaned_widgets",
+        "passed": true,
+        "checks": {
+          "unique_fields": true,
+          "canonical_text": true,
+          "canonical_checkbox": true
+        }
+      },
+      {
+        "operation": "ocr_scanned_pdf",
+        "passed": true,
+        "checks": {
+          "successful_exit": true,
+          "expected_text": true
+        }
+      },
+      {
+        "operation": "native_pdfinfo",
+        "passed": true,
+        "checks": {
+          "successful_exit": true,
+          "two_pages": true
+        }
+      },
+      {
+        "operation": "native_poppler_render",
+        "passed": true,
+        "checks": {
+          "successful_exit": true,
+          "image_created": true
+        }
+      }
+    ],
+    "python_packages": {
+      "reportlab": "4.4.9",
+      "pypdf": "6.10.0",
+      "pdfplumber": "0.11.9",
+      "pypdfium2": "5.14.0",
+      "Pillow": "12.3.0"
+    },
+    "logical_form_fields_widgets_and_appearances_checked": true,
+    "genuinely_orphaned_widgets_repaired": true,
+    "independent_Poppler_render_checked": true,
+    "visual_review_passed": true,
+    "diagnostic_renderer_initialization_correction_recorded": true,
+    "final_image_sha256": {
+      "native-fixture-1.png": "7eed2705d435ad2fc163fecabd87dfb576d08642bfc1630aaa86c8e4241d739f",
+      "native-fixture-2.png": "edadd50296292b7c543ddb94a689297599d5d7d6eccf22918070391fd7767b10",
+      "watermark-1.png": "dc81d57ca238183b014dee32b16ae4f7418bc29852cb6da2d0439f011d111d88"
+    },
+    "private_driver_sha256": "56dbf508aa3b1fa5aeedac377596a92938ea1f24ad16d05a6f0f4c0e958c0720",
+    "final_fixture_sha256": "5ed1d3aaa8de4c6e59dc5518afd2b70b46bbfaadd6beb1acbd2ddedeecd4039d"
+  },
+  "safety": {
+    "new_installations": 0,
+    "configuration_or_link_changes": 0,
+    "new_model_workers": 0,
+    "threads_or_turns_created": 0,
+    "token_refresh_requested": false,
+    "external_requests": 0,
+    "real_documents_or_forms_used": false,
+    "Affirm_or_work_access": false,
+    "source_pin_or_original_migration_records_modified": false
+  },
+  "unqualified_operations": [
+    "qpdf-specific structural repair and linearization",
+    "JavaScript-specific pdf-lib and pdfjs-dist workflows",
+    "signed, malformed, protected real or large production document workflows"
+  ],
+  "authority_limits": [
+    "Observation does not authorize installing or enabling a provider absent from the destination.",
+    "Source acceptance supports only the recorded bounded personal Codex alternative; destination preimage and native functional acceptance remain separate.",
+    "No other capabilities, clients, inherited native worker allowance or whole migration completion is established."
+  ]
+}
