@@ -125,10 +125,16 @@ def _root_matches_binding(root: Path, metadata: dict[str, Any], root_fd: int) ->
             if not pointer.startswith("gitdir: "):
                 return False
             admin = (root / pointer[len("gitdir: "):]).resolve(strict=False)
-            admin_fd = _open_directory(admin)
+            if admin.parent != common / "worktrees":
+                return False
+            worktrees_fd = os.open("worktrees", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                   dir_fd=common_fd)
             try:
-                if admin.parent != common / "worktrees":
-                    return False
+                admin_fd = os.open(admin.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                   dir_fd=worktrees_fd)
+            finally:
+                os.close(worktrees_fd)
+            try:
                 declared_common = (admin / _pointer_at(admin_fd, "commondir")).resolve(strict=False)
                 backpointer = (admin / _pointer_at(admin_fd, "gitdir")).resolve(strict=False)
                 if declared_common != common or backpointer != root / ".git":
@@ -143,7 +149,7 @@ def _root_matches_binding(root: Path, metadata: dict[str, Any], root_fd: int) ->
                 os.close(admin_fd)
         finally:
             os.close(common_fd)
-    except (OSError, UnicodeError, ValueError):
+    except (OSError, UnicodeError, ValueError, RuntimeError):
         return False
 
 

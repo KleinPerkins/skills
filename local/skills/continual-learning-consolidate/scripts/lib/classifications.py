@@ -19,7 +19,10 @@ class PolicyError(ValueError):
 def canonical_path(value: object) -> str:
     if not isinstance(value, str) or not value or not Path(value).is_absolute():
         raise PolicyError("local alias must be an absolute path")
-    canonical = str(Path(value).resolve(strict=False))
+    try:
+        canonical = str(Path(value).resolve(strict=False))
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise PolicyError("cannot resolve local alias") from exc
     if canonical != value:
         raise PolicyError("local alias must be canonical (no symlink, dot or trailing slash)")
     return canonical

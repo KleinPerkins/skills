@@ -592,6 +592,62 @@ class ClassificationTests(unittest.TestCase):
                 self.assertEqual(report["unknown_or_excluded_roots"], 1)
                 self.assertEqual(report["workspace_sources"], 0)
 
+    def test_linked_registration_stays_bound_to_open_common_descriptor(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            primary = h.source("primary", "Example/primary", "Primary memory.")
+            common = h.home / "common"
+            common.mkdir()
+            (primary / ".git").rmdir()
+            (primary / ".git").write_text("gitdir: " + str(common) + "\n")
+            h.policy["repositories"][0]["active_bindings"][0]["git_common_dir"] = str(common)
+            forged = h.home / "forged"
+            forged.mkdir()
+            admin = common / "worktrees/slot"
+            admin.mkdir(parents=True)
+            (forged / ".git").write_text("gitdir: " + str(admin) + "\n")
+            (admin / "commondir").write_text("../..\n")
+            (admin / "gitdir").write_text(str(h.home / "other-root/.git") + "\n")
+            (forged / "agent-learnings.md").write_bytes(b"\xff")
+            h.roots = [dict(h.roots[0], abs_path=str(forged), git_common_dir=str(common))]
+            original = consolidator._primary_owns_common
+            swapped = False
+            def replace_common(path, primary_fd, common_fd):
+                nonlocal swapped
+                valid = original(path, primary_fd, common_fd)
+                if not swapped:
+                    swapped = True
+                    common.rename(h.home / "held-common")
+                    replacement = common / "worktrees/slot"
+                    replacement.mkdir(parents=True)
+                    (replacement / "commondir").write_text("../..\n")
+                    (replacement / "gitdir").write_text(str(forged / ".git") + "\n")
+                return valid
+            with mock.patch.object(consolidator, "_primary_owns_common", side_effect=replace_common):
+                report = h.run()
+            self.assertTrue(swapped)
+            self.assertEqual(report["unknown_or_excluded_roots"], 1)
+            self.assertEqual(report["workspace_sources"], 0)
+
+    def test_loop_resolution_is_domain_blocked_without_memory_reads(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.source("active", "Example/active", "A workspace source.")
+            loop = h.home / "loop"
+            h.policy["repositories"][0]["active_bindings"][0]["primary_path"] = str(loop)
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            original = Path.resolve
+            def resolution(path, *args, **kwargs):
+                if path == loop:
+                    raise RuntimeError("synthetic symlink loop")
+                return original(path, *args, **kwargs)
+            with mock.patch.object(Path, "resolve", resolution), mock.patch.object(consolidator, "_read_bullets", side_effect=AssertionError("memory must not be read")):
+                with self.assertRaises(consolidator.ConsolidationError): h.run()
+            self.assertEqual(target.read_bytes(), b"prior output")
+
     def test_forged_route_root_cannot_borrow_an_accepted_binding(self) -> None:
         for shape in ["missing-git", "unrelated-git-directory", "missing-registration", "wrong-backpointer"]:
             with self.subTest(shape=shape), tempfile.TemporaryDirectory() as directory:
