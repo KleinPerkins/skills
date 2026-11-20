@@ -39,6 +39,8 @@ a configured custom runtime root). Source-tree runs use
 `~/.local/share/continual-learning-consolidate/classifications.json`.
 `--classifications PATH` selects an explicit policy. Keep host paths, accepted
 assignments and private continuity evidence out of source repositories and CI.
+Policy inputs are bounded to 1 MiB and read as no-follow, nonblocking regular
+files; installed runtime policy also requires current-user ownership and mode 0600.
 This is a derived consumer input, not a new classification authority.
 
 The closed `memory-source-classification/v1` format requires all shown fields:
@@ -103,7 +105,10 @@ verified repair. Old releases remain available. The
 installer holds the exclusive installation lock; installed runtimes hold its
 shared side through policy loading, discovery and projection. A process that
 loaded a superseded release before waiting refuses before reading policy.
-Rollback validates policy with the verified target release before activation. Policy bytes are separate private data, owned by the current user with mode `0600`;
+Rollback validates policy with the verified target release before activation.
+New release files and affected publication/restoration directories are flushed
+before clearing the pending marker. Tests verify conventional fsync ordering and
+failure handling; this is not physical power-loss or hardware qualification. Policy bytes are separate private data, owned by the current user with mode `0600`;
 the JSON receipt binds their hash to the release digest. `current` and
 `~/.local/bin/continual-learning-consolidate` point at the installed release.
 

@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 SCHEMA = "memory-source-classification/v1"
+MAX_POLICY_BYTES = 1024 * 1024
 
 
 class PolicyError(ValueError):
@@ -182,16 +183,26 @@ class Policy:
         return identity, kind
 
 
+def read_policy_file(path: Path, *, private: bool = False) -> tuple[bytes, int]:
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(descriptor, "rb") as handle:
+        info = os.fstat(handle.fileno())
+        mode = stat.S_IMODE(info.st_mode)
+        if not stat.S_ISREG(info.st_mode):
+            raise PolicyError("classification policy must be a regular file")
+        if private and (info.st_uid != os.getuid() or mode != 0o600):
+            raise PolicyError("classification policy must be current-user owned with mode 0600")
+        if info.st_size > MAX_POLICY_BYTES:
+            raise PolicyError("classification policy exceeds 1 MiB limit")
+        data = handle.read(MAX_POLICY_BYTES + 1)
+        if len(data) > MAX_POLICY_BYTES:
+            raise PolicyError("classification policy exceeds 1 MiB limit")
+        return data, mode
+
+
 def load_policy(path: Path) -> Policy:
     try:
-        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
-        with os.fdopen(descriptor, "rb") as handle:
-            info = os.fstat(handle.fileno())
-            if not stat.S_ISREG(info.st_mode):
-                raise PolicyError("classification policy must be a regular file")
-            if info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o600:
-                raise PolicyError("classification policy must be current-user owned with mode 0600")
-            data = handle.read()
+        data, _ = read_policy_file(path, private=True)
         payload = json.loads(data.decode("utf-8"), object_pairs_hook=_unique_object)
         return Policy(payload, hashlib.sha256(data).hexdigest())
     except (OSError, UnicodeError, ValueError, TypeError) as exc:

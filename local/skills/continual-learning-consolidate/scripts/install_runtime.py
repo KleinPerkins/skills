@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from classifications import read_policy_file  # noqa: E402
 
 
 def file_hash(data: bytes) -> str:
@@ -51,15 +52,45 @@ def verify_release(path: Path, release_id: str) -> None:
         raise ValueError("release contains unexpected files or symlinks")
 
 
-def atomic_bytes(path: Path, content: bytes) -> None:
+def fsync_directory(path: Path) -> None:
+    descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def ensure_directory(path: Path, mode: int = 0o755) -> None:
+    missing = []
+    cursor = path
+    while not cursor.exists():
+        missing.append(cursor)
+        cursor = cursor.parent
+    for directory in reversed(missing):
+        directory.mkdir(mode=mode if directory == path else 0o755, exist_ok=True)
+        fsync_directory(directory.parent)
+
+
+def write_release_file(path: Path, content: bytes, mode: int) -> None:
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
+    with os.fdopen(descriptor, "wb") as handle:
+        handle.write(content)
+        handle.flush()
+        os.fchmod(handle.fileno(), mode)
+        os.fsync(handle.fileno())
+    fsync_directory(path.parent)
+
+
+def atomic_bytes(path: Path, content: bytes, mode: int = 0o600) -> None:
     fd, name = tempfile.mkstemp(prefix=".policy-", dir=path.parent)
     try:
         with os.fdopen(fd, "wb") as handle:
             handle.write(content)
             handle.flush()
+            os.fchmod(handle.fileno(), mode)
             os.fsync(handle.fileno())
-        os.chmod(name, 0o600)
         os.replace(name, path)
+        fsync_directory(path.parent)
     finally:
         Path(name).unlink(missing_ok=True)
 
@@ -75,6 +106,7 @@ def link_preimage(path: Path) -> str | None:
 def atomic_link(path: Path, target: str | None) -> None:
     if target is None:
         path.unlink(missing_ok=True)
+        fsync_directory(path.parent)
         return
     fd, name = tempfile.mkstemp(prefix=".link-", dir=path.parent)
     os.close(fd)
@@ -83,20 +115,16 @@ def atomic_link(path: Path, target: str | None) -> None:
     try:
         temporary.symlink_to(target)
         os.replace(temporary, path)
+        fsync_directory(path.parent)
     finally:
         temporary.unlink(missing_ok=True)
 
 
 def read_policy_preimage(path: Path) -> tuple[bytes | None, int | None]:
     try:
-        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        return read_policy_file(path)
     except FileNotFoundError:
         return None, None
-    with os.fdopen(descriptor, "rb") as handle:
-        info = os.fstat(handle.fileno())
-        if not stat.S_ISREG(info.st_mode):
-            raise ValueError("private policy must be a regular file")
-        return handle.read(), stat.S_IMODE(info.st_mode)
 
 
 def recovery_marker(lock, pending: bool) -> None:
@@ -113,9 +141,9 @@ def recovery_marker(lock, pending: bool) -> None:
 def restore_policy(path: Path, content: bytes | None, mode: int | None) -> None:
     if content is None:
         path.unlink(missing_ok=True)
+        fsync_directory(path.parent)
     else:
-        atomic_bytes(path, content)
-        os.chmod(path, mode)
+        atomic_bytes(path, content, mode)
 
 
 def validate_target_policy(release: Path, policy: bytes) -> None:
@@ -140,8 +168,8 @@ def validate_target_policy(release: Path, policy: bytes) -> None:
 
 def install(args: argparse.Namespace) -> dict:
     root, bin_dir = args.runtime.resolve(), args.bin_dir.resolve()
-    root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    bin_dir.mkdir(parents=True, exist_ok=True)
+    ensure_directory(root, mode=0o700)
+    ensure_directory(bin_dir)
     with (root / ".install.lock").open("a+") as lock:
         os.chmod(root / ".install.lock", 0o600)
         fcntl.flock(lock, fcntl.LOCK_EX)
@@ -164,7 +192,7 @@ def install(args: argparse.Namespace) -> dict:
                 raise ValueError("policy installation requires --expected-policy-sha256 HASH|absent")
             if args.expected_policy_sha256 != observed_policy:
                 raise ValueError("private policy preimage changed")
-            candidate_policy = args.policy.read_bytes()
+            candidate_policy, _ = read_policy_file(args.policy)
         else:
             if args.expected_policy_sha256 is not None and args.expected_policy_sha256 != observed_policy:
                 raise ValueError("private policy preimage changed")
@@ -174,7 +202,7 @@ def install(args: argparse.Namespace) -> dict:
         from classifications import Policy, _unique_object
         Policy(json.loads(candidate_policy.decode("utf-8"), object_pairs_hook=_unique_object), file_hash(candidate_policy))
         releases = root / "releases"
-        releases.mkdir(exist_ok=True)
+        ensure_directory(releases)
         if args.rollback_to:
             if args.expected_current is None:
                 raise ValueError("rollback requires --expected-current")
@@ -193,14 +221,16 @@ def install(args: argparse.Namespace) -> dict:
             release = releases / release_id
             if not release.exists():
                 stage = Path(tempfile.mkdtemp(prefix=".stage-", dir=root))
+                fsync_directory(root)
                 try:
                     for name, content in files.items():
                         target = stage / name
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        target.write_bytes(content)
-                        target.chmod(required_mode(name))
-                    (stage / "manifest.json").write_bytes(record)
+                        ensure_directory(target.parent)
+                        write_release_file(target, content, required_mode(name))
+                    write_release_file(stage / "manifest.json", record, 0o644)
                     stage.rename(release)
+                    fsync_directory(releases)
+                    fsync_directory(root)
                 finally:
                     if stage.exists():
                         shutil.rmtree(stage)
@@ -241,7 +271,9 @@ def install(args: argparse.Namespace) -> dict:
                 except Exception as error:
                     entry.update(restored=False, verification_error=str(error))
                 recovery[name] = entry
-            restored = all(entry["restored"] for entry in recovery.values())
+            restored = all(entry["restored"] and "inverse_error" not in entry
+                           and "verification_error" not in entry
+                           for entry in recovery.values())
             if restored and not was_pending:
                 try:
                     recovery_marker(lock, False)

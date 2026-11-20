@@ -355,6 +355,55 @@ class InstallTests(unittest.TestCase):
         repaired = subprocess.run(command, env=self.env, capture_output=True, text=True, timeout=10)
         self.assertEqual(repaired.returncode, 0, repaired.stderr)
 
+    def test_publication_syncs_precede_marker_clear_and_sync_failure_blocks(self) -> None:
+        self.initial()
+        before = self.pointers()
+        with (self.source / "scripts/lib/memory.py").open("a") as handle:
+            handle.write("\n# next addressed release\n")
+        self.policy.write_text(json.dumps({"schema": "memory-source-classification/v1", "repositories": [], "excluded_paths": [str(self.home / "new-only")]}))
+        args = SimpleNamespace(runtime=self.runtime, bin_dir=self.bin_dir, expected_current=None, policy=self.policy, expected_policy_sha256=hashlib.sha256(before[2]).hexdigest(), rollback_to=None, source=self.source)
+        events = []
+        sync, marker, link, policy_write = installer.fsync_directory, installer.recovery_marker, installer.atomic_link, installer.atomic_bytes
+        def record_sync(path): events.append(("sync", path)); sync(path)
+        def record_marker(lock, pending): events.append(("marker", pending)); marker(lock, pending)
+        def record_link(path, target): events.append(("publish", path)); link(path, target)
+        def record_policy(path, data, mode=0o600): events.append(("publish", path)); policy_write(path, data, mode)
+        with mock.patch.object(installer, "fsync_directory", side_effect=record_sync), mock.patch.object(installer, "recovery_marker", side_effect=record_marker), mock.patch.object(installer, "atomic_link", side_effect=record_link), mock.patch.object(installer, "atomic_bytes", side_effect=record_policy):
+            installer.install(args)
+        clear = events.index(("marker", False))
+        self.assertIn(("sync", self.runtime / "releases"), events[:clear])
+        for position, event in enumerate(events):
+            if event[0] != "publish": continue
+            end = next((i for i in range(position + 1, len(events)) if events[i][0] in {"publish", "marker"}), len(events))
+            self.assertIn(("sync", event[1].parent), events[position + 1:end])
+        args.policy = None
+        args.expected_policy_sha256 = None
+        def fail_bin_sync(path):
+            if path == self.bin_dir: raise OSError("synthetic directory sync failure")
+            sync(path)
+        with mock.patch.object(installer, "fsync_directory", side_effect=fail_bin_sync):
+            with self.assertRaises(ValueError) as caught: installer.install(args)
+        recovery = json.loads(str(caught.exception).split("recovery=", 1)[1])
+        self.assertTrue(recovery["runtime_blocked"])
+        self.assertIn("inverse_error", recovery["binary"])
+        self.assertTrue((self.runtime / ".install.lock").read_bytes())
+
+    def test_candidate_policy_inputs_are_bounded_regular_nofollow_files(self) -> None:
+        self.initial()
+        before = self.pointers()
+        previous_hash = hashlib.sha256(before[2]).hexdigest()
+        fifo = self.root / "candidate-fifo"
+        os.mkfifo(fifo, mode=0o600)
+        symlink = self.root / "candidate-link"
+        symlink.symlink_to(self.policy)
+        oversized = self.root / "candidate-oversize"
+        oversized.write_bytes(self.policy.read_bytes() + b" " * (1024 * 1024))
+        for candidate in [fifo, symlink, oversized]:
+            with self.subTest(candidate=candidate.name):
+                result = subprocess.run(["bash", str(self.source / "install.sh"), "--no-schedule", "--policy", str(candidate), "--expected-policy-sha256", previous_hash], env=self.env, capture_output=True, text=True, timeout=5)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(self.pointers(), before)
+
     def test_failed_pointer_swap_restores_policy_and_runtime(self) -> None:
         self.initial()
         (self.runtime / "classifications.json").chmod(0o640)
