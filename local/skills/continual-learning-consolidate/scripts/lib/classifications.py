@@ -97,8 +97,7 @@ class Policy:
         self.excluded = tuple(Path(canonical_path(path)) for path in payload["excluded_paths"])
         self.bindings: dict[tuple[str, str], tuple[str, str, frozenset[str]]] = {}
         self.ids: set[str] = set()
-        primary_owners: dict[str, str] = {}
-        common_owners: dict[str, str] = {}
+        local_owners: dict[str, str] = {}
         origin_owners: dict[str, str] = {}
         for row in payload["repositories"]:
             if not isinstance(row, dict) or set(row) != {"repository_id", "classification", "active_bindings", "origin_aliases"}:
@@ -123,10 +122,10 @@ class Policy:
                 common = canonical_path(binding["git_common_dir"])
                 if self.is_excluded(Path(primary)) or self.is_excluded(Path(common)):
                     raise PolicyError("active binding overlaps excluded storage")
-                for alias, owners in [(primary, primary_owners), (common, common_owners)]:
-                    if alias in owners and owners[alias] != identity:
+                for alias in (primary, common):
+                    if alias in local_owners and local_owners[alias] != identity:
                         raise PolicyError("local alias assigned to different repository IDs")
-                    owners[alias] = identity
+                    local_owners[alias] = identity
                 key = (primary, common)
                 if key in self.bindings:
                     raise PolicyError("duplicate active binding")

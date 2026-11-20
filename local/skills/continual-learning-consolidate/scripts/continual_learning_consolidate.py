@@ -211,12 +211,18 @@ def _workspace_sources(
             raise ConsolidationError(
                 f"agent-route roots[{position}] is missing abs_path"
             )
-        root_path = Path(raw_path).expanduser()
+        root_path = Path(raw_path)
         if not root_path.is_absolute():
             raise ConsolidationError(
                 f"agent-route roots[{position}] abs_path is not absolute"
             )
-        root_path = root_path.resolve(strict=False)
+        try:
+            # Preserve lexical exclusions: resolving a recovery alias first
+            # would erase its excluded location and borrow the active target.
+            classifications.canonical_path(str(root_path))
+        except classifications.PolicyError:
+            unknown_roots += 1
+            continue
         assigned = policy.resolve(raw_root, root_path)
         if assigned is None:
             unknown_roots += 1

@@ -433,6 +433,24 @@ class ClassificationTests(unittest.TestCase):
             self.assertEqual(report["unknown_or_excluded_roots"], 2)
             self.assertEqual(report["workspace_sources"], 1)
 
+    def test_discovered_root_symlink_cannot_erase_lexical_exclusion(self) -> None:
+        for prefix in ["recovery", "unreviewed-alias"]:
+            with self.subTest(prefix=prefix), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                active = h.source("active", "Example/active", "Initial memory.")
+                (active / "agent-learnings.md").write_bytes(b"\xff")
+                alias = h.home / prefix / "alias"
+                alias.parent.mkdir()
+                alias.symlink_to(active, target_is_directory=True)
+                h.policy["excluded_paths"] = [str(h.home / "recovery")]
+                # Only the alias is discovered; borrowing its target would read
+                # the invalid sentinel, despite the accepted target metadata.
+                h.roots[0]["abs_path"] = str(alias)
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertEqual(report["workspace_sources"], 0)
+
     def test_active_memory_symlink_cannot_read_excluded_storage(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             h = Harness(Path(directory))
@@ -524,7 +542,7 @@ class ClassificationTests(unittest.TestCase):
                 self.assertEqual(report["workspace_sources"], 1)
 
     def test_invalid_policy_preserves_output_and_precedes_seed_reads(self) -> None:
-        cases = ["missing", "json", "schema", "classification", "duplicate-id", "common-conflict", "primary-conflict", "origin-conflict", "duplicate-key", "excluded-binding", "noncanonical", "extra-field"]
+        cases = ["missing", "json", "schema", "classification", "duplicate-id", "common-conflict", "primary-conflict", "cross-role-conflict", "origin-conflict", "duplicate-key", "excluded-binding", "noncanonical", "extra-field"]
         for case in cases:
             with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
                 h = Harness(Path(directory))
@@ -538,6 +556,7 @@ class ClassificationTests(unittest.TestCase):
                 elif case in {"common-conflict", "primary-conflict"}:
                     key = "git_common_dir" if case == "common-conflict" else "primary_path"
                     second["active_bindings"][0][key] = first["active_bindings"][0][key]
+                elif case == "cross-role-conflict": second["active_bindings"][0]["git_common_dir"] = first["active_bindings"][0]["primary_path"]
                 elif case == "origin-conflict": second["origin_aliases"] = ["git@github.com:example/one.git/"]
                 elif case == "excluded-binding": h.policy["excluded_paths"] = [str(h.home / "one")]
                 elif case == "noncanonical": first["active_bindings"][0]["primary_path"] += "/../one"

@@ -139,6 +139,18 @@ class InstallTests(unittest.TestCase):
         self.run_install("--expected-current", release_id, success=False)
         self.assertEqual(os.readlink(current), unrelated_target)
 
+    def test_rollback_forces_runtime_only_without_no_schedule_flag(self) -> None:
+        old = self.initial()["release_id"]
+        with (self.source / "scripts/lib/memory.py").open("a") as handle:
+            handle.write("\n# next release\n")
+        new = self.run_install()["release_id"]
+        previous_job = self.job.read_bytes()
+        result = subprocess.run(["bash", str(self.source / "install.sh"), "--rollback-to", old, "--expected-current", new], env=self.env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(Path(self.pointers()[0]).name, old)
+        self.assertFalse((self.home / "job-calls").exists())
+        self.assertEqual(self.job.read_bytes(), previous_job)
+
     def test_rollback_validates_policy_with_target_release(self) -> None:
         validator = self.source / "scripts/lib/classifications.py"
         original = validator.read_text()
