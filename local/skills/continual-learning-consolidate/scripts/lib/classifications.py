@@ -183,21 +183,58 @@ class Policy:
         return identity, kind
 
 
-def read_policy_file(path: Path, *, private: bool = False) -> tuple[bytes, int]:
-    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+def open_directory(path: Path, *, directory_fd: int | None = None) -> int:
+    if directory_fd is None:
+        if not path.is_absolute():
+            raise PolicyError("directory must be absolute")
+        descriptor = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        components = path.parts[1:]
+    else:
+        if path.is_absolute() or ".." in path.parts:
+            raise PolicyError("anchored directory must stay relative")
+        descriptor = os.dup(directory_fd)
+        components = path.parts
+    try:
+        for component in components:
+            child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                            dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        return descriptor
+    except Exception:
+        os.close(descriptor)
+        raise
+
+
+def read_regular_file(path: Path, *, private: bool = False,
+                      directory_fd: int | None = None) -> tuple[bytes, int]:
+    parent_fd = None
+    try:
+        if directory_fd is not None:
+            parent_fd = open_directory(path.parent, directory_fd=directory_fd)
+        descriptor = os.open(path.name if parent_fd is not None else path,
+                             os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                             dir_fd=parent_fd)
+    finally:
+        if parent_fd is not None:
+            os.close(parent_fd)
     with os.fdopen(descriptor, "rb") as handle:
         info = os.fstat(handle.fileno())
         mode = stat.S_IMODE(info.st_mode)
         if not stat.S_ISREG(info.st_mode):
-            raise PolicyError("classification policy must be a regular file")
+            raise PolicyError("input must be a regular file")
         if private and (info.st_uid != os.getuid() or mode != 0o600):
             raise PolicyError("classification policy must be current-user owned with mode 0600")
         if info.st_size > MAX_POLICY_BYTES:
-            raise PolicyError("classification policy exceeds 1 MiB limit")
+            raise PolicyError("input exceeds 1 MiB limit")
         data = handle.read(MAX_POLICY_BYTES + 1)
         if len(data) > MAX_POLICY_BYTES:
-            raise PolicyError("classification policy exceeds 1 MiB limit")
+            raise PolicyError("input exceeds 1 MiB limit")
         return data, mode
+
+
+def read_policy_file(path: Path, *, private: bool = False) -> tuple[bytes, int]:
+    return read_regular_file(path, private=private)
 
 
 def load_policy(path: Path) -> Policy:

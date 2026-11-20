@@ -404,6 +404,62 @@ class InstallTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(self.pointers(), before)
 
+    def test_release_integrity_reads_refuse_nonregular_alias_and_oversize_files(self) -> None:
+        release_id = self.initial()["release_id"]
+        release = self.runtime / "releases" / release_id
+        before = self.pointers()
+        targets = [self.source / "scripts/lib/memory.py", release / "scripts/lib/memory.py", release / "manifest.json"]
+        for target in targets:
+            original, mode = target.read_bytes(), target.stat().st_mode & 0o777
+            backup = self.root / (target.name + "-backup")
+            backup.write_bytes(original)
+            for shape in ["fifo", "symlink", "oversize"]:
+                with self.subTest(target=str(target), shape=shape):
+                    target.unlink()
+                    try:
+                        if shape == "fifo": os.mkfifo(target, mode=mode)
+                        elif shape == "symlink": target.symlink_to(backup)
+                        else: target.write_bytes(original + b" " * (1024 * 1024))
+                        result = subprocess.run(["bash", str(self.source / "install.sh"), "--no-schedule"], env=self.env, capture_output=True, text=True, timeout=5)
+                        self.assertNotEqual(result.returncode, 0)
+                        if shape == "oversize": self.assertIn("1 MiB limit", result.stderr)
+                        self.assertEqual(self.pointers(), before)
+                        with (self.runtime / ".install.lock").open("a+") as lock:
+                            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    finally:
+                        target.unlink(missing_ok=True)
+                        target.write_bytes(original)
+                        target.chmod(mode)
+
+    def test_runtime_code_integrity_reads_refuse_and_release_lock(self) -> None:
+        release_id = self.initial()["release_id"]
+        entry = self.runtime / "releases" / release_id / "scripts/continual_learning_consolidate.py"
+        original = entry.read_bytes()
+        backup = entry.parent / "probe-original.py"
+        backup.write_bytes(original)
+        route = self.root / "route.sh"
+        route.write_text("#!/bin/sh\nprintf '%s\\n' '{\"roots\":[]}'\n")
+        target = self.home / "AGENTS.md"
+        target.write_bytes(b"prior output")
+        program = f"import sys,types,json;from pathlib import Path;m=types.ModuleType('probe');m.__file__={str(entry)!r};sys.modules[m.__name__]=m;exec(compile(Path({str(backup)!r}).read_bytes(),m.__file__,'exec'),m.__dict__);m._read_bullets=lambda *a,**k:(_ for _ in ()).throw(AssertionError('memory must not be read'))\ntry:m.consolidate_home(Path({str(self.home)!r}),Path({str(route)!r}))\nexcept m.ConsolidationError as error:print(json.dumps({{'blocked':str(error)}}))\nelse:raise AssertionError('corrupted code accepted')"
+        for shape in ["fifo", "symlink", "oversize"]:
+            with self.subTest(shape=shape):
+                entry.unlink()
+                try:
+                    if shape == "fifo": os.mkfifo(entry, mode=0o755)
+                    elif shape == "symlink": entry.symlink_to(backup)
+                    else: entry.write_bytes(original + b" " * (1024 * 1024))
+                    result = subprocess.run([sys.executable, "-B", "-c", program], env=self.env, capture_output=True, text=True, timeout=5)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("cannot verify installed runtime code", json.loads(result.stdout)["blocked"])
+                    self.assertEqual(target.read_bytes(), b"prior output")
+                    with (self.runtime / ".install.lock").open("a+") as lock:
+                        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                finally:
+                    entry.unlink(missing_ok=True)
+                    entry.write_bytes(original)
+                    entry.chmod(0o755)
+
     def test_failed_pointer_swap_restores_policy_and_runtime(self) -> None:
         self.initial()
         (self.runtime / "classifications.json").chmod(0o640)

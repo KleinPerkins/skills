@@ -41,6 +41,9 @@ a configured custom runtime root). Source-tree runs use
 assignments and private continuity evidence out of source repositories and CI.
 Policy inputs are bounded to 1 MiB and read as no-follow, nonblocking regular
 files; installed runtime policy also requires current-user ownership and mode 0600.
+Release Python/manifest snapshots and the runtime code-identity reread use the
+same finite bound and descriptor-based regular-file checks. Corruption refuses
+without leaving an integrity read blocked on a FIFO or following a symlink.
 This is a derived consumer input, not a new classification authority.
 
 The closed `memory-source-classification/v1` format requires all shown fields:

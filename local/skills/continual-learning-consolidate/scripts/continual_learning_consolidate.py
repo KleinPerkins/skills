@@ -52,21 +52,7 @@ class Occurrence:
     index: int
 
 
-def _open_directory(path: Path) -> int:
-    """Bind a directory without following any path component symlink."""
-    if not path.is_absolute():
-        raise ConsolidationError("workspace directory must be absolute")
-    directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    try:
-        for component in path.parts[1:]:
-            child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                            dir_fd=directory)
-            os.close(directory)
-            directory = child
-        return directory
-    except Exception:
-        os.close(directory)
-        raise
+_open_directory = classifications.open_directory
 
 
 def _pointer_at(directory: int, name: str) -> str:
@@ -455,11 +441,17 @@ def _runtime_snapshot():
         # Refuse that snapshot after the exclusive publisher changes current.
         # The bin/current symlinks can change after Python reads the script but
         # before SCRIPT_DIR is resolved. Compare the executing module too.
-        current_code = compile(
-            (release / "scripts/continual_learning_consolidate.py").read_bytes(),
-            _LOADED_MODULE_CODE.co_filename, "exec", dont_inherit=True,
-            optimize=sys.flags.optimize,
-        )
+        try:
+            script_fd = _open_directory(SCRIPT_DIR)
+            try:
+                code, _ = classifications.read_regular_file(
+                    Path("continual_learning_consolidate.py"), directory_fd=script_fd)
+            finally:
+                os.close(script_fd)
+            current_code = compile(code, _LOADED_MODULE_CODE.co_filename, "exec",
+                                   dont_inherit=True, optimize=sys.flags.optimize)
+        except (OSError, ValueError, SyntaxError) as exc:
+            raise ConsolidationError("cannot verify installed runtime code") from exc
         if ((runtime / "current").resolve(strict=False) != release
                 or current_code != _LOADED_MODULE_CODE):
             raise ConsolidationError("installed runtime changed before startup; retry")

@@ -16,16 +16,31 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
-from classifications import read_policy_file  # noqa: E402
+from classifications import open_directory, read_policy_file, read_regular_file  # noqa: E402
 
 
 def file_hash(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def release_files(source: Path) -> dict[str, bytes]:
-    return {str(path.relative_to(source)): path.read_bytes()
-            for path in sorted((source / "scripts").rglob("*.py"))}
+def release_files(source: Path, *, directory_fd: int | None = None,
+                  modes: dict[str, int] | None = None) -> dict[str, bytes]:
+    owned = directory_fd is None
+    if owned:
+        source = source.resolve(strict=True)
+        directory_fd = open_directory(source)
+    try:
+        result = {}
+        for path in sorted((source / "scripts").rglob("*.py")):
+            name = str(path.relative_to(source))
+            content, mode = read_regular_file(Path(name), directory_fd=directory_fd)
+            result[name] = content
+            if modes is not None:
+                modes[name] = mode
+        return result
+    finally:
+        if owned:
+            os.close(directory_fd)
 
 
 def required_mode(name: str) -> int:
@@ -40,12 +55,17 @@ def manifest(files: dict[str, bytes]) -> bytes:
 def verify_release(path: Path, release_id: str) -> None:
     if path.is_symlink() or any(p.is_symlink() for p in path.rglob("*")):
         raise ValueError("release contains symlinks")
-    recorded = (path / "manifest.json").read_bytes()
-    if file_hash(recorded) != release_id or manifest(release_files(path)) != recorded:
-        raise ValueError("release content failed address verification")
-    for name, entry in json.loads(recorded).items():
-        if stat.S_IMODE((path / name).stat().st_mode) != entry["mode"]:
+    descriptor = open_directory(path)
+    try:
+        recorded, _ = read_regular_file(Path("manifest.json"), directory_fd=descriptor)
+        modes = {}
+        files = release_files(path, directory_fd=descriptor, modes=modes)
+        if file_hash(recorded) != release_id or manifest(files) != recorded:
+            raise ValueError("release content failed address verification")
+        if any(mode != required_mode(name) for name, mode in modes.items()):
             raise ValueError("release file mode failed verification")
+    finally:
+        os.close(descriptor)
     expected = set(json.loads(recorded)) | {"manifest.json"}
     actual = {str(p.relative_to(path)) for p in path.rglob("*") if not p.is_dir()}
     if expected != actual or any(p.is_symlink() for p in path.rglob("*")):
