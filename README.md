@@ -4,7 +4,20 @@
 useful everywhere, across every tool and every org. Cloned locally to
 `~/dev/capabilities/skills` and consumed by Cursor, Claude, and Codex via symlinks.
 
-This repo is **private** (personal GitHub: `KleinPerkins/skills`).
+This is the **public clean source successor** at `KleinPerkins/skills`
+(GitHub repository ID `1461925043`). Retained original history, installed runtimes
+and downstream pins have separate lifecycle controls.
+
+The admitted [reviewer enrollment registry](.github/review-enrollments.json)
+enables WORK and keeps PERSONAL disabled pending separate qualification. The
+App writer remains a separate operational gate.
+
+Bootstrap evidence: [initial admission PR #2](https://github.com/KleinPerkins/skills/pull/2),
+[main CI run 44696726922](https://github.com/KleinPerkins/skills/actions/runs/44696726922),
+and [read-only App qualification run 44697238310](https://github.com/KleinPerkins/skills/actions/runs/44697238310).
+These links record bootstrap evidence; ordinary App delivery remains a separate
+qualification. See the admitted [reviewer workflow](.github/workflows/reviewer-app.yml)
+and [admission implementation](scripts/reviewer_app.py) for the current gates.
 
 ---
 
