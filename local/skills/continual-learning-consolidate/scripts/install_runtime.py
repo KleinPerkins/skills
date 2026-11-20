@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -26,8 +27,12 @@ def release_files(source: Path) -> dict[str, bytes]:
             for path in sorted((source / "scripts").rglob("*.py"))}
 
 
+def required_mode(name: str) -> int:
+    return 0o755 if Path(name).parent.name == "scripts" else 0o644
+
+
 def manifest(files: dict[str, bytes]) -> bytes:
-    return (json.dumps({name: file_hash(data) for name, data in files.items()},
+    return (json.dumps({name: {"sha256": file_hash(data), "mode": required_mode(name)} for name, data in files.items()},
                        sort_keys=True, separators=(",", ":")) + "\n").encode()
 
 
@@ -37,6 +42,9 @@ def verify_release(path: Path, release_id: str) -> None:
     recorded = (path / "manifest.json").read_bytes()
     if file_hash(recorded) != release_id or manifest(release_files(path)) != recorded:
         raise ValueError("release content failed address verification")
+    for name, entry in json.loads(recorded).items():
+        if stat.S_IMODE((path / name).stat().st_mode) != entry["mode"]:
+            raise ValueError("release file mode failed verification")
     expected = set(json.loads(recorded)) | {"manifest.json"}
     actual = {str(p.relative_to(path)) for p in path.rglob("*") if not p.is_dir()}
     if expected != actual or any(p.is_symlink() for p in path.rglob("*")):
@@ -137,7 +145,7 @@ def install(args: argparse.Namespace) -> dict:
                         target = stage / name
                         target.parent.mkdir(parents=True, exist_ok=True)
                         target.write_bytes(content)
-                        target.chmod(0o755 if target.parent.name == "scripts" else 0o644)
+                        target.chmod(required_mode(name))
                     (stage / "manifest.json").write_bytes(record)
                     stage.rename(release)
                 finally:

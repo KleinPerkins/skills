@@ -144,6 +144,14 @@ class InstallTests(unittest.TestCase):
         self.run_install(success=False)
         self.assertEqual(binary.read_text(), "unrelated occupant")
 
+    def test_reused_release_requires_executable_entrypoint_mode(self) -> None:
+        release_id = self.initial()["release_id"]
+        before = self.pointers()
+        entrypoint = self.runtime / "releases" / release_id / "scripts/continual_learning_consolidate.py"
+        entrypoint.chmod(0o644)
+        self.run_install(success=False)
+        self.assertEqual(self.pointers(), before)
+
     def test_failed_pointer_swap_restores_policy_and_runtime(self) -> None:
         self.initial()
         (self.runtime / "classifications.json").chmod(0o640)

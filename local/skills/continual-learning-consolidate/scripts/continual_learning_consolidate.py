@@ -49,29 +49,94 @@ class Occurrence:
     index: int
 
 
-def _open_workspace_memory(path: Path) -> int:
-    """Bind every directory and the final file without following symlinks."""
+def _open_directory(path: Path) -> int:
+    """Bind a directory without following any path component symlink."""
     if not path.is_absolute():
-        raise ConsolidationError("workspace memory path must be absolute")
+        raise ConsolidationError("workspace directory must be absolute")
     directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        for component in path.parts[1:-1]:
+        for component in path.parts[1:]:
             child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
                             dir_fd=directory)
             os.close(directory)
             directory = child
-        return os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
-                       dir_fd=directory)
-    finally:
+        return directory
+    except Exception:
         os.close(directory)
+        raise
 
 
-def _read_bullets(path: Path, *, no_follow: bool = False) -> tuple[tuple[str, str], ...]:
+def _pointer_at(directory: int, name: str) -> str:
+    descriptor = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                         dir_fd=directory)
+    with os.fdopen(descriptor, "rb") as handle:
+        info = os.fstat(handle.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_size > 8192:
+            raise ValueError("Git pointer must be a small regular file")
+        data = handle.read(8193)
+        if len(data) > 8192:
+            raise ValueError("Git pointer exceeds bound")
+        return data.decode("utf-8", errors="strict").strip()
+
+
+def _same_directory(left: int, right: int) -> bool:
+    a, b = os.fstat(left), os.fstat(right)
+    return (a.st_dev, a.st_ino) == (b.st_dev, b.st_ino)
+
+
+def _root_matches_binding(root: Path, metadata: dict[str, Any], root_fd: int) -> bool:
+    """Corroborate route identity using local Git pointers, never a Git process."""
+    primary, common = Path(metadata["primary_abs_path"]), Path(metadata["git_common_dir"])
+    try:
+        info = os.stat(".git", dir_fd=root_fd, follow_symlinks=False)
+        common_fd = _open_directory(common)
+        try:
+            if stat.S_ISDIR(info.st_mode):
+                if root != primary:
+                    return False
+                git_fd = os.open(".git", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                 dir_fd=root_fd)
+                try:
+                    return _same_directory(git_fd, common_fd)
+                finally:
+                    os.close(git_fd)
+            pointer = _pointer_at(root_fd, ".git")
+            if not pointer.startswith("gitdir: "):
+                return False
+            admin = (root / pointer[len("gitdir: "):]).resolve(strict=False)
+            admin_fd = _open_directory(admin)
+            try:
+                if root == primary and _same_directory(admin_fd, common_fd):
+                    return True  # Explicit primary with a separate Git directory.
+                if admin.parent != common / "worktrees":
+                    return False
+                declared_common = (admin / _pointer_at(admin_fd, "commondir")).resolve(strict=False)
+                backpointer = (admin / _pointer_at(admin_fd, "gitdir")).resolve(strict=False)
+                if declared_common != common or backpointer != root / ".git":
+                    return False
+                # Bind the registered backpointer to the directory already open.
+                observed_fd = _open_directory(backpointer.parent)
+                try:
+                    return _same_directory(observed_fd, root_fd)
+                finally:
+                    os.close(observed_fd)
+            finally:
+                os.close(admin_fd)
+        finally:
+            os.close(common_fd)
+    except (OSError, UnicodeError, ValueError):
+        return False
+
+
+def _read_bullets(path: Path, *, no_follow: bool = False, root_fd: int | None = None) -> tuple[tuple[str, str], ...]:
     try:
         if no_follow:
             # The descriptor, not a prior path check, binds the admitted file.
             # NONBLOCK also avoids hanging if a workspace swaps in a FIFO.
-            descriptor = _open_workspace_memory(path)
+            if root_fd is None:
+                raise ConsolidationError("workspace directory descriptor is missing")
+            descriptor = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                                 dir_fd=root_fd)
             with os.fdopen(descriptor, "r", encoding="utf-8", errors="strict") as handle:
                 if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
                     raise ConsolidationError(f"workspace memory is not a regular file: {path}")
@@ -154,34 +219,41 @@ def _workspace_sources(
             unknown_roots += 1
             continue
         identity, kind = assigned
-        for field in ("origin", "live_origin"):
-            if raw_root.get(field):
-                origin = classifications.normalize_origin(raw_root[field])
-                previous_id = observed_origins.setdefault(origin, identity)
-                if previous_id != identity:
-                    raise ConsolidationError("discovered origin conflicts across accepted repository IDs")
-        candidate = root_path / "agent-learnings.md"
-        if candidate == seed_path or candidate in seen_paths:
-            continue
-        seen_paths.add(candidate)
-        if candidate.is_symlink():
-            # An active repository binding does not authorize reading a memory
-            # alias into recovery storage or another repository.
+        try:
+            root_fd = _open_directory(root_path)
+        except OSError:
             unknown_roots += 1
             continue
-        if not candidate.is_file():
-            continue
-        bullets = _read_bullets(candidate, no_follow=True)
-        if not bullets:
-            continue
-        sources.append(
-            Source(
-                path=candidate,
-                identity=identity,
-                is_work=kind == "work",
-                bullets=bullets,
-            )
-        )
+        try:
+            if not _root_matches_binding(root_path, raw_root, root_fd):
+                unknown_roots += 1
+                continue
+            for field in ("origin", "live_origin"):
+                if raw_root.get(field):
+                    origin = classifications.normalize_origin(raw_root[field])
+                    previous_id = observed_origins.setdefault(origin, identity)
+                    if previous_id != identity:
+                        raise ConsolidationError("discovered origin conflicts across accepted repository IDs")
+            candidate = root_path / "agent-learnings.md"
+            if candidate == seed_path or candidate in seen_paths:
+                continue
+            seen_paths.add(candidate)
+            try:
+                info = os.stat(candidate.name, dir_fd=root_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                continue
+            if stat.S_ISLNK(info.st_mode):
+                unknown_roots += 1
+                continue
+            if not stat.S_ISREG(info.st_mode):
+                continue
+            bullets = _read_bullets(candidate, no_follow=True, root_fd=root_fd)
+            if not bullets:
+                continue
+            sources.append(Source(path=candidate, identity=identity,
+                                  is_work=kind == "work", bullets=bullets))
+        finally:
+            os.close(root_fd)
 
     sources.sort(key=lambda item: (item.is_work, str(item.path)))
     return sources, len(roots), unknown_roots

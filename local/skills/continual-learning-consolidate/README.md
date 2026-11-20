@@ -9,7 +9,11 @@ The runtime makes no Git, GitHub or network calls.
 2. `agent-route map --json` supplies candidate roots and local identity metadata.
 3. A private accepted classification projection binds logical repository IDs to
    exact **active** primary/common-Git directory pairs. Paths and remote owners
-   do not assign personal/work classification.
+   do not assign personal/work classification. Route metadata is corroborated
+   against the opened root: a primary must own the accepted common directory; a
+   linked worktree needs matching `.git`, `commondir` and registration backpointer
+   files. This reads bounded local pointer metadata without executing Git. The
+   same open directory descriptor anchors the subsequent memory read.
 4. Excluded storage, unknown assignments and stale/unmatched bindings are skipped
    **before opening workspace memory**. Exclude all recovery/archive-only stores
    and retired roots explicitly, including aliases of an otherwise active ID.
@@ -86,7 +90,7 @@ without `--policy`, installation validates and retains the existing policy.
 The installer publishes under
 `~/.local/share/continual-learning-consolidate/releases/`, records a manifest and
 addresses **every Python dependency** (including policy validation and installer
-support). It verifies reused releases, atomically replaces links and policy,
+support), with required file modes in the manifest. It verifies reused releases, atomically replaces links and policy,
 restores preimages on a local pointer failure, uses a local installation lock and
 retains old releases. Policy bytes are separate private data with mode `0600`;
 the JSON receipt binds their hash to the release digest. `current` and

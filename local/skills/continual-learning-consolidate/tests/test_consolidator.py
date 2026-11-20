@@ -56,6 +56,7 @@ class Harness:
     ) -> Path:
         root = self.home / relative
         root.mkdir(parents=True)
+        (root / ".git").mkdir()
         (root / "agent-learnings.md").write_text(
             learned(*bullets), encoding="utf-8"
         )
@@ -345,6 +346,11 @@ class ClassificationTests(unittest.TestCase):
                 path.mkdir()
                 (path / "agent-learnings.md").write_text(learned(phrase))
                 root["abs_path"] = str(path)
+                admin = Path(root["git_common_dir"]) / "worktrees" / f"native-{i}"
+                admin.mkdir(parents=True)
+                (path / ".git").write_text("gitdir: " + str(admin) + "\n")
+                (admin / "commondir").write_text("../..\n")
+                (admin / "gitdir").write_text(str(path / ".git") + "\n")
                 h.roots.append(root)
             report = h.run()
             self.assertEqual(report["workspace_sources"], 4)
@@ -468,18 +474,19 @@ class ClassificationTests(unittest.TestCase):
                 with self.assertRaises(consolidator.ConsolidationError): h.run()
             self.assertEqual(target.read_bytes(), b"prior output")
 
-    def test_workspace_directory_symlink_swap_is_blocked_at_open(self) -> None:
+    def test_workspace_directory_swap_keeps_the_opened_admitted_root(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             h = Harness(Path(directory))
             h.seed("Keep a durable machine-local seed.")
-            active = h.source("active", "Example/active", "Initial regular memory.")
+            phrase = "Original admitted directory memory is corroborated by another repository."
+            active = h.source("active", "Example/active", phrase)
+            h.source("other", "Example/other", phrase)
             recovery = h.home / "recovery"
             recovery.mkdir()
-            (recovery / "agent-learnings.md").write_text(learned("Excluded directory memory must never be opened."))
+            excluded = "Excluded directory memory must never be opened."
+            (recovery / "agent-learnings.md").write_text(learned(excluded))
             h.policy["excluded_paths"] = [str(recovery)]
             candidate = active / "agent-learnings.md"
-            target = h.home / "AGENTS.md"
-            target.write_bytes(b"prior output")
             original_read = consolidator._read_bullets
             def swap_directory(path: Path, **kwargs):
                 if path == candidate:
@@ -487,8 +494,34 @@ class ClassificationTests(unittest.TestCase):
                     active.symlink_to(recovery, target_is_directory=True)
                 return original_read(path, **kwargs)
             with mock.patch.object(consolidator, "_read_bullets", side_effect=swap_directory):
-                with self.assertRaises(consolidator.ConsolidationError): h.run()
-            self.assertEqual(target.read_bytes(), b"prior output")
+                h.run()
+            output = (h.home / "AGENTS.md").read_text()
+            self.assertIn(phrase, output)
+            self.assertNotIn(excluded, output)
+
+    def test_forged_route_root_cannot_borrow_an_accepted_binding(self) -> None:
+        for shape in ["missing-git", "unrelated-git-directory", "missing-registration", "wrong-backpointer"]:
+            with self.subTest(shape=shape), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                h.source("accepted", "Example/accepted", "A single accepted source.")
+                forged = h.home / "forged"
+                forged.mkdir()
+                (forged / "agent-learnings.md").write_bytes(b"\xff")
+                root = dict(h.roots[0], abs_path=str(forged))
+                if shape == "unrelated-git-directory":
+                    (forged / ".git").mkdir()
+                elif shape in {"missing-registration", "wrong-backpointer"}:
+                    admin = Path(root["git_common_dir"]) / "worktrees/forged"
+                    admin.mkdir(parents=True)
+                    (forged / ".git").write_text("gitdir: " + str(admin) + "\n")
+                    if shape == "wrong-backpointer":
+                        (admin / "commondir").write_text("../..\n")
+                        (admin / "gitdir").write_text(str(h.home / "another-root/.git") + "\n")
+                h.roots.append(root)
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertEqual(report["workspace_sources"], 1)
 
     def test_invalid_policy_preserves_output_and_precedes_seed_reads(self) -> None:
         cases = ["missing", "json", "schema", "classification", "duplicate-id", "common-conflict", "primary-conflict", "origin-conflict", "duplicate-key", "excluded-binding", "noncanonical", "extra-field"]
