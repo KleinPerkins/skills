@@ -27,26 +27,51 @@ def normalize_origin(value: object) -> str:
     if not isinstance(value, str) or not value.strip():
         raise PolicyError("origin alias must be nonempty text")
     value = value.strip().rstrip("/")
-    if "://" in value:
-        parsed = urlsplit(value)
-        if parsed.scheme not in {"ssh", "https", "http", "git"} or not parsed.hostname:
-            raise PolicyError("unsupported origin locator")
-        if parsed.query or parsed.fragment or parsed.password:
-            raise PolicyError("origin must not contain credentials, query or fragment")
-        host, path = parsed.hostname, parsed.path.strip("/")
-    else:
-        match = re.fullmatch(r"(?:[^/@:]+@)?([^/:]+):(.+)", value)
-        if match:
-            host, path = match.groups()
+    try:
+        if "://" in value:
+            parsed = urlsplit(value)
+            if parsed.scheme not in {"ssh", "https", "http", "git"} or not parsed.hostname:
+                raise PolicyError("unsupported origin locator")
+            if parsed.query or parsed.fragment or parsed.password:
+                raise PolicyError("origin must not contain credentials, query or fragment")
+            host = parsed.hostname
+            if ":" in host:
+                host = f"[{host}]"
+            port = parsed.port  # Validates numeric range and malformed ports.
+            if port is not None:
+                if port == 0:
+                    raise PolicyError("invalid origin port")
+                defaults = {"ssh": 22, "https": 443, "http": 80, "git": 9418}
+                if port != defaults[parsed.scheme]:
+                    host += f":{port}"
+            path = parsed.path.strip("/")
+        elif len(value.split("/")) == 3 and "@" not in value.split("/")[0]:
+            # Canonical host[:port]/owner/repository keeps an explicit port.
+            # It may represent a non-default port for a different protocol.
+            authority, owner, repository = value.split("/")
+            parsed = urlsplit("//" + authority)
+            if not parsed.hostname or parsed.username or parsed.password:
+                raise PolicyError("invalid origin authority")
+            port = parsed.port
+            if port == 0:
+                raise PolicyError("invalid origin port")
+            host = parsed.hostname
+            if ":" in host:
+                host = f"[{host}]"
+            if port is not None:
+                host += f":{port}"
+            path = owner + "/" + repository
         else:
-            parts = value.split("/")
-            if len(parts) != 3:
+            match = re.fullmatch(r"(?:[^/@:]+@)?([^/:]+):(.+)", value)
+            if not match:
                 raise PolicyError("origin alias requires a host and repository path")
-            host, path = parts[0], "/".join(parts[1:])
+            host, path = match.groups()
+    except ValueError as exc:
+        raise PolicyError("invalid origin locator or port") from exc
     path = path.rstrip("/").lower()
     if path.endswith(".git"):
         path = path[:-4]
-    if not host or not re.fullmatch(r"[^\s/]+/[^\s/]+", path):
+    if not host or re.search(r"\s", host) or not re.fullmatch(r"[^\s/]+/[^\s/]+", path):
         raise PolicyError("origin alias requires owner/repository")
     return f"{host.lower()}/{path}"
 

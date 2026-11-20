@@ -59,7 +59,7 @@ class Harness:
         (root / "agent-learnings.md").write_text(
             learned(*bullets), encoding="utf-8"
         )
-        if "://" not in origin and ":" not in origin:
+        if "://" not in origin and ":" not in origin and origin.count("/") == 1:
             origin = "https://github.com/" + origin
         identity = identity or "repo-" + hashlib.sha256(origin.lower().encode()).hexdigest()[:12]
         rows = self.policy["repositories"]
@@ -359,8 +359,23 @@ class ClassificationTests(unittest.TestCase):
             phrase = "A single logical repository cannot corroborate its own clones."
             for i, origin in enumerate(variants):
                 h.source(f"clone-{i}", origin, phrase, identity="accepted-one")
-            h.run()
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], len(variants))
+            self.assertEqual(report["unknown_or_excluded_roots"], 0)
             self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
+
+    def test_origin_ports_preserve_distinct_endpoints_and_reject_invalid_ports(self) -> None:
+        normalize = consolidator.classifications.normalize_origin
+        base = "github.com/example/repository"
+        for origin in ["ssh://git@github.com:22/example/repository.git", "https://github.com:443/example/repository", "http://github.com:80/example/repository", "git://github.com:9418/example/repository"]:
+            self.assertEqual(normalize(origin), base)
+        for origin in ["ssh://git@github.com:2222/example/repository", "https://github.com:2222/example/repository", "github.com:2222/example/repository"]:
+            value = normalize(origin)
+            self.assertEqual(value, "github.com:2222/example/repository")
+            self.assertEqual(normalize(value), value)
+            self.assertNotEqual(value, base)
+        for origin in ["ssh://git@github.com:bad/example/repository", "https://github.com:65536/example/repository", "https://github.com:0/example/repository", "github.com:bad/example/repository"]:
+            with self.assertRaises(consolidator.classifications.PolicyError): normalize(origin)
 
     def test_unknowns_never_open_memory_or_corroborate(self) -> None:
         for change in ["unassigned", "unknown", "missing-primary", "missing-common", "changed-common", "changed-origin"]:
@@ -428,6 +443,52 @@ class ClassificationTests(unittest.TestCase):
             report = h.run()
             self.assertEqual(report["unknown_or_excluded_roots"], 1)
             self.assertEqual(report["workspace_sources"], 0)
+
+    def test_workspace_memory_symlink_swap_is_blocked_at_open(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            active = h.source("active", "Example/active", "Initial regular memory.")
+            recovery = h.home / "recovery"
+            recovery.mkdir()
+            excluded = recovery / "agent-learnings.md"
+            excluded.write_text(learned("Excluded memory must never be read through a raced alias."))
+            h.policy["excluded_paths"] = [str(recovery)]
+            candidate = active / "agent-learnings.md"
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            original_read = consolidator._read_bullets
+            def swap_at_open(path: Path, **kwargs):
+                if path == candidate:
+                    self.assertTrue(kwargs["no_follow"])
+                    candidate.unlink()
+                    candidate.symlink_to(excluded)
+                return original_read(path, **kwargs)
+            with mock.patch.object(consolidator, "_read_bullets", side_effect=swap_at_open):
+                with self.assertRaises(consolidator.ConsolidationError): h.run()
+            self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_workspace_directory_symlink_swap_is_blocked_at_open(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            active = h.source("active", "Example/active", "Initial regular memory.")
+            recovery = h.home / "recovery"
+            recovery.mkdir()
+            (recovery / "agent-learnings.md").write_text(learned("Excluded directory memory must never be opened."))
+            h.policy["excluded_paths"] = [str(recovery)]
+            candidate = active / "agent-learnings.md"
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            original_read = consolidator._read_bullets
+            def swap_directory(path: Path, **kwargs):
+                if path == candidate:
+                    active.rename(h.home / "held-active")
+                    active.symlink_to(recovery, target_is_directory=True)
+                return original_read(path, **kwargs)
+            with mock.patch.object(consolidator, "_read_bullets", side_effect=swap_directory):
+                with self.assertRaises(consolidator.ConsolidationError): h.run()
+            self.assertEqual(target.read_bytes(), b"prior output")
 
     def test_invalid_policy_preserves_output_and_precedes_seed_reads(self) -> None:
         cases = ["missing", "json", "schema", "classification", "duplicate-id", "common-conflict", "primary-conflict", "origin-conflict", "duplicate-key", "excluded-binding", "noncanonical", "extra-field"]

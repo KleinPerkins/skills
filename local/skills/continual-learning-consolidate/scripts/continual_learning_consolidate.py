@@ -49,9 +49,35 @@ class Occurrence:
     index: int
 
 
-def _read_bullets(path: Path) -> tuple[tuple[str, str], ...]:
+def _open_workspace_memory(path: Path) -> int:
+    """Bind every directory and the final file without following symlinks."""
+    if not path.is_absolute():
+        raise ConsolidationError("workspace memory path must be absolute")
+    directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        text = path.read_text(encoding="utf-8", errors="strict")
+        for component in path.parts[1:-1]:
+            child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                            dir_fd=directory)
+            os.close(directory)
+            directory = child
+        return os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                       dir_fd=directory)
+    finally:
+        os.close(directory)
+
+
+def _read_bullets(path: Path, *, no_follow: bool = False) -> tuple[tuple[str, str], ...]:
+    try:
+        if no_follow:
+            # The descriptor, not a prior path check, binds the admitted file.
+            # NONBLOCK also avoids hanging if a workspace swaps in a FIFO.
+            descriptor = _open_workspace_memory(path)
+            with os.fdopen(descriptor, "r", encoding="utf-8", errors="strict") as handle:
+                if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+                    raise ConsolidationError(f"workspace memory is not a regular file: {path}")
+                text = handle.read()
+        else:
+            text = path.read_text(encoding="utf-8", errors="strict")
     except (OSError, UnicodeError) as exc:
         raise ConsolidationError(f"cannot parse {path}: {exc}") from exc
     # A valid-UTF8 file with no machine headings (e.g. a fresh clone's
@@ -145,7 +171,7 @@ def _workspace_sources(
             continue
         if not candidate.is_file():
             continue
-        bullets = _read_bullets(candidate)
+        bullets = _read_bullets(candidate, no_follow=True)
         if not bullets:
             continue
         sources.append(

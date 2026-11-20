@@ -14,7 +14,9 @@ The runtime makes no Git, GitHub or network calls.
    **before opening workspace memory**. Exclude all recovery/archive-only stores
    and retired roots explicitly, including aliases of an otherwise active ID.
    Workspace memory symlinks are skipped so active roots cannot read through an
-   alias into excluded storage or another repository.
+   alias into excluded storage or another repository. Descriptor-based no-follow
+   opens cover every directory component and the final regular file, preventing
+   file or directory swaps between classification and opening.
 5. Workspace memory needs two distinct accepted repository IDs and at least one
    personal source. Worktrees and equivalent clones share their accepted ID;
    normalized origins corroborate bindings and never create an assignment.
@@ -57,7 +59,8 @@ memory. List independent active clone pairs under the same ID. Linked worktrees
 match `primary_abs_path` plus `git_common_dir` from route metadata. Both values
 must match one pair; no cross-product matching is allowed. Missing metadata or
 observed origin disagreement makes that root unknown. Origin aliases are optional
-corroboration; equivalent SSH/HTTPS/case/`.git` forms normalize consistently.
+corroboration; equivalent SSH/HTTPS/case/`.git` forms normalize consistently. Non-default ports remain distinct; malformed ports
+are rejected.
 
 All local paths must be absolute and canonical, without symlinks, dot segments or
 trailing slashes. Exclusions cover the named path and every descendant, including
