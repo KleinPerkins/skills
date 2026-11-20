@@ -1,0 +1,153 @@
+"""Validate private active-source bindings without Git or network access."""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from pathlib import Path
+from urllib.parse import urlsplit
+
+SCHEMA = "memory-source-classification/v1"
+
+
+class PolicyError(ValueError):
+    pass
+
+
+def canonical_path(value: object) -> str:
+    if not isinstance(value, str) or not value or not Path(value).is_absolute():
+        raise PolicyError("local alias must be an absolute path")
+    canonical = str(Path(value).resolve(strict=False))
+    if canonical != value:
+        raise PolicyError("local alias must be canonical (no symlink, dot or trailing slash)")
+    return canonical
+
+
+def normalize_origin(value: object) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise PolicyError("origin alias must be nonempty text")
+    value = value.strip().rstrip("/")
+    if "://" in value:
+        parsed = urlsplit(value)
+        if parsed.scheme not in {"ssh", "https", "http", "git"} or not parsed.hostname:
+            raise PolicyError("unsupported origin locator")
+        if parsed.query or parsed.fragment or parsed.password:
+            raise PolicyError("origin must not contain credentials, query or fragment")
+        host, path = parsed.hostname, parsed.path.strip("/")
+    else:
+        match = re.fullmatch(r"(?:[^/@:]+@)?([^/:]+):(.+)", value)
+        if match:
+            host, path = match.groups()
+        else:
+            parts = value.split("/")
+            if len(parts) != 3:
+                raise PolicyError("origin alias requires a host and repository path")
+            host, path = parts[0], "/".join(parts[1:])
+    path = path.rstrip("/").lower()
+    if path.endswith(".git"):
+        path = path[:-4]
+    if not host or not re.fullmatch(r"[^\s/]+/[^\s/]+", path):
+        raise PolicyError("origin alias requires owner/repository")
+    return f"{host.lower()}/{path}"
+
+
+def _unique_object(pairs: list[tuple[str, object]]) -> dict:
+    result: dict = {}
+    for key, value in pairs:
+        if key in result:
+            raise PolicyError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+class Policy:
+    def __init__(self, payload: object, digest: str) -> None:
+        if not isinstance(payload, dict) or set(payload) != {"schema", "repositories", "excluded_paths"}:
+            raise PolicyError("policy requires schema, repositories and excluded_paths only")
+        if payload["schema"] != SCHEMA:
+            raise PolicyError("unsupported classification schema")
+        if not isinstance(payload["repositories"], list) or not isinstance(payload["excluded_paths"], list):
+            raise PolicyError("repositories and excluded_paths must be arrays")
+        self.digest = digest
+        self.excluded = tuple(Path(canonical_path(path)) for path in payload["excluded_paths"])
+        self.bindings: dict[tuple[str, str], tuple[str, str, frozenset[str]]] = {}
+        self.ids: set[str] = set()
+        primary_owners: dict[str, str] = {}
+        common_owners: dict[str, str] = {}
+        origin_owners: dict[str, str] = {}
+        for row in payload["repositories"]:
+            if not isinstance(row, dict) or set(row) != {"repository_id", "classification", "active_bindings", "origin_aliases"}:
+                raise PolicyError("invalid repository record")
+            identity, kind = row["repository_id"], row["classification"]
+            if not isinstance(identity, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", identity) or identity in self.ids:
+                raise PolicyError("repository_id must be unique stable text")
+            self.ids.add(identity)
+            if kind not in {"personal", "work", "unknown"}:
+                raise PolicyError("invalid repository classification")
+            if not isinstance(row["active_bindings"], list) or not isinstance(row["origin_aliases"], list):
+                raise PolicyError("bindings and origins must be arrays")
+            origins = frozenset(normalize_origin(origin) for origin in row["origin_aliases"])
+            for origin in origins:
+                if origin in origin_owners and origin_owners[origin] != identity:
+                    raise PolicyError("origin alias assigned to different repository IDs")
+                origin_owners[origin] = identity
+            for binding in row["active_bindings"]:
+                if not isinstance(binding, dict) or set(binding) != {"primary_path", "git_common_dir"}:
+                    raise PolicyError("active binding requires paired primary_path and git_common_dir")
+                primary = canonical_path(binding["primary_path"])
+                common = canonical_path(binding["git_common_dir"])
+                if self.is_excluded(Path(primary)) or self.is_excluded(Path(common)):
+                    raise PolicyError("active binding overlaps excluded storage")
+                for alias, owners in [(primary, primary_owners), (common, common_owners)]:
+                    if alias in owners and owners[alias] != identity:
+                        raise PolicyError("local alias assigned to different repository IDs")
+                    owners[alias] = identity
+                key = (primary, common)
+                if key in self.bindings:
+                    raise PolicyError("duplicate active binding")
+                self.bindings[key] = (identity, kind, origins)
+
+    def is_excluded(self, path: Path) -> bool:
+        return any(path == prefix or prefix in path.parents for prefix in self.excluded)
+
+    def resolve(self, root: dict, path: Path) -> tuple[str, str] | None:
+        # Historical identity never grants admission. Exclude storage before
+        # matching metadata and before the caller opens a memory file.
+        if self.is_excluded(path):
+            return None
+        primary, common = root.get("primary_abs_path"), root.get("git_common_dir")
+        if not isinstance(primary, str) or not isinstance(common, str):
+            return None
+        try:
+            primary, common = canonical_path(primary), canonical_path(common)
+        except PolicyError:
+            return None
+        if self.is_excluded(Path(primary)) or self.is_excluded(Path(common)):
+            return None
+        record = self.bindings.get((primary, common))
+        if record is None:
+            return None
+        identity, kind, origins = record
+        if kind == "unknown":
+            return None
+        # Observed disagreement invalidates this binding. Origin never creates
+        # an assignment or another independent corroborating repository.
+        for field in ("origin", "live_origin"):
+            observed = root.get(field)
+            if observed:
+                try:
+                    normalized = normalize_origin(observed)
+                except PolicyError:
+                    return None
+                if origins and normalized not in origins:
+                    return None
+        return identity, kind
+
+
+def load_policy(path: Path) -> Policy:
+    try:
+        data = path.read_bytes()
+        payload = json.loads(data.decode("utf-8"), object_pairs_hook=_unique_object)
+        return Policy(payload, hashlib.sha256(data).hexdigest())
+    except (OSError, UnicodeError, ValueError, TypeError) as exc:
+        raise PolicyError(f"invalid classification policy: {exc}") from exc

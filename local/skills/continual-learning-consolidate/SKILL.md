@@ -5,9 +5,9 @@ description: Build the machine-local global learning projection in ~/AGENTS.md f
 
 # continual-learning-consolidate
 
-`~/AGENTS.md` is generated output. Never hand-edit it and never treat it as a
-learning source. The durable machine-local home seed is
-`~/agent-learnings.md`.
+`~/AGENTS.md` is generated output, never a learning source. The explicit home
+seed is `~/agent-learnings.md`. Do not hand-edit or retrospectively clean memory
+as part of runtime repair.
 
 ## Run
 
@@ -17,28 +17,29 @@ continual-learning-consolidate --dry-run
 continual-learning-consolidate --json
 ```
 
-The consolidator reads candidate roots only from `agent-route map --json`, then
-looks for `agent-learnings.md` at those exact roots. It never scans the home
-directory and makes no git or GitHub calls.
+Candidate roots come only from `agent-route map --json`; no Git or network call
+is made by the consolidator. A private `memory-source-classification/v1` policy
+at `~/.local/share/continual-learning-consolidate/classifications.json` binds
+accepted personal/work/unknown logical IDs to paired active primary/common-Git
+aliases. See [README.md](README.md) for the closed schema and installation guards.
+Never publish the host policy, private assignments or continuity evidence.
 
 ## Admission and safety
 
-- Home-seed bullets are always eligible.
-- A workspace bullet is promoted only when it exactly matches the home seed, or
-  recurs across at least two independent roots with at least one root outside
-  `~/dev/affirm`.
-- Multiple worktrees/clones of the same origin count as one independent source.
-- Near-duplicate uncertainty keeps both bullets.
-- The final projection is scanner-gated. Missing sources, malformed input,
-  discovery failure, scanner failure, or a blocked finding leaves
-  `~/AGENTS.md` unchanged.
-- Successful writes are atomic and deterministic.
+- The explicit home seed remains eligible.
+- Workspace recurrence requires two distinct accepted logical repository IDs,
+  including at least one personal source. Paths and remote ownership do not
+  decide classification; equivalent worktrees/clones share one ID.
+- Unknown, stale and excluded recovery/archive/retired roots are skipped before
+  memory access. Identity continuity never grants active-memory admission.
+- Missing/invalid/conflicting policy, discovery/parse failure, scanner failure
+  or blocked findings leave the output unchanged.
+- Deduplication remains conservative; successful writes are atomic/deterministic.
 
-Install or repair the durable runtime with:
-
-```bash
-bash ~/.cursor/skills/continual-learning-consolidate/install.sh
-```
-
-The installer uses supported `local-jobs` verbs to ensure the daily 09:00
-`continual-learning-consolidate` job.
+Install or update using `install.sh --no-schedule`, supplying an explicitly
+validated private policy and exact preimage hash when replacing it. This form
+preserves scheduler state and capture. Qualify with a synthetic child-only
+`--home` and fake `--agent-route`; real-home dry runs still read memory.
+Resume only the intended job through its owner tooling after qualification.
+The installer's scheduling form retains existing jobs or creates a missing
+09:00 command job. Keep a failed repair paused and preserve rollback evidence.

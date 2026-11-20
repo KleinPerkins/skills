@@ -51,6 +51,7 @@
         "global/skills/swarm/tests/test_repository_verifier.py",
         "global/skills/swarm/tests/test_static.py",
         "local/skills/continual-learning-consolidate/tests/test_consolidator.py",
+        "local/skills/continual-learning-consolidate/tests/test_install_runtime.py",
         "scripts/tests/test_ci_delivery_create_review_pr.py",
         "scripts/tests/test_ci_delivery_dispatch.py",
         "scripts/tests/test_ci_delivery_local_review.py",

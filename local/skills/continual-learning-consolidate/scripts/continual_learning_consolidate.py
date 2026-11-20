@@ -20,9 +20,11 @@ from pathlib import Path
 from typing import Any, Callable
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(SCRIPT_DIR / "lib"))
 
 import memory  # noqa: E402
+import classifications  # noqa: E402
 
 MANAGED_HEADER = "<!-- generated; edit agent-learnings.md sources, not this file -->\n"
 
@@ -92,30 +94,15 @@ def _route_payload(
     return payload
 
 
-def _identity(root: dict[str, Any], path: Path) -> str:
-    origin = root.get("live_origin") or root.get("origin")
-    if isinstance(origin, str) and origin.strip():
-        value = origin.strip().lower()
-        return value[:-4] if value.endswith(".git") else value
-    return f"path:{path}"
-
-
-def _is_within(path: Path, parent: Path) -> bool:
-    try:
-        path.relative_to(parent)
-        return True
-    except ValueError:
-        return False
-
-
 def _workspace_sources(
     payload: dict[str, Any],
-    home: Path,
+    policy: classifications.Policy,
     seed_path: Path,
-) -> tuple[list[Source], int]:
-    affirm_root = (home / "dev" / "affirm").resolve(strict=False)
+) -> tuple[list[Source], int, int]:
+    unknown_roots = 0
     sources: list[Source] = []
     seen_paths: set[Path] = set()
+    observed_origins: dict[str, str] = {}
     roots = payload["roots"]
 
     for position, raw_root in enumerate(roots):
@@ -136,6 +123,17 @@ def _workspace_sources(
                 f"agent-route roots[{position}] abs_path is not absolute"
             )
         root_path = root_path.resolve(strict=False)
+        assigned = policy.resolve(raw_root, root_path)
+        if assigned is None:
+            unknown_roots += 1
+            continue
+        identity, kind = assigned
+        for field in ("origin", "live_origin"):
+            if raw_root.get(field):
+                origin = classifications.normalize_origin(raw_root[field])
+                previous_id = observed_origins.setdefault(origin, identity)
+                if previous_id != identity:
+                    raise ConsolidationError("discovered origin conflicts across accepted repository IDs")
         candidate = root_path / "agent-learnings.md"
         if candidate == seed_path or candidate in seen_paths:
             continue
@@ -148,14 +146,14 @@ def _workspace_sources(
         sources.append(
             Source(
                 path=candidate,
-                identity=_identity(raw_root, root_path),
-                is_work=_is_within(root_path, affirm_root),
+                identity=identity,
+                is_work=kind == "work",
                 bullets=bullets,
             )
         )
 
     sources.sort(key=lambda item: (item.is_work, str(item.path)))
-    return sources, len(roots)
+    return sources, len(roots), unknown_roots
 
 
 def _admit(
@@ -216,6 +214,7 @@ def _admit(
 def _projection(
     home: Path,
     payload: dict[str, Any],
+    policy: classifications.Policy,
 ) -> tuple[bytes, dict[str, Any]]:
     seed_path = (home / "agent-learnings.md").resolve(strict=False)
     if not seed_path.is_file():
@@ -230,7 +229,7 @@ def _projection(
         is_work=False,
         bullets=seed_bullets,
     )
-    workspaces, discovered_roots = _workspace_sources(payload, home, seed_path)
+    workspaces, discovered_roots, unknown_roots = _workspace_sources(payload, policy, seed_path)
     sources = [seed, *workspaces]
     if not sources:
         raise ConsolidationError("no readable learning sources")
@@ -255,6 +254,9 @@ def _projection(
 
     report: dict[str, Any] = {
         "discovered_roots": discovered_roots,
+        "unknown_or_excluded_roots": unknown_roots,
+        "classification_schema": classifications.SCHEMA,
+        "classification_sha256": policy.digest,
         "sources": len(sources),
         "workspace_sources": len(workspaces),
         "source_paths": [str(item.path) for item in sources],
@@ -301,13 +303,20 @@ def consolidate_home(
     agent_route: Path,
     *,
     dry_run: bool = False,
+    policy_path: Path | None = None,
     runner: Callable[..., Any] = subprocess.run,
 ) -> dict[str, Any]:
     """Consolidate once. All validation and scanning precede the atomic write."""
     home = home.expanduser().resolve(strict=False)
     target = home / "AGENTS.md"
+    if policy_path is None:
+        policy_path = home / ".local/share/continual-learning-consolidate/classifications.json"
+    try:
+        policy = classifications.load_policy(policy_path)
+    except classifications.PolicyError as exc:
+        raise ConsolidationError(str(exc)) from exc
     payload = _route_payload(agent_route.expanduser(), runner=runner)
-    content, report = _projection(home, payload)
+    content, report = _projection(home, payload, policy)
 
     previous = target.read_bytes() if target.is_file() else None
     changed = previous != content
@@ -340,6 +349,7 @@ def _parser() -> argparse.ArgumentParser:
         / "agent-route.sh",
         help=argparse.SUPPRESS,
     )
+    parser.add_argument("--classifications", type=Path, help="private active-source classification projection")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser
@@ -352,6 +362,7 @@ def main(argv: list[str] | None = None) -> int:
             args.home,
             args.agent_route,
             dry_run=args.dry_run,
+            policy_path=args.classifications,
         )
     except ConsolidationError as exc:
         print(f"continual-learning-consolidate: BLOCKED: {exc}", file=sys.stderr)
