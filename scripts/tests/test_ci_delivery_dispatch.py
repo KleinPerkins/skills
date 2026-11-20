@@ -59,12 +59,14 @@ class DeliveryTests(unittest.TestCase):
                 p=target/rel;p.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/rel,p)
             (target/'.github/scripts/verify-skills.sh').write_text('exit 0\n')
             with self.assertRaises(ci.ContractError):ci.policy(target)
-    def test_duplicate_json_and_disabled_review_policy(self):
+    def test_duplicate_json_and_work_only_review_policy(self):
         with self.assertRaises(ci.ContractError):ci.parse('{"x":1,"x":2}')
         p=json.loads((ROOT/'.github/review-enrollments.json').read_text())
         self.assertEqual(p['repository_id'],1461925043)
         self.assertEqual(p['repository_names'],['KleinPerkins/skills'])
-        self.assertFalse(p['enabled']);self.assertEqual({x['credential_store'] for x in p['producers']},{'file','keyring'})
+        self.assertTrue(p['enabled'])
+        self.assertEqual({x['origin_account'] for x in p['producers'] if x['enabled']},{'origin-7612de79'})
+        self.assertEqual({x['credential_store'] for x in p['producers']},{'file','keyring'})
         self.assertTrue(all(x['creation_adapter_sha256']==hashlib.sha256((ROOT/'scripts/create_review_pr.py').read_bytes()).hexdigest() and x['capture_adapter_sha256']==hashlib.sha256((ROOT/'scripts/local_review.py').read_bytes()).hexdigest() for x in p['producers']))
     def test_workflow_all_groups_aggregate_and_no_privilege(self):
         workflow=json.loads((ROOT/'.github/workflows/ci.yml').read_text())

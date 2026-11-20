@@ -1037,6 +1037,48 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(caff_state["status"], "refresh-failed")
             self.assertEqual(caff_state["expiry"], 108)
 
+    def test_caffeinate_startup_interruption_reaps_candidate_and_preserves_old(self):
+        for target in ("hook", "launcher"):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                env, state_root, _log = self.make_environment(root)
+                old_pid = self.spawn_mock_caffeinate(env)
+                write_caffeinate_state(
+                    state_root / "caffeinate.json", pid=old_pid, expiry=108, status="started"
+                )
+                ready = root / "startup-wait-ready"
+                sleeper = root / "startup-sleep"
+                write_executable(
+                    sleeper,
+                    r"""
+                    #!/bin/bash
+                    if [ "$1" = "0.05" ]; then
+                      printf '%s\n' "$PPID" > "$MOCK_STARTUP_WAIT_READY"
+                      /bin/sleep 0.25
+                    else
+                      exec /bin/sleep "$@"
+                    fi
+                    """,
+                )
+                env["KEEP_AWAKE_SLEEP"] = str(sleeper)
+                env["MOCK_STARTUP_WAIT_READY"] = str(ready)
+                hook = subprocess.Popen(
+                    [str(RUNTIME), "beforeSubmitPrompt"], env=env,
+                    stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE, text=True, start_new_session=True,
+                )
+                self.addCleanup(self._kill_and_reap, hook)
+                self.assertTrue(wait_until(ready.exists), "startup wait was never entered")
+                events = self.caffeinate_events(Path(env["MOCK_CAFFEINATE_LOG"]))
+                replacement = next(e["pid"] for e in events if e["event"] == "start" and e["pid"] != old_pid)
+                os.kill(hook.pid if target == "hook" else int(ready.read_text()), signal.SIGTERM)
+                stdout, stderr = hook.communicate(timeout=5)
+                self.assertEqual(hook.returncode, 0, stderr)
+                self.assertEqual(json.loads(stdout), {})
+                self.assert_caffeinate_pid_dead(replacement)
+                self.assertTrue(pid_alive(old_pid))
+                self.assertEqual(self.caffeinate_state(state_root)["pid"], old_pid)
+
     def test_caffeinate_pid_reuse_by_unrelated_process_is_not_trusted_at_initial_read(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

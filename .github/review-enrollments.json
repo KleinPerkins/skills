@@ -1,7 +1,7 @@
 {
   "schema": "g1-review-enrollments/v1",
   "repository_id": 1461925043,
-  "enabled": false,
+  "enabled": true,
   "producers": [
     {
       "id": "enrollment-24c0a5f2",
@@ -20,7 +20,7 @@
     },
     {
       "id": "enrollment-e876e8eb",
-      "enabled": true,
+      "enabled": false,
       "origin_account": "origin-6a644d43",
       "github_user_id": 49759187,
       "instructions_sha256": "7efd718dd897e06155b8e49eca37d18b15fb1e47610d9cf4b2d26e294a99e10b",
@@ -34,11 +34,11 @@
     }
   ],
   "governance": {
-    "phase": "clean-successor-preparation-writer-off",
+    "phase": "clean-successor-work-enrollment-app-writer-off",
     "repository": "KleinPerkins/skills",
-    "authority": "Prepared combined existing WORK/PERSONAL source mapping; no new account qualification. Global enrollment and App writer remain disabled.",
-    "publication": "Empty private identity only; no source upload, visibility/name swap, downstream pin or runtime authorization.",
-    "future_name": "KleinPerkins/skills only after separately accepted consumer reconciliation and cutover."
+    "authority": "WORK origin-7612de79 is enabled after fresh successor qualification and owner initial enrollment admission. PERSONAL remains disabled pending separate qualification. The App writer is a separate operational gate.",
+    "publication": "The exact clean source was admitted at this public successor identity under the owner release. Original history, downstream pins and installed runtimes remain separate.",
+    "future_name": "KleinPerkins/skills is the final successor identity; retained original history remains separate."
   },
   "repository_names": [
     "KleinPerkins/skills"

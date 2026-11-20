@@ -19,6 +19,7 @@ LOCK_HELD=0
 LOCK_DIR=""
 LOCK_OWNER=""
 OSA_PID=""
+CAFFEINATE_LAUNCHER_PID=""
 
 release_lock() {
   if [ "$LOCK_HELD" -eq 1 ] && [ -n "$LOCK_DIR" ]; then
@@ -40,9 +41,18 @@ kill_osa() {
   fi
 }
 
+kill_pending_caffeinate() {
+  if [ -n "$CAFFEINATE_LAUNCHER_PID" ]; then
+    kill -TERM "$CAFFEINATE_LAUNCHER_PID" >/dev/null 2>&1 || true
+    wait "$CAFFEINATE_LAUNCHER_PID" 2>/dev/null || true
+    CAFFEINATE_LAUNCHER_PID=""
+  fi
+}
+
 respond() {
   RESPONDED=1
   kill_osa
+  kill_pending_caffeinate
   release_lock
   printf '%s\n' "$RESPONSE"
   trap - EXIT HUP INT TERM
@@ -51,6 +61,7 @@ respond() {
 # shellcheck disable=SC2329 # Invoked indirectly by the traps below.
 respond_on_exit() {
   kill_osa
+  kill_pending_caffeinate
   release_lock
   if [ "$RESPONDED" -eq 0 ]; then
     printf '%s\n' "$RESPONSE"
@@ -328,10 +339,34 @@ fork_caffeinate() {
     caffeinate_flags=(-i -s)
   fi
   (
+    candidate_pid=""
+    cleanup_candidate() {
+      if [ -n "$candidate_pid" ]; then
+        kill -TERM "$candidate_pid" >/dev/null 2>&1 || true
+        wait "$candidate_pid" 2>/dev/null || true
+      fi
+    }
+    trap cleanup_candidate EXIT
+    trap 'exit 1' HUP INT TERM
     set -m
     "$CAFFEINATE" "${caffeinate_flags[@]}" -t "$DURATION_SECONDS" </dev/null >/dev/null 2>&1 &
-    echo $! >"$pidfile"
-  )
+    candidate_pid=$!
+    # Keep the parent alive long enough to reap an immediate startup failure.
+    # An orphan can still answer kill -0 while exiting (or as a zombie), which
+    # would otherwise let a failed replacement retire the working old process.
+    "$SLEEP" 0.05
+    if ! kill -0 "$candidate_pid" >/dev/null 2>&1; then
+      exit 1
+    fi
+    echo "$candidate_pid" >"$pidfile" || exit 1
+    trap - EXIT HUP INT TERM
+  ) >/dev/null 2>&1 &
+  CAFFEINATE_LAUNCHER_PID=$!
+  if ! wait "$CAFFEINATE_LAUNCHER_PID"; then
+    CAFFEINATE_LAUNCHER_PID=""
+    return 1
+  fi
+  CAFFEINATE_LAUNCHER_PID=""
   NEW_CAFFEINATE_PID=""
   IFS= read -r NEW_CAFFEINATE_PID <"$pidfile" 2>/dev/null || NEW_CAFFEINATE_PID=""
   "$RM" -f "$pidfile" >/dev/null 2>&1 || true
