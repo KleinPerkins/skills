@@ -24,6 +24,26 @@ def file_hash(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def directory_files(directory_fd: int, prefix: Path = Path()) -> list[str]:
+    """Inventory regular leaves from the same directory used for content reads."""
+    files = []
+    for name in sorted(os.listdir(directory_fd)):
+        info = os.stat(name, dir_fd=directory_fd, follow_symlinks=False)
+        relative = prefix / name
+        if stat.S_ISDIR(info.st_mode):
+            child = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                            dir_fd=directory_fd)
+            try:
+                files.extend(directory_files(child, relative))
+            finally:
+                os.close(child)
+        elif stat.S_ISREG(info.st_mode):
+            files.append(str(relative))
+        else:
+            raise ValueError("release contains nonregular files or symlinks")
+    return files
+
+
 def release_files(source: Path, *, directory_fd: int | None = None,
                   modes: dict[str, int] | None = None) -> dict[str, bytes]:
     owned = directory_fd is None
@@ -32,8 +52,15 @@ def release_files(source: Path, *, directory_fd: int | None = None,
         directory_fd = open_directory(source)
     try:
         result = {}
-        for path in sorted((source / "scripts").rglob("*.py")):
-            name = str(path.relative_to(source))
+        scripts_fd = os.open("scripts", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                             dir_fd=directory_fd)
+        try:
+            names = directory_files(scripts_fd, Path("scripts"))
+        finally:
+            os.close(scripts_fd)
+        for name in names:
+            if not name.endswith(".py"):
+                continue
             content, mode = read_regular_file(Path(name), directory_fd=directory_fd)
             result[name] = content
             if modes is not None:
@@ -54,8 +81,6 @@ def manifest(files: dict[str, bytes]) -> bytes:
 
 
 def verify_release(path: Path, release_id: str, *, directory_fd: int | None = None) -> None:
-    if path.is_symlink() or any(p.is_symlink() for p in path.rglob("*")):
-        raise ValueError("release contains symlinks")
     owned = directory_fd is None
     descriptor = open_directory(path) if owned else directory_fd
     try:
@@ -66,13 +91,12 @@ def verify_release(path: Path, release_id: str, *, directory_fd: int | None = No
             raise ValueError("release content failed address verification")
         if any(mode != required_mode(name) for name, mode in modes.items()):
             raise ValueError("release file mode failed verification")
+        expected = set(json.loads(recorded)) | {"manifest.json"}
+        if expected != set(directory_files(descriptor)):
+            raise ValueError("release contains unexpected files")
     finally:
         if owned:
             os.close(descriptor)
-    expected = set(json.loads(recorded)) | {"manifest.json"}
-    actual = {str(p.relative_to(path)) for p in path.rglob("*") if not p.is_dir()}
-    if expected != actual or any(p.is_symlink() for p in path.rglob("*")):
-        raise ValueError("release contains unexpected files or symlinks")
 
 
 def fsync_directory(path: Path) -> None:

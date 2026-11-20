@@ -482,6 +482,22 @@ class InstallTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "current-user regular file"):
                 installer.open_install_lock(lock)
 
+    def test_release_inventory_uses_the_verified_directory_descriptor(self) -> None:
+        receipt = self.initial()
+        release = self.runtime / "releases" / receipt["release_id"]
+        descriptor = installer.open_directory(release)
+        try:
+            held = release.with_name(release.name + "-held")
+            release.rename(held)
+            shutil.copytree(held, release)
+            # Only the retained directory has this undeclared leaf. Using the
+            # replacement pathname's inventory would wrongly certify it.
+            (held / "undeclared.txt").write_text("unmanifested bytes")
+            with self.assertRaisesRegex(ValueError, "unexpected files"):
+                installer.verify_release(release, receipt["release_id"], directory_fd=descriptor)
+        finally:
+            os.close(descriptor)
+
     def test_candidate_policy_inputs_are_bounded_regular_nofollow_files(self) -> None:
         self.initial()
         before = self.pointers()

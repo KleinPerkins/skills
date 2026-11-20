@@ -762,7 +762,14 @@ class ClassificationTests(unittest.TestCase):
                 h.policy["repositories"][-1]["origin_aliases"] = []
             target = h.home / "AGENTS.md"
             target.write_bytes(b"prior output")
-            with self.assertRaises(consolidator.ConsolidationError): h.run()
+            original = consolidator._read_bullets
+            def no_workspace_read(path, **kwargs):
+                if kwargs.get("no_follow"):
+                    self.fail("conflicting workspace identity must precede memory access")
+                return original(path, **kwargs)
+            with mock.patch.object(consolidator, "_read_bullets", side_effect=no_workspace_read):
+                with self.assertRaisesRegex(consolidator.ConsolidationError, "origin conflicts"):
+                    h.run()
             self.assertEqual(target.read_bytes(), b"prior output")
 
     def test_policy_must_be_a_nofollow_regular_file(self) -> None:

@@ -9,7 +9,7 @@ used as memory input.
 from __future__ import annotations
 
 import argparse
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 import fcntl
 import json
 import os
@@ -240,41 +240,45 @@ def _workspace_sources(
     observed_origins: dict[str, str] = {}
     roots = payload["roots"]
 
-    for position, raw_root in enumerate(roots):
-        if not isinstance(raw_root, dict):
-            raise ConsolidationError(
-                f"agent-route roots[{position}] is not an object"
-            )
-        if raw_root.get("exists") is False:
-            continue
-        raw_path = raw_root.get("abs_path")
-        if not isinstance(raw_path, str) or not raw_path:
-            raise ConsolidationError(
-                f"agent-route roots[{position}] is missing abs_path"
-            )
-        root_path = Path(raw_path)
-        if not root_path.is_absolute():
-            raise ConsolidationError(
-                f"agent-route roots[{position}] abs_path is not absolute"
-            )
-        try:
-            # Preserve lexical exclusions: resolving a recovery alias first
-            # would erase its excluded location and borrow the active target.
-            classifications.canonical_path(str(root_path))
-        except classifications.PolicyError:
-            unknown_roots += 1
-            continue
-        assigned = policy.resolve(raw_root, root_path)
-        if assigned is None:
-            unknown_roots += 1
-            continue
-        identity, kind = assigned
-        try:
-            root_fd = _open_directory(root_path)
-        except OSError:
-            unknown_roots += 1
-            continue
-        try:
+    admitted_roots = []
+    with ExitStack() as handles:
+        # Corroborate every identity and detect global origin conflicts before
+        # opening any workspace memory; keep those same admitted directories.
+        for position, raw_root in enumerate(roots):
+            if not isinstance(raw_root, dict):
+                raise ConsolidationError(
+                    f"agent-route roots[{position}] is not an object"
+                )
+            if raw_root.get("exists") is False:
+                continue
+            raw_path = raw_root.get("abs_path")
+            if not isinstance(raw_path, str) or not raw_path:
+                raise ConsolidationError(
+                    f"agent-route roots[{position}] is missing abs_path"
+                )
+            root_path = Path(raw_path)
+            if not root_path.is_absolute():
+                raise ConsolidationError(
+                    f"agent-route roots[{position}] abs_path is not absolute"
+                )
+            try:
+                # Preserve lexical exclusions: resolving a recovery alias first
+                # would erase its excluded location and borrow the active target.
+                classifications.canonical_path(str(root_path))
+            except classifications.PolicyError:
+                unknown_roots += 1
+                continue
+            assigned = policy.resolve(raw_root, root_path)
+            if assigned is None:
+                unknown_roots += 1
+                continue
+            identity, kind = assigned
+            try:
+                root_fd = _open_directory(root_path)
+            except OSError:
+                unknown_roots += 1
+                continue
+            handles.callback(os.close, root_fd)
             if not _root_matches_binding(root_path, raw_root, root_fd):
                 unknown_roots += 1
                 continue
@@ -284,6 +288,8 @@ def _workspace_sources(
                     previous_id = observed_origins.setdefault(origin, identity)
                     if previous_id != identity:
                         raise ConsolidationError("discovered origin conflicts across accepted repository IDs")
+            admitted_roots.append((root_path, root_fd, identity, kind))
+        for root_path, root_fd, identity, kind in admitted_roots:
             candidate = root_path / "agent-learnings.md"
             if candidate == seed_path or candidate in seen_paths:
                 continue
@@ -302,8 +308,6 @@ def _workspace_sources(
                 continue
             sources.append(Source(path=candidate, identity=identity,
                                   is_work=kind == "work", bullets=bullets))
-        finally:
-            os.close(root_fd)
 
     sources.sort(key=lambda item: (item.is_work, str(item.path)))
     return sources, len(roots), unknown_roots
