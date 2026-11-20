@@ -63,7 +63,10 @@ memory. List independent active clone pairs under the same ID. Linked worktrees
 match `primary_abs_path` plus `git_common_dir` from route metadata. Both values
 must match one pair; no cross-product matching is allowed. Missing metadata or
 observed origin disagreement makes that root unknown. Origin aliases are optional
-corroboration; equivalent SSH/HTTPS/case/`.git` forms normalize consistently. Non-default ports remain distinct; malformed ports
+corroboration; the installed producer's GitHub `owner/repo` format and equivalent
+SSH/HTTPS/case/`.git` forms normalize consistently. When both configured and live
+origins are present in one observation they must agree after normalization;
+different accepted aliases across separate clones still share one logical ID. Non-default ports remain distinct; malformed ports
 are rejected.
 
 All local paths must be absolute and canonical, without symlinks, dot segments or

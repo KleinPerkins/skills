@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import stat
 import re
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -45,6 +47,10 @@ def normalize_origin(value: object) -> str:
                 if port != defaults[parsed.scheme]:
                     host += f":{port}"
             path = parsed.path.strip("/")
+        elif len(value.split("/")) == 2 and not re.search(r"[:@\s]", value):
+            # agent-route's installed map protocol uses GitHub owner/repo.
+            # This normalizes a locator; it never assigns classification.
+            host, path = "github.com", value
         elif len(value.split("/")) == 3 and "@" not in value.split("/")[0]:
             # Canonical host[:port]/owner/repository keeps an explicit port.
             # It may represent a non-default port for a different protocol.
@@ -156,6 +162,7 @@ class Policy:
             return None
         # Observed disagreement invalidates this binding. Origin never creates
         # an assignment or another independent corroborating repository.
+        observed_origins: set[str] = set()
         for field in ("origin", "live_origin"):
             observed = root.get(field)
             if observed:
@@ -165,12 +172,19 @@ class Policy:
                     return None
                 if origins and normalized not in origins:
                     return None
+                observed_origins.add(normalized)
+        if len(observed_origins) > 1:
+            return None
         return identity, kind
 
 
 def load_policy(path: Path) -> Policy:
     try:
-        data = path.read_bytes()
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        with os.fdopen(descriptor, "rb") as handle:
+            if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+                raise PolicyError("classification policy must be a regular file")
+            data = handle.read()
         payload = json.loads(data.decode("utf-8"), object_pairs_hook=_unique_object)
         return Policy(payload, hashlib.sha256(data).hexdigest())
     except (OSError, UnicodeError, ValueError, TypeError) as exc:

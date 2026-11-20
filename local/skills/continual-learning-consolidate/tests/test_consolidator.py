@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -60,8 +61,6 @@ class Harness:
         (root / "agent-learnings.md").write_text(
             learned(*bullets), encoding="utf-8"
         )
-        if "://" not in origin and ":" not in origin and origin.count("/") == 1:
-            origin = "https://github.com/" + origin
         identity = identity or "repo-" + hashlib.sha256(origin.lower().encode()).hexdigest()[:12]
         rows = self.policy["repositories"]
         row = next((row for row in rows if row["repository_id"] == identity), None)
@@ -357,7 +356,7 @@ class ClassificationTests(unittest.TestCase):
             self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
 
     def test_equivalent_origins_and_clones_share_logical_identity(self) -> None:
-        variants = ["git@GitHub.com:Example/One.git", "https://github.com/example/one/", "ssh://git@github.com/EXAMPLE/one.git/", "github.com/example/one"]
+        variants = ["git@GitHub.com:Example/One.git", "https://github.com/example/one/", "ssh://git@github.com/EXAMPLE/one.git/", "github.com/example/one", "EXAMPLE/One.git/"]
         self.assertEqual({consolidator.classifications.normalize_origin(v) for v in variants}, {"github.com/example/one"})
         with tempfile.TemporaryDirectory() as directory:
             h = Harness(Path(directory))
@@ -382,6 +381,27 @@ class ClassificationTests(unittest.TestCase):
             self.assertNotEqual(value, base)
         for origin in ["ssh://git@github.com:bad/example/repository", "https://github.com:65536/example/repository", "https://github.com:0/example/repository", "github.com:bad/example/repository"]:
             with self.assertRaises(consolidator.classifications.PolicyError): normalize(origin)
+
+    def test_accepted_aliases_deduplicate_across_clones_but_conflict_within_one_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            phrase = "Accepted logical aliases still cannot corroborate one repository twice."
+            original = "git@github.com:Example/one-original.git"
+            successor = "https://github.com/example/one"
+            h.source("original", original, phrase, identity="logical-one")
+            second = h.source("successor", successor, phrase, identity="logical-one")
+            h.policy["repositories"][0]["origin_aliases"].append(successor)
+            h.roots[0]["origin"] = "https://github.com/example/one-original/"
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], 2)
+            self.assertEqual(report["unknown_or_excluded_roots"], 0)
+            self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
+            h.roots[1]["origin"] = original
+            (second / "agent-learnings.md").write_bytes(b"\xff")
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], 1)
+            self.assertEqual(report["unknown_or_excluded_roots"], 1)
 
     def test_unknowns_never_open_memory_or_corroborate(self) -> None:
         for change in ["unassigned", "unknown", "missing-primary", "missing-common", "changed-common", "changed-origin"]:
@@ -582,6 +602,20 @@ class ClassificationTests(unittest.TestCase):
             target.write_bytes(b"prior output")
             with self.assertRaises(consolidator.ConsolidationError): h.run()
             self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_policy_must_be_a_nofollow_regular_file(self) -> None:
+        for shape in ["symlink", "fifo"]:
+            with self.subTest(shape=shape), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                other = h.home / "other-policy.json"
+                other.write_text(json.dumps(h.policy))
+                if shape == "symlink": h.policy_path.symlink_to(other)
+                else: os.mkfifo(h.policy_path)
+                target = h.home / "AGENTS.md"
+                target.write_bytes(b"prior output")
+                with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+                self.assertEqual(target.read_bytes(), b"prior output")
 
     def test_discovery_failure_preserves_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
