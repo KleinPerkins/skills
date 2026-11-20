@@ -537,6 +537,37 @@ class ClassificationTests(unittest.TestCase):
             self.assertIn(phrase, output)
             self.assertNotIn(excluded, output)
 
+    def test_linked_worktree_requires_primary_to_own_accepted_common_store(self) -> None:
+        for broken in ["missing", "different-store"]:
+            with self.subTest(broken=broken), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                primary = h.source("primary", "Example/primary", "Primary source.")
+                common = h.home / "separate-common"
+                common.mkdir()
+                (primary / ".git").rmdir()
+                (primary / ".git").write_text("gitdir: " + str(common) + "\n")
+                h.policy["repositories"][0]["active_bindings"][0]["git_common_dir"] = str(common)
+                linked = h.home / "linked"
+                linked.mkdir()
+                admin = common / "worktrees/linked"
+                admin.mkdir(parents=True)
+                (linked / ".git").write_text("gitdir: " + str(admin) + "\n")
+                (admin / "commondir").write_text("../..\n")
+                (admin / "gitdir").write_text(str(linked / ".git") + "\n")
+                (linked / "agent-learnings.md").write_text(learned("Linked source."))
+                h.roots = [dict(h.roots[0], abs_path=str(linked), git_common_dir=str(common))]
+                self.assertEqual(h.run()["workspace_sources"], 1)
+                (primary / ".git").unlink()
+                if broken == "different-store":
+                    other = h.home / "other-common"
+                    other.mkdir()
+                    (primary / ".git").write_text("gitdir: " + str(other) + "\n")
+                (linked / "agent-learnings.md").write_bytes(b"\xff")
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertEqual(report["workspace_sources"], 0)
+
     def test_forged_route_root_cannot_borrow_an_accepted_binding(self) -> None:
         for shape in ["missing-git", "unrelated-git-directory", "missing-registration", "wrong-backpointer"]:
             with self.subTest(shape=shape), tempfile.TemporaryDirectory() as directory:

@@ -251,6 +251,18 @@ class InstallTests(unittest.TestCase):
                 process.kill()
                 process.communicate()
 
+    def test_nonmanaged_binary_symlink_is_preserved(self) -> None:
+        self.initial()
+        before = self.pointers()
+        binary = self.bin_dir / "continual-learning-consolidate"
+        binary.unlink()
+        unrelated = str(self.root / "unrelated-tool")
+        binary.symlink_to(unrelated)
+        self.run_install(success=False)
+        self.assertEqual(os.readlink(binary), unrelated)
+        self.assertEqual(os.readlink(self.runtime / "current"), before[0])
+        self.assertEqual((self.runtime / "classifications.json").read_bytes(), before[2])
+
     def test_corrupted_release_and_occupied_bin_refuse(self) -> None:
         release = self.initial()["release_id"]
         before = self.pointers()

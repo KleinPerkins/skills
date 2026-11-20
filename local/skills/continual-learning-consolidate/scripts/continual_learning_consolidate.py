@@ -87,6 +87,22 @@ def _same_directory(left: int, right: int) -> bool:
     return (a.st_dev, a.st_ino) == (b.st_dev, b.st_ino)
 
 
+def _primary_owns_common(primary: Path, primary_fd: int, common_fd: int) -> bool:
+    info = os.stat(".git", dir_fd=primary_fd, follow_symlinks=False)
+    if stat.S_ISDIR(info.st_mode):
+        git_fd = os.open(".git", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                         dir_fd=primary_fd)
+    else:
+        pointer = _pointer_at(primary_fd, ".git")
+        if not pointer.startswith("gitdir: "):
+            return False
+        git_fd = _open_directory((primary / pointer[len("gitdir: "):]).resolve(strict=False))
+    try:
+        return _same_directory(git_fd, common_fd)
+    finally:
+        os.close(git_fd)
+
+
 def _root_matches_binding(root: Path, metadata: dict[str, Any], root_fd: int) -> bool:
     """Corroborate route identity using local Git pointers, never a Git process."""
     primary, common = Path(metadata["primary_abs_path"]), Path(metadata["git_common_dir"])
@@ -94,23 +110,23 @@ def _root_matches_binding(root: Path, metadata: dict[str, Any], root_fd: int) ->
         info = os.stat(".git", dir_fd=root_fd, follow_symlinks=False)
         common_fd = _open_directory(common)
         try:
-            if stat.S_ISDIR(info.st_mode):
-                if root != primary:
+            primary_fd = root_fd if root == primary else _open_directory(primary)
+            try:
+                if not _primary_owns_common(primary, primary_fd, common_fd):
                     return False
-                git_fd = os.open(".git", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                 dir_fd=root_fd)
-                try:
-                    return _same_directory(git_fd, common_fd)
-                finally:
-                    os.close(git_fd)
+            finally:
+                if primary_fd != root_fd:
+                    os.close(primary_fd)
+            if root == primary:
+                return True
+            if stat.S_ISDIR(info.st_mode):
+                return False
             pointer = _pointer_at(root_fd, ".git")
             if not pointer.startswith("gitdir: "):
                 return False
             admin = (root / pointer[len("gitdir: "):]).resolve(strict=False)
             admin_fd = _open_directory(admin)
             try:
-                if root == primary and _same_directory(admin_fd, common_fd):
-                    return True  # Explicit primary with a separate Git directory.
                 if admin.parent != common / "worktrees":
                     return False
                 declared_common = (admin / _pointer_at(admin_fd, "commondir")).resolve(strict=False)

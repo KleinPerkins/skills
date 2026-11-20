@@ -117,6 +117,9 @@ def install(args: argparse.Namespace) -> dict:
         fcntl.flock(lock, fcntl.LOCK_EX)
         current, binary = root / "current", bin_dir / "continual-learning-consolidate"
         previous_current, previous_binary = link_preimage(current), link_preimage(binary)
+        managed_binary = str(current / "scripts/continual_learning_consolidate.py")
+        if previous_binary is not None and previous_binary != managed_binary:
+            raise ValueError("refusing to replace nonmanaged binary symlink")
         if args.expected_current is not None:
             observed = Path(previous_current).name if previous_current else "absent"
             if args.expected_current != observed or (previous_current is not None and previous_current != str(root / "releases" / observed)):
