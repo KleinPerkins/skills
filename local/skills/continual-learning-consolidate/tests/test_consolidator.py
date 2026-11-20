@@ -3,8 +3,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -30,12 +32,16 @@ def learned(*bullets: str) -> str:
 
 class Harness:
     def __init__(self, root: Path) -> None:
-        self.home = root / "home"
+        self.home = (root / "home").resolve()
         self.home.mkdir()
         self.route = root / "agent-route.sh"
         self.route.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
         self.roots: list[dict[str, object]] = []
         self.commands: list[list[str]] = []
+        self.policy_path = self.home / ".local/share/continual-learning-consolidate/classifications.json"
+        self.policy_path.parent.mkdir(parents=True)
+        self.policy_path.touch(mode=0o600)
+        self.policy = {"schema": "memory-source-classification/v1", "repositories": [], "excluded_paths": []}
 
     def seed(self, *bullets: str) -> None:
         (self.home / "agent-learnings.md").write_text(
@@ -47,16 +53,29 @@ class Harness:
         relative: str,
         origin: str,
         *bullets: str,
+        classification: str = "personal",
+        identity: str | None = None,
     ) -> Path:
         root = self.home / relative
         root.mkdir(parents=True)
+        (root / ".git").mkdir()
         (root / "agent-learnings.md").write_text(
             learned(*bullets), encoding="utf-8"
         )
+        identity = identity or "repo-" + hashlib.sha256(origin.lower().encode()).hexdigest()[:12]
+        rows = self.policy["repositories"]
+        row = next((row for row in rows if row["repository_id"] == identity), None)
+        if row is None:
+            row = {"repository_id": identity, "classification": classification, "active_bindings": [], "origin_aliases": [origin]}
+            rows.append(row)
+        common = str(root / ".git")
+        row["active_bindings"].append({"primary_path": str(root), "git_common_dir": common})
         self.roots.append(
             {
                 "abs_path": str(root),
                 "exists": True,
+                "primary_abs_path": str(root),
+                "git_common_dir": common,
                 "origin": origin,
                 "live_origin": origin,
             }
@@ -71,11 +90,15 @@ class Harness:
             stderr="",
         )
 
-    def run(self, *, dry_run: bool = False) -> dict[str, object]:
+    def run(self, *, dry_run: bool = False, write_policy: bool = True) -> dict[str, object]:
+        if write_policy:
+            self.policy_path.write_text(json.dumps(self.policy))
+            self.policy_path.chmod(0o600)
         return consolidator.consolidate_home(
             self.home,
             self.route,
             dry_run=dry_run,
+            policy_path=self.policy_path,
             runner=self.runner,
         )
 
@@ -97,11 +120,13 @@ class AdmissionTests(unittest.TestCase):
                 seed_one,
                 shared,
                 work_only,
+                classification="work",
             )
             harness.source(
                 "dev/affirm/work-b",
                 "Affirm/work-b",
                 work_only,
+                classification="work",
             )
             harness.source(
                 "dev/personal/personal-a",
@@ -292,6 +317,497 @@ class ProjectionTests(unittest.TestCase):
             executables = {Path(part).name for part in command}
             self.assertNotIn("git", executables)
             self.assertNotIn("gh", executables)
+
+
+class ClassificationTests(unittest.TestCase):
+    def test_assignment_overrides_owner_and_employer_looking_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            shared = "Accepted personal evidence corroborates this reusable practice."
+            work_only = "Work-only process detail must remain within its workspaces."
+            h.source("dev/employer/personal", "Employer/personal-archive", shared, classification="personal")
+            h.source("personal/other", "Person/other", shared)
+            h.source("personal/work", "Person/analytics", work_only, classification="work")
+            h.source("future-employer/work", "Future/work", work_only, classification="work")
+            h.run()
+            output = (h.home / "AGENTS.md").read_text()
+            self.assertIn(shared, output)
+            self.assertNotIn(work_only, output)
+
+    def test_work_linked_worktrees_never_become_personal(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            phrase = "Recurring work evidence remains private across native worktrees."
+            for i in range(2):
+                h.source(f"work-primary-{i}", f"Employer/repo-{i}", phrase, classification="work")
+                root = dict(h.roots[-1])
+                path = h.home / f"native-worktree-{i}"
+                path.mkdir()
+                (path / "agent-learnings.md").write_text(learned(phrase))
+                root["abs_path"] = str(path)
+                admin = Path(root["git_common_dir"]) / "worktrees" / f"native-{i}"
+                admin.mkdir(parents=True)
+                (path / ".git").write_text("gitdir: " + str(admin) + "\n")
+                (admin / "commondir").write_text("../..\n")
+                (admin / "gitdir").write_text(str(path / ".git") + "\n")
+                h.roots.append(root)
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], 4)
+            self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
+
+    def test_equivalent_origins_and_clones_share_logical_identity(self) -> None:
+        variants = ["git@GitHub.com:Example/One.git", "https://github.com/example/one/", "ssh://git@github.com/EXAMPLE/one.git/", "github.com/example/one", "EXAMPLE/One.git/"]
+        self.assertEqual({consolidator.classifications.normalize_origin(v) for v in variants}, {"github.com/example/one"})
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            phrase = "A single logical repository cannot corroborate its own clones."
+            for i, origin in enumerate(variants):
+                h.source(f"clone-{i}", origin, phrase, identity="accepted-one")
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], len(variants))
+            self.assertEqual(report["unknown_or_excluded_roots"], 0)
+            self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
+
+    def test_origin_ports_preserve_distinct_endpoints_and_reject_invalid_ports(self) -> None:
+        normalize = consolidator.classifications.normalize_origin
+        base = "github.com/example/repository"
+        for origin in ["ssh://git@github.com:22/example/repository.git", "https://github.com:443/example/repository", "http://github.com:80/example/repository", "git://github.com:9418/example/repository"]:
+            self.assertEqual(normalize(origin), base)
+        for origin in ["ssh://git@github.com:2222/example/repository", "https://github.com:2222/example/repository", "github.com:2222/example/repository"]:
+            value = normalize(origin)
+            self.assertEqual(value, "github.com:2222/example/repository")
+            self.assertEqual(normalize(value), value)
+            self.assertNotEqual(value, base)
+        for origin in ["ssh://git@github.com:bad/example/repository", "https://github.com:65536/example/repository", "https://github.com:0/example/repository", "github.com:bad/example/repository"]:
+            with self.assertRaises(consolidator.classifications.PolicyError): normalize(origin)
+
+    def test_accepted_aliases_deduplicate_across_clones_but_conflict_within_one_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            phrase = "Accepted logical aliases still cannot corroborate one repository twice."
+            original = "git@github.com:Example/one-original.git"
+            successor = "https://github.com/example/one"
+            h.source("original", original, phrase, identity="logical-one")
+            second = h.source("successor", successor, phrase, identity="logical-one")
+            h.policy["repositories"][0]["origin_aliases"].append(successor)
+            h.roots[0]["origin"] = "https://github.com/example/one-original/"
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], 2)
+            self.assertEqual(report["unknown_or_excluded_roots"], 0)
+            self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
+            h.roots[1]["origin"] = original
+            (second / "agent-learnings.md").write_bytes(b"\xff")
+            report = h.run()
+            self.assertEqual(report["workspace_sources"], 1)
+            self.assertEqual(report["unknown_or_excluded_roots"], 1)
+
+    def test_non_ssh_url_userinfo_is_rejected_and_ssh_login_is_allowed(self) -> None:
+        normalize = consolidator.classifications.normalize_origin
+        for scheme in ["https", "http", "git"]:
+            locator = f"{scheme}://{'synthetic-user'}@example.com/owner/repository"
+            with self.assertRaises(consolidator.classifications.PolicyError): normalize(locator)
+        self.assertEqual(normalize("ssh://git@example.com/owner/repository"), "example.com/owner/repository")
+
+    def test_policy_requires_current_user_and_private_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.run()
+            h.policy_path.chmod(0o644)
+            with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+            h.policy_path.chmod(0o600)
+            original_stat = os.fstat
+            def foreign_owner(descriptor):
+                info = original_stat(descriptor)
+                return SimpleNamespace(st_mode=info.st_mode, st_uid=info.st_uid + 1)
+            with mock.patch.object(consolidator.classifications.os, "fstat", side_effect=foreign_owner):
+                with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+
+    def test_unknowns_never_open_memory_or_corroborate(self) -> None:
+        for change in ["unassigned", "unknown", "missing-primary", "missing-common", "changed-common", "changed-origin"]:
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                phrase = "A lone accepted personal source requires independent evidence."
+                h.source("personal", "Example/personal", phrase)
+                unknown = h.source("unknown", "Example/unknown", phrase)
+                if change == "unassigned":
+                    h.policy["repositories"].pop()
+                elif change == "unknown":
+                    h.policy["repositories"][-1]["classification"] = "unknown"
+                elif change.startswith("missing-"):
+                    h.roots[-1].pop("primary_abs_path" if change == "missing-primary" else "git_common_dir")
+                elif change == "changed-common":
+                    h.roots[-1]["git_common_dir"] = str(h.home / "unvalidated-store")
+                else:
+                    h.roots[-1]["live_origin"] = "https://github.com/other/identity"
+                # Unreadable memory is a sentinel: opening it would block the run.
+                (unknown / "agent-learnings.md").write_bytes(b"\xff")
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertNotIn(phrase, (h.home / "AGENTS.md").read_text())
+
+    def test_clone_bindings_never_match_a_primary_common_cross_product(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.source("one", "Example/same", "First clone.", identity="same")
+            second = h.source("two", "Example/same", "Second clone.", identity="same")
+            h.roots[-1]["primary_abs_path"] = h.roots[0]["primary_abs_path"]
+            (second / "agent-learnings.md").write_bytes(b"\xff")
+            self.assertEqual(h.run()["unknown_or_excluded_roots"], 1)
+
+    def test_recovery_and_retired_roots_excluded_despite_active_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.source("active", "Example/active", "A single local fact stays local.")
+            for name in ["recovery/archive", "retired-linked-root"]:
+                path = h.home / name
+                path.mkdir(parents=True)
+                (path / "agent-learnings.md").write_bytes(b"\xff")
+                row = dict(h.roots[0], abs_path=str(path))
+                h.roots.append(row)
+                h.policy["excluded_paths"].append(str(path.parent if name.startswith("recovery/") else path))
+            report = h.run()
+            self.assertEqual(report["unknown_or_excluded_roots"], 2)
+            self.assertEqual(report["workspace_sources"], 1)
+
+    def test_discovered_root_symlink_cannot_erase_lexical_exclusion(self) -> None:
+        for prefix in ["recovery", "unreviewed-alias"]:
+            with self.subTest(prefix=prefix), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                active = h.source("active", "Example/active", "Initial memory.")
+                (active / "agent-learnings.md").write_bytes(b"\xff")
+                alias = h.home / prefix / "alias"
+                alias.parent.mkdir()
+                alias.symlink_to(active, target_is_directory=True)
+                h.policy["excluded_paths"] = [str(h.home / "recovery")]
+                # Only the alias is discovered; borrowing its target would read
+                # the invalid sentinel, despite the accepted target metadata.
+                h.roots[0]["abs_path"] = str(alias)
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertEqual(report["workspace_sources"], 0)
+
+    def test_active_memory_symlink_cannot_read_excluded_storage(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            active = h.source("active", "Example/active", "Temporary source.")
+            recovery = h.home / "recovery"
+            recovery.mkdir()
+            excluded = recovery / "agent-learnings.md"
+            excluded.write_bytes(b"\xff")
+            h.policy["excluded_paths"] = [str(recovery)]
+            candidate = active / "agent-learnings.md"
+            candidate.unlink()
+            candidate.symlink_to(excluded)
+            report = h.run()
+            self.assertEqual(report["unknown_or_excluded_roots"], 1)
+            self.assertEqual(report["workspace_sources"], 0)
+
+    def test_workspace_memory_symlink_swap_is_blocked_at_open(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            active = h.source("active", "Example/active", "Initial regular memory.")
+            recovery = h.home / "recovery"
+            recovery.mkdir()
+            excluded = recovery / "agent-learnings.md"
+            excluded.write_text(learned("Excluded memory must never be read through a raced alias."))
+            h.policy["excluded_paths"] = [str(recovery)]
+            candidate = active / "agent-learnings.md"
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            original_read = consolidator._read_bullets
+            def swap_at_open(path: Path, **kwargs):
+                if path == candidate:
+                    self.assertTrue(kwargs["no_follow"])
+                    candidate.unlink()
+                    candidate.symlink_to(excluded)
+                return original_read(path, **kwargs)
+            with mock.patch.object(consolidator, "_read_bullets", side_effect=swap_at_open):
+                with self.assertRaises(consolidator.ConsolidationError): h.run()
+            self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_workspace_directory_swap_keeps_the_opened_admitted_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            phrase = "Original admitted directory memory is corroborated by another repository."
+            active = h.source("active", "Example/active", phrase)
+            h.source("other", "Example/other", phrase)
+            recovery = h.home / "recovery"
+            recovery.mkdir()
+            excluded = "Excluded directory memory must never be opened."
+            (recovery / "agent-learnings.md").write_text(learned(excluded))
+            h.policy["excluded_paths"] = [str(recovery)]
+            candidate = active / "agent-learnings.md"
+            original_read = consolidator._read_bullets
+            def swap_directory(path: Path, **kwargs):
+                if path == candidate:
+                    active.rename(h.home / "held-active")
+                    active.symlink_to(recovery, target_is_directory=True)
+                return original_read(path, **kwargs)
+            with mock.patch.object(consolidator, "_read_bullets", side_effect=swap_directory):
+                h.run()
+            output = (h.home / "AGENTS.md").read_text()
+            self.assertIn(phrase, output)
+            self.assertNotIn(excluded, output)
+
+    def test_linked_worktree_requires_primary_to_own_accepted_common_store(self) -> None:
+        for broken in ["missing", "different-store"]:
+            with self.subTest(broken=broken), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                primary = h.source("primary", "Example/primary", "Primary source.")
+                common = h.home / "separate-common"
+                common.mkdir()
+                (primary / ".git").rmdir()
+                (primary / ".git").write_text("gitdir: " + str(common) + "\n")
+                h.policy["repositories"][0]["active_bindings"][0]["git_common_dir"] = str(common)
+                linked = h.home / "linked"
+                linked.mkdir()
+                admin = common / "worktrees/linked"
+                admin.mkdir(parents=True)
+                (linked / ".git").write_text("gitdir: " + str(admin) + "\n")
+                (admin / "commondir").write_text("../..\n")
+                (admin / "gitdir").write_text(str(linked / ".git") + "\n")
+                (linked / "agent-learnings.md").write_text(learned("Linked source."))
+                h.roots = [dict(h.roots[0], abs_path=str(linked), git_common_dir=str(common))]
+                self.assertEqual(h.run()["workspace_sources"], 1)
+                (primary / ".git").unlink()
+                if broken == "different-store":
+                    other = h.home / "other-common"
+                    other.mkdir()
+                    (primary / ".git").write_text("gitdir: " + str(other) + "\n")
+                (linked / "agent-learnings.md").write_bytes(b"\xff")
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertEqual(report["workspace_sources"], 0)
+
+    def test_linked_registration_stays_bound_to_open_common_descriptor(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            primary = h.source("primary", "Example/primary", "Primary memory.")
+            common = h.home / "common"
+            common.mkdir()
+            (primary / ".git").rmdir()
+            (primary / ".git").write_text("gitdir: " + str(common) + "\n")
+            h.policy["repositories"][0]["active_bindings"][0]["git_common_dir"] = str(common)
+            forged = h.home / "forged"
+            forged.mkdir()
+            admin = common / "worktrees/slot"
+            admin.mkdir(parents=True)
+            (forged / ".git").write_text("gitdir: " + str(admin) + "\n")
+            (admin / "commondir").write_text("../..\n")
+            (admin / "gitdir").write_text(str(h.home / "other-root/.git") + "\n")
+            (forged / "agent-learnings.md").write_bytes(b"\xff")
+            h.roots = [dict(h.roots[0], abs_path=str(forged), git_common_dir=str(common))]
+            original = consolidator._primary_owns_common
+            swapped = False
+            def replace_common(path, primary_fd, common_fd):
+                nonlocal swapped
+                valid = original(path, primary_fd, common_fd)
+                if not swapped:
+                    swapped = True
+                    common.rename(h.home / "held-common")
+                    replacement = common / "worktrees/slot"
+                    replacement.mkdir(parents=True)
+                    (replacement / "commondir").write_text("../..\n")
+                    (replacement / "gitdir").write_text(str(forged / ".git") + "\n")
+                return valid
+            with mock.patch.object(consolidator, "_primary_owns_common", side_effect=replace_common):
+                report = h.run()
+            self.assertTrue(swapped)
+            self.assertEqual(report["unknown_or_excluded_roots"], 1)
+            self.assertEqual(report["workspace_sources"], 0)
+
+    def test_relative_git_pointer_family_stays_anchored_after_directory_replacement(self) -> None:
+        for pointer_kind in ["primary", "commondir", "gitdir"]:
+            with self.subTest(pointer_kind=pointer_kind), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                primary = h.source("primary", "Example/primary", "Primary memory.")
+                common = primary / ".git"
+                linked = h.home / "linked"
+                linked.mkdir()
+                admin = common / "worktrees/slot"
+                admin.mkdir(parents=True)
+                (linked / ".git").write_text("gitdir: ../primary/.git/worktrees/slot\n")
+                (admin / "commondir").write_text("../..\n")
+                (admin / "gitdir").write_text("../../../../linked/.git\n")
+                (linked / "agent-learnings.md").write_text(learned("Linked memory."))
+                h.roots = [dict(h.roots[0], abs_path=str(linked))]
+                self.assertEqual(h.run()["workspace_sources"], 1)
+                # The original descriptor's relative target is deliberately
+                # invalid. Only the replacement pathname would validate it.
+                if pointer_kind == "primary":
+                    common.rename(h.home / "accepted-common")
+                    common = h.home / "accepted-common"
+                    (primary / ".git").write_text("gitdir: store\n")
+                    (primary / "store").mkdir()
+                    h.policy["repositories"][0]["active_bindings"][0]["git_common_dir"] = str(common)
+                    h.roots = [dict(h.roots[0], abs_path=str(primary), git_common_dir=str(common))]
+                    target, filename = primary, ".git"
+                else:
+                    target, filename = admin, pointer_kind
+                    (admin / filename).write_text("redirect" + ("/.git" if pointer_kind == "gitdir" else "") + "\n")
+                    (admin / "redirect").mkdir()
+                original = consolidator._pointer_at
+                swapped = False
+                def replace_after_read(fd, name):
+                    nonlocal swapped
+                    value = original(fd, name)
+                    if name == filename and not swapped:
+                        swapped = True
+                        target.rename(target.with_name(target.name + "-held"))
+                        target.mkdir()
+                        # Replacement points at accepted directory; the opened
+                        # original still points at its unrelated child.
+                        (target / ("store" if pointer_kind == "primary" else "redirect")).symlink_to(
+                            linked if pointer_kind == "gitdir" else common, target_is_directory=True)
+                    return value
+                with mock.patch.object(consolidator, "_pointer_at", side_effect=replace_after_read):
+                    report = h.run()
+                self.assertTrue(swapped)
+                self.assertEqual(report["workspace_sources"], 0)
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+
+    def test_loop_resolution_is_domain_blocked_without_memory_reads(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.source("active", "Example/active", "A workspace source.")
+            loop = h.home / "loop"
+            h.policy["repositories"][0]["active_bindings"][0]["primary_path"] = str(loop)
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            original = Path.resolve
+            def resolution(path, *args, **kwargs):
+                if path == loop:
+                    raise RuntimeError("synthetic symlink loop")
+                return original(path, *args, **kwargs)
+            with mock.patch.object(Path, "resolve", resolution), mock.patch.object(consolidator, "_read_bullets", side_effect=AssertionError("memory must not be read")):
+                with self.assertRaises(consolidator.ConsolidationError): h.run()
+            self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_forged_route_root_cannot_borrow_an_accepted_binding(self) -> None:
+        for shape in ["missing-git", "unrelated-git-directory", "missing-registration", "wrong-backpointer"]:
+            with self.subTest(shape=shape), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                h.source("accepted", "Example/accepted", "A single accepted source.")
+                forged = h.home / "forged"
+                forged.mkdir()
+                (forged / "agent-learnings.md").write_bytes(b"\xff")
+                root = dict(h.roots[0], abs_path=str(forged))
+                if shape == "unrelated-git-directory":
+                    (forged / ".git").mkdir()
+                elif shape in {"missing-registration", "wrong-backpointer"}:
+                    admin = Path(root["git_common_dir"]) / "worktrees/forged"
+                    admin.mkdir(parents=True)
+                    (forged / ".git").write_text("gitdir: " + str(admin) + "\n")
+                    if shape == "wrong-backpointer":
+                        (admin / "commondir").write_text("../..\n")
+                        (admin / "gitdir").write_text(str(h.home / "another-root/.git") + "\n")
+                h.roots.append(root)
+                report = h.run()
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+                self.assertEqual(report["workspace_sources"], 1)
+
+    def test_invalid_policy_preserves_output_and_precedes_seed_reads(self) -> None:
+        cases = ["missing", "json", "schema", "classification", "duplicate-id", "common-conflict", "primary-conflict", "cross-role-conflict", "origin-conflict", "duplicate-key", "excluded-binding", "noncanonical", "extra-field"]
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                h.source("one", "Example/one", "One independent source.")
+                h.source("two", "Example/two", "Another independent source.")
+                first, second = h.policy["repositories"]
+                if case == "schema": h.policy["schema"] = "unsupported/v9"
+                elif case == "classification": first["classification"] = "guess"
+                elif case == "duplicate-id": second["repository_id"] = first["repository_id"]
+                elif case in {"common-conflict", "primary-conflict"}:
+                    key = "git_common_dir" if case == "common-conflict" else "primary_path"
+                    second["active_bindings"][0][key] = first["active_bindings"][0][key]
+                elif case == "cross-role-conflict": second["active_bindings"][0]["git_common_dir"] = first["active_bindings"][0]["primary_path"]
+                elif case == "origin-conflict": second["origin_aliases"] = ["git@github.com:example/one.git/"]
+                elif case == "excluded-binding": h.policy["excluded_paths"] = [str(h.home / "one")]
+                elif case == "noncanonical": first["active_bindings"][0]["primary_path"] += "/../one"
+                elif case == "extra-field": first["allow_all_clones"] = True
+                h.policy_path.write_text(json.dumps(h.policy))
+                if case == "missing": h.policy_path.unlink()
+                elif case == "json": h.policy_path.write_bytes(b"{")
+                elif case == "duplicate-key": h.policy_path.write_text('{"schema":"old","schema":"new"}')
+                target = h.home / "AGENTS.md"
+                target.write_bytes(b"prior output")
+                with mock.patch.object(consolidator, "_read_bullets", side_effect=AssertionError("must not read memory")):
+                    with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+                self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_shared_observed_origin_cannot_bypass_optional_aliases(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            for i in range(2):
+                h.source(f"clone-{i}", "Example/same", "One logical origin cannot corroborate itself.", identity=f"different-{i}")
+                h.policy["repositories"][-1]["origin_aliases"] = []
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            original = consolidator._read_bullets
+            def no_workspace_read(path, **kwargs):
+                if kwargs.get("no_follow"):
+                    self.fail("conflicting workspace identity must precede memory access")
+                return original(path, **kwargs)
+            with mock.patch.object(consolidator, "_read_bullets", side_effect=no_workspace_read):
+                with self.assertRaisesRegex(consolidator.ConsolidationError, "origin conflicts"):
+                    h.run()
+            self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_policy_must_be_a_nofollow_regular_file(self) -> None:
+        for shape in ["symlink", "fifo"]:
+            with self.subTest(shape=shape), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                other = h.home / "other-policy.json"
+                other.write_text(json.dumps(h.policy))
+                other.chmod(0o600)
+                h.policy_path.unlink()
+                if shape == "symlink": h.policy_path.symlink_to(other)
+                else: os.mkfifo(h.policy_path, mode=0o600)
+                target = h.home / "AGENTS.md"
+                target.write_bytes(b"prior output")
+                with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+                self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_discovery_failure_preserves_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.policy_path.write_text(json.dumps(h.policy))
+            target = h.home / "AGENTS.md"
+            target.write_bytes(b"prior output")
+            for result in [SimpleNamespace(returncode=1, stderr="unavailable", stdout=""), SimpleNamespace(returncode=0, stderr="", stdout="bad JSON")]:
+                with self.assertRaises(consolidator.ConsolidationError):
+                    consolidator.consolidate_home(h.home, h.route, policy_path=h.policy_path, runner=lambda *a, **k: result)
+                self.assertEqual(target.read_bytes(), b"prior output")
+
+    def test_scanner_warning_and_dry_run_do_not_bypass_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            with mock.patch.object(consolidator.memory, "scan", return_value=([{"severity": "WARN"}], False)):
+                report = h.run(dry_run=True)
+            self.assertEqual(report["scanner_warnings"], 1)
+            self.assertFalse((h.home / "AGENTS.md").exists())
 
 
 class MemoryTests(unittest.TestCase):
