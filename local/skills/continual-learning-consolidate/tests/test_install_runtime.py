@@ -283,6 +283,67 @@ class InstallTests(unittest.TestCase):
         self.run_install(success=False)
         self.assertEqual(self.pointers(), before)
 
+    def test_existing_policy_snapshot_does_not_follow_replacement(self) -> None:
+        self.initial()
+        policy = self.runtime / "classifications.json"
+        before = policy.read_bytes()
+        other = self.root / "other-policy"
+        other.write_bytes(b"different bytes")
+        original_open = os.open
+        swapped = False
+        def swap_after_open(path, flags, *args, **kwargs):
+            nonlocal swapped
+            descriptor = original_open(path, flags, *args, **kwargs)
+            if Path(path) == policy and not swapped:
+                swapped = True
+                policy.rename(self.root / "preserved-policy")
+                policy.symlink_to(other)
+            return descriptor
+        with mock.patch.object(installer.os, "open", side_effect=swap_after_open):
+            content, mode = installer.read_policy_preimage(policy)
+        self.assertTrue(swapped)
+        self.assertEqual((content, mode), (before, 0o600))
+        with self.assertRaises(OSError): installer.read_policy_preimage(policy)
+
+    def test_persistent_inverse_failure_attempts_all_and_blocks_runtime(self) -> None:
+        self.initial()
+        before = self.pointers()
+        with (self.source / "scripts/lib/memory.py").open("a") as handle:
+            handle.write("\n# next release\n")
+        self.policy.write_text(json.dumps({"schema": "memory-source-classification/v1", "repositories": [], "excluded_paths": [str(self.home / "new-only")]}))
+        args = SimpleNamespace(runtime=self.runtime, bin_dir=self.bin_dir, expected_current=None, policy=self.policy, expected_policy_sha256=hashlib.sha256(before[2]).hexdigest(), rollback_to=None, source=self.source)
+        real_link = installer.atomic_link
+        calls = []
+        binary = self.bin_dir / "continual-learning-consolidate"
+        def persistent_failure(path: Path, target: str | None) -> None:
+            calls.append((path.name, target))
+            if path == binary or (path == self.runtime / "current" and target == before[0]):
+                raise OSError("synthetic persistent pointer failure")
+            real_link(path, target)
+        with mock.patch.object(installer, "atomic_link", side_effect=persistent_failure):
+            with self.assertRaises(ValueError) as caught: installer.install(args)
+        report = json.loads(str(caught.exception).split("recovery=", 1)[1])
+        self.assertFalse(report["current"]["restored"])
+        self.assertTrue(report["binary"]["restored"])
+        self.assertTrue(report["policy"]["restored"])
+        self.assertTrue(report["runtime_blocked"])
+        self.assertEqual(sum(name == "continual-learning-consolidate" for name, _ in calls), 2)
+        self.assertEqual((self.runtime / "classifications.json").read_bytes(), before[2])
+        (self.home / "agent-learnings.md").write_text("## Learned User Preferences\n- Synthetic seed.\n")
+        target = self.home / "AGENTS.md"
+        target.write_bytes(b"prior output")
+        route = self.root / "route.sh"
+        route.write_text("#!/bin/sh\nprintf '%s\\n' '{\"roots\":[]}'\n")
+        command = [str(binary), "--home", str(self.home), "--agent-route", str(route), "--json"]
+        result = subprocess.run(command, env=self.env, capture_output=True, text=True, timeout=10)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("installation recovery is incomplete", result.stderr)
+        self.assertEqual(target.read_bytes(), b"prior output")
+        self.run_install()
+        self.assertEqual((self.runtime / ".install.lock").read_bytes(), b"")
+        repaired = subprocess.run(command, env=self.env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(repaired.returncode, 0, repaired.stderr)
+
     def test_failed_pointer_swap_restores_policy_and_runtime(self) -> None:
         self.initial()
         (self.runtime / "classifications.json").chmod(0o640)
@@ -300,7 +361,7 @@ class InstallTests(unittest.TestCase):
                 raise OSError("synthetic pointer failure")
             real_link(path, target)
         with mock.patch.object(installer, "atomic_link", side_effect=fail_once):
-            with self.assertRaises(OSError): installer.install(args)
+            with self.assertRaises(ValueError): installer.install(args)
         self.assertEqual(self.pointers(), before)
         self.assertEqual((self.runtime / "classifications.json").stat().st_mode & 0o777, 0o640)
         self.assertFalse(list(self.runtime.glob(".policy-*")))

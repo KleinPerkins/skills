@@ -16,7 +16,6 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
-from classifications import load_policy  # noqa: E402
 
 
 def file_hash(data: bytes) -> str:
@@ -88,6 +87,37 @@ def atomic_link(path: Path, target: str | None) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def read_policy_preimage(path: Path) -> tuple[bytes | None, int | None]:
+    try:
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except FileNotFoundError:
+        return None, None
+    with os.fdopen(descriptor, "rb") as handle:
+        info = os.fstat(handle.fileno())
+        if not stat.S_ISREG(info.st_mode):
+            raise ValueError("private policy must be a regular file")
+        return handle.read(), stat.S_IMODE(info.st_mode)
+
+
+def recovery_marker(lock, pending: bool) -> None:
+    lock.seek(0)
+    if pending:
+        if not lock.read(1):
+            lock.write("pending recovery\n")
+    else:
+        lock.truncate(0)
+    lock.flush()
+    os.fsync(lock.fileno())
+
+
+def restore_policy(path: Path, content: bytes | None, mode: int | None) -> None:
+    if content is None:
+        path.unlink(missing_ok=True)
+    else:
+        atomic_bytes(path, content)
+        os.chmod(path, mode)
+
+
 def validate_target_policy(release: Path, policy: bytes) -> None:
     # Run only the verified target's validator in an isolated Python process.
     # Current-source validation alone cannot establish rollback compatibility.
@@ -112,9 +142,11 @@ def install(args: argparse.Namespace) -> dict:
     root, bin_dir = args.runtime.resolve(), args.bin_dir.resolve()
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
     bin_dir.mkdir(parents=True, exist_ok=True)
-    with (root / ".install.lock").open("a") as lock:
+    with (root / ".install.lock").open("a+") as lock:
         os.chmod(root / ".install.lock", 0o600)
         fcntl.flock(lock, fcntl.LOCK_EX)
+        lock.seek(0)
+        was_pending = bool(lock.read(1))
         current, binary = root / "current", bin_dir / "continual-learning-consolidate"
         previous_current, previous_binary = link_preimage(current), link_preimage(binary)
         managed_binary = str(current / "scripts/continual_learning_consolidate.py")
@@ -125,10 +157,7 @@ def install(args: argparse.Namespace) -> dict:
             if args.expected_current != observed or (previous_current is not None and previous_current != str(root / "releases" / observed)):
                 raise ValueError("current runtime preimage changed")
         policy = root / "classifications.json"
-        if policy.is_symlink() or (policy.exists() and not policy.is_file()):
-            raise ValueError("private policy must be a regular file")
-        previous_policy = policy.read_bytes() if policy.exists() else None
-        previous_policy_mode = policy.stat().st_mode & 0o777 if policy.exists() else None
+        previous_policy, previous_policy_mode = read_policy_preimage(policy)
         observed_policy = file_hash(previous_policy) if previous_policy is not None else "absent"
         if args.policy is not None:
             if args.expected_policy_sha256 is None:
@@ -136,14 +165,14 @@ def install(args: argparse.Namespace) -> dict:
             if args.expected_policy_sha256 != observed_policy:
                 raise ValueError("private policy preimage changed")
             candidate_policy = args.policy.read_bytes()
-            # Validate exactly the bytes later installed, avoiding input rereads.
-            from classifications import Policy, _unique_object
-            Policy(json.loads(candidate_policy.decode("utf-8"), object_pairs_hook=_unique_object), file_hash(candidate_policy))
         else:
             if args.expected_policy_sha256 is not None and args.expected_policy_sha256 != observed_policy:
                 raise ValueError("private policy preimage changed")
-            load_policy(policy)
             candidate_policy = previous_policy
+        if candidate_policy is None:
+            raise ValueError("private classification policy is missing")
+        from classifications import Policy, _unique_object
+        Policy(json.loads(candidate_policy.decode("utf-8"), object_pairs_hook=_unique_object), file_hash(candidate_policy))
         releases = root / "releases"
         releases.mkdir(exist_ok=True)
         if args.rollback_to:
@@ -177,22 +206,52 @@ def install(args: argparse.Namespace) -> dict:
                         shutil.rmtree(stage)
             verify_release(release, release_id)
         validate_target_policy(release, candidate_policy)
-        # All policy/source/path validation precedes changing live pointers.
-        # Keep the old release and restore exact preimages on any local failure.
+        # The existing coordination lock also carries a one-bit incomplete
+        # status. Readers refuse a mixed state until a successful repair.
+        recovery_marker(lock, True)
         try:
             if candidate_policy != previous_policy or previous_policy_mode != 0o600:
                 atomic_bytes(policy, candidate_policy)
             atomic_link(current, str(release))
             atomic_link(binary, str(current / "scripts/continual_learning_consolidate.py"))
-        except Exception:
-            atomic_link(current, previous_current)
-            atomic_link(binary, previous_binary)
-            if previous_policy is None:
-                policy.unlink(missing_ok=True)
-            else:
-                atomic_bytes(policy, previous_policy)
-                os.chmod(policy, previous_policy_mode)
-            raise
+            if (link_preimage(current) != str(release)
+                    or link_preimage(binary) != managed_binary
+                    or read_policy_preimage(policy) != (candidate_policy, 0o600)):
+                raise ValueError("published runtime/policy verification failed")
+        except Exception as failure:
+            inverses = {
+                "current": lambda: atomic_link(current, previous_current),
+                "binary": lambda: atomic_link(binary, previous_binary),
+                "policy": lambda: restore_policy(policy, previous_policy, previous_policy_mode),
+            }
+            checks = {
+                "current": lambda: link_preimage(current) == previous_current,
+                "binary": lambda: link_preimage(binary) == previous_binary,
+                "policy": lambda: read_policy_preimage(policy) == (previous_policy, previous_policy_mode),
+            }
+            recovery = {}
+            for name, inverse in inverses.items():
+                entry = {}
+                try:
+                    inverse()
+                except Exception as error:
+                    entry["inverse_error"] = str(error)
+                try:
+                    entry["restored"] = checks[name]()
+                except Exception as error:
+                    entry.update(restored=False, verification_error=str(error))
+                recovery[name] = entry
+            restored = all(entry["restored"] for entry in recovery.values())
+            if restored and not was_pending:
+                try:
+                    recovery_marker(lock, False)
+                except Exception as error:
+                    recovery["marker_error"] = str(error)
+            lock.seek(0)
+            recovery["runtime_blocked"] = bool(lock.read(1))
+            raise ValueError("installation failed; recovery=" + json.dumps(recovery, sort_keys=True)) from failure
+        # A verified successful retry can repair a previously incomplete state.
+        recovery_marker(lock, False)
         return {"release_id": release_id, "classification_sha256": file_hash(candidate_policy),
                 "previous_release": previous_current, "runtime": str(root)}
 

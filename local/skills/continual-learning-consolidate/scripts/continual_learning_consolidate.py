@@ -433,8 +433,11 @@ def _runtime_snapshot():
         yield  # Source-tree tests/runs are outside installed pointer activation.
         return
     runtime = release.parent.parent
-    with (runtime / ".install.lock").open("a") as lock:
+    with (runtime / ".install.lock").open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_SH)
+        lock.seek(0)
+        if lock.read(1):
+            raise ConsolidationError("installation recovery is incomplete; keep consolidation paused")
         # A process can load the old script before blocking on the installer.
         # Refuse that snapshot after the exclusive publisher changes current.
         # The bin/current symlinks can change after Python reads the script but

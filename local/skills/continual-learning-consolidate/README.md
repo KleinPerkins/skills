@@ -94,7 +94,10 @@ The installer publishes under
 `~/.local/share/continual-learning-consolidate/releases/`, records a manifest and
 addresses **every Python dependency** (including policy validation and installer
 support), with required file modes in the manifest. It verifies reused releases, atomically replaces links and policy,
-restores preimages on a local pointer failure, and retains old releases. The
+attempts every inverse independently on a pointer failure, verifies each
+preimage, and reports unresolved recovery. The existing lock retains an
+incomplete marker that blocks installed runtime reads until a successful
+verified repair. Old releases remain available. The
 installer holds the exclusive installation lock; installed runtimes hold its
 shared side through policy loading, discovery and projection. A process that
 loaded a superseded release before waiting refuses before reading policy.
