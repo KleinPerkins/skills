@@ -206,6 +206,20 @@ def open_directory(path: Path, *, directory_fd: int | None = None) -> int:
         raise
 
 
+def open_install_lock(path: Path):
+    """Open the cooperating installer/reader lock without following a link."""
+    descriptor = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+    try:
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid():
+            raise PolicyError("installation lock must be a current-user regular file")
+        os.fchmod(descriptor, 0o600)
+        return os.fdopen(descriptor, "r+")
+    except Exception:
+        os.close(descriptor)
+        raise
+
+
 def read_regular_file(path: Path, *, private: bool = False,
                       directory_fd: int | None = None) -> tuple[bytes, int]:
     parent_fd = None

@@ -465,7 +465,7 @@ def _runtime_snapshot():
     if runtime is None:
         yield  # Source-tree tests/runs are outside installed pointer activation.
         return
-    with (runtime / ".install.lock").open("a+") as lock:
+    with classifications.open_install_lock(runtime / ".install.lock") as lock:
         fcntl.flock(lock, fcntl.LOCK_SH)
         lock.seek(0)
         if lock.read(1):

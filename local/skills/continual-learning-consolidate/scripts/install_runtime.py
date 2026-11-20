@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import ExitStack
 import fcntl
 import hashlib
 import json
@@ -16,7 +17,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
-from classifications import open_directory, read_policy_file, read_regular_file  # noqa: E402
+from classifications import open_directory, open_install_lock, read_policy_file, read_regular_file  # noqa: E402
 
 
 def file_hash(data: bytes) -> str:
@@ -52,10 +53,11 @@ def manifest(files: dict[str, bytes]) -> bytes:
                        sort_keys=True, separators=(",", ":")) + "\n").encode()
 
 
-def verify_release(path: Path, release_id: str) -> None:
+def verify_release(path: Path, release_id: str, *, directory_fd: int | None = None) -> None:
     if path.is_symlink() or any(p.is_symlink() for p in path.rglob("*")):
         raise ValueError("release contains symlinks")
-    descriptor = open_directory(path)
+    owned = directory_fd is None
+    descriptor = open_directory(path) if owned else directory_fd
     try:
         recorded, _ = read_regular_file(Path("manifest.json"), directory_fd=descriptor)
         modes = {}
@@ -65,7 +67,8 @@ def verify_release(path: Path, release_id: str) -> None:
         if any(mode != required_mode(name) for name, mode in modes.items()):
             raise ValueError("release file mode failed verification")
     finally:
-        os.close(descriptor)
+        if owned:
+            os.close(descriptor)
     expected = set(json.loads(recorded)) | {"manifest.json"}
     actual = {str(p.relative_to(path)) for p in path.rglob("*") if not p.is_dir()}
     if expected != actual or any(p.is_symlink() for p in path.rglob("*")):
@@ -202,8 +205,7 @@ def install(args: argparse.Namespace) -> dict:
     root, bin_dir = args.runtime.resolve(), args.bin_dir.resolve()
     ensure_directory(root, mode=0o700)
     ensure_directory(bin_dir)
-    with (root / ".install.lock").open("a+") as lock:
-        os.chmod(root / ".install.lock", 0o600)
+    with ExitStack() as handles, open_install_lock(root / ".install.lock") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         lock.seek(0)
         was_pending = bool(lock.read(1))
@@ -242,7 +244,6 @@ def install(args: argparse.Namespace) -> dict:
             if len(release_id) != 64 or any(c not in "0123456789abcdef" for c in release_id):
                 raise ValueError("rollback target must be a release digest")
             release = releases / release_id
-            verify_release(release, release_id)
         else:
             files = release_files(args.source)
             required = {"scripts/continual_learning_consolidate.py", "scripts/lib/memory.py", "scripts/lib/classifications.py", "scripts/install_runtime.py"}
@@ -266,7 +267,9 @@ def install(args: argparse.Namespace) -> dict:
                 finally:
                     if stage.exists():
                         shutil.rmtree(stage)
-            verify_release(release, release_id)
+        release_fd = open_directory(release)
+        handles.callback(os.close, release_fd)
+        verify_release(release, release_id, directory_fd=release_fd)
         validate_target_policy(release, candidate_policy)
         # The existing coordination lock also carries a one-bit incomplete
         # status. Readers refuse a mixed state until a successful repair.
@@ -280,6 +283,16 @@ def install(args: argparse.Namespace) -> dict:
                     or link_preimage(binary) != managed_binary
                     or read_policy_preimage(policy) != (candidate_policy, 0o600)):
                 raise ValueError("published runtime/policy verification failed")
+            # Retain the verified inode through publication and verify that
+            # current activates that same directory, including its bytes/modes.
+            published_fd = open_directory(Path(link_preimage(current)))
+            try:
+                expected, actual = os.fstat(release_fd), os.fstat(published_fd)
+                if (expected.st_dev, expected.st_ino) != (actual.st_dev, actual.st_ino):
+                    raise ValueError("published release directory changed")
+                verify_release(release, release_id, directory_fd=published_fd)
+            finally:
+                os.close(published_fd)
             # Clearing is part of publication: its failure also runs inverses.
             recovery_marker(lock, False)
         except Exception as failure:

@@ -131,6 +131,13 @@ existing command job unchanged or creates a missing daily **09:00** job, then
 runs owner doctor. It never intentionally enables an existing paused instance.
 Use the runtime-only form when preserving a different existing schedule.
 
+The coordination lock is opened without following symlinks and must be a
+current-user-owned regular file. Publication retains the verified release
+directory descriptor and checks the activated directory identity and content
+before clearing its incomplete marker. The operational trust boundary is
+cooperating governed writers and owner-controlled immutable releases. This is
+not isolation from an arbitrary same-user process modifying executable code.
+
 ## Rollback
 
 Keep consolidation paused when installation or qualification fails. Retain the

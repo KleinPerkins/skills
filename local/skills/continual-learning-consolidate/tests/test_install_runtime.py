@@ -418,6 +418,70 @@ class InstallTests(unittest.TestCase):
         installer.install(args)
         self.assertEqual((self.runtime / ".install.lock").read_bytes(), b"")
 
+    def test_published_release_is_the_verified_inode_and_bytes(self) -> None:
+        self.initial()
+        for change in ["replace-directory", "change-bytes"]:
+            with self.subTest(change=change):
+                before = self.pointers()
+                with (self.source / "scripts/lib/memory.py").open("a") as handle:
+                    handle.write("\n# new release " + change + "\n")
+                args = SimpleNamespace(runtime=self.runtime, bin_dir=self.bin_dir, expected_current=None,
+                                       policy=None, expected_policy_sha256=None, rollback_to=None, source=self.source)
+                link = installer.atomic_link
+                changed = False
+                def swap_on_publication(path, target):
+                    nonlocal changed
+                    link(path, target)
+                    if path == self.runtime / "current" and target != before[0] and not changed:
+                        changed = True
+                        release = Path(target)
+                        if change == "replace-directory":
+                            held = release.with_name(release.name + "-held")
+                            release.rename(held)
+                            shutil.copytree(held, release)
+                        else:
+                            with (release / "scripts/lib/memory.py").open("a") as handle:
+                                handle.write("\n# unpublished changed bytes\n")
+                with mock.patch.object(installer, "atomic_link", side_effect=swap_on_publication):
+                    with self.assertRaisesRegex(ValueError, "installation failed; recovery="):
+                        installer.install(args)
+                self.assertTrue(changed)
+                self.assertEqual(self.pointers(), before)
+
+    def test_installer_and_runtime_refuse_unsafe_lock_without_touching_target(self) -> None:
+        self.initial()
+        before = self.pointers()
+        lock = self.runtime / ".install.lock"
+        target = self.root / "unrelated-file"
+        target.write_bytes(b"preserve unrelated content")
+        target.chmod(0o644)
+        before_target = (target.read_bytes(), target.stat().st_mode)
+        route = self.root / "route.sh"
+        route.write_text("#!/bin/sh\nexit 99\n")
+        command = [str(self.bin_dir / "continual-learning-consolidate"), "--home", str(self.home), "--agent-route", str(route), "--json"]
+        for kind in ["symlink", "fifo", "directory"]:
+            lock.unlink()
+            if kind == "symlink": lock.symlink_to(target)
+            elif kind == "fifo": os.mkfifo(lock)
+            else: lock.mkdir()
+            with self.subTest(kind=kind):
+                result = subprocess.run(["bash", str(self.source / "install.sh"), "--no-schedule"], env=self.env, capture_output=True, timeout=10)
+                self.assertNotEqual(result.returncode, 0)
+                result = subprocess.run(command, env=self.env, capture_output=True, timeout=10)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(self.pointers(), before)
+                self.assertEqual((target.read_bytes(), target.stat().st_mode), before_target)
+            if kind == "directory": lock.rmdir(); lock.touch(mode=0o600)
+        lock.unlink()
+        lock.touch(mode=0o600)
+        real_stat = installer.os.fstat
+        def foreign_owner(fd):
+            info = real_stat(fd)
+            return SimpleNamespace(st_mode=info.st_mode, st_uid=os.getuid() + 1)
+        with mock.patch.object(installer.os, "fstat", side_effect=foreign_owner):
+            with self.assertRaisesRegex(ValueError, "current-user regular file"):
+                installer.open_install_lock(lock)
+
     def test_candidate_policy_inputs_are_bounded_regular_nofollow_files(self) -> None:
         self.initial()
         before = self.pointers()
