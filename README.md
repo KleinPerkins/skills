@@ -4,7 +4,25 @@
 useful everywhere, across every tool and every org. Cloned locally to
 `~/dev/capabilities/skills` and consumed by Cursor, Claude, and Codex via symlinks.
 
-This repo is **private** (personal GitHub: `KleinPerkins/skills`).
+This is the **public clean source successor** at `KleinPerkins/skills`
+(GitHub repository ID `1461925043`). Retained original history, installed runtimes
+and downstream pins have separate lifecycle controls.
+
+The initial WORK enrollment and bootstrap correction were admitted in
+[PR #2](https://github.com/KleinPerkins/skills/pull/2), producing main revision
+`ef67b0f433d163e8d872aa47c8a016344177443e`.
+[Main CI run 44696726922, attempt 1](https://github.com/KleinPerkins/skills/actions/runs/44696726922)
+passed all four jobs. The subsequent
+[read-only App qualification](https://github.com/KleinPerkins/skills/actions/runs/44697238310)
+verified that same main revision, the repository-scoped reviewer App and its
+inability to bypass either contributing ruleset. The App writer remained off
+through these checks; WORK is enrolled and PERSONAL remains disabled.
+
+These bootstrap and read-only results do not establish ordinary App delivery.
+That requires a fresh ordinary WORK review and creation witness, an unedited
+review receipt, current head/base CI and receipt admission, followed by the
+separate writer activation gate, an actual App-owned squash merge and passing
+merged-revision CI.
 
 ---
 
