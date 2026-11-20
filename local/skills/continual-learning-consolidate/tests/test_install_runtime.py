@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import fcntl
 import importlib.util
 import json
 import os
@@ -11,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from types import SimpleNamespace
 import unittest
 from unittest import mock
@@ -44,6 +46,11 @@ class InstallTests(unittest.TestCase):
         self.fake_jobs.write_text("#!/bin/sh\necho called >> \"$HOME/job-calls\"\nexit 99\n")
         self.fake_jobs.chmod(0o755)
         self.env = {**os.environ, "HOME": str(self.home), "CONTINUAL_LEARNING_CONSOLIDATE_RUNTIME": str(self.runtime), "CONTINUAL_LEARNING_CONSOLIDATE_BIN_DIR": str(self.bin_dir), "LOCAL_JOBS_CLI": str(self.fake_jobs), "PYTHONDONTWRITEBYTECODE": "1"}
+
+    def stop_process(self, process: subprocess.Popen) -> None:
+        if process.poll() is None:
+            process.kill()
+        process.communicate(timeout=10)
 
     def run_install(self, *args: str, success: bool = True) -> dict | None:
         result = subprocess.run(["bash", str(self.source / "install.sh"), "--no-schedule", *args], env=self.env, capture_output=True, text=True)
@@ -131,6 +138,84 @@ class InstallTests(unittest.TestCase):
         current.symlink_to(unrelated_target)
         self.run_install("--expected-current", release_id, success=False)
         self.assertEqual(os.readlink(current), unrelated_target)
+
+    def test_rollback_validates_policy_with_target_release(self) -> None:
+        validator = self.source / "scripts/lib/classifications.py"
+        original = validator.read_text()
+        validator.write_text(original + "\nBasePolicy = Policy\nclass Policy(BasePolicy):\n    def __init__(self, payload, digest):\n        super().__init__(payload, digest)\n        if payload['excluded_paths']:\n            raise PolicyError('synthetic old target rejects this policy')\n")
+        old = self.initial()["release_id"]
+        validator.write_text(original)
+        previous_hash = hashlib.sha256(self.pointers()[2]).hexdigest()
+        self.policy.write_text(json.dumps({"schema": "memory-source-classification/v1", "repositories": [], "excluded_paths": [str(self.home / "new-only")]}))
+        new = self.run_install("--policy", str(self.policy), "--expected-policy-sha256", previous_hash)["release_id"]
+        before = self.pointers()
+        self.run_install("--rollback-to", old, "--expected-current", new, success=False)
+        self.assertEqual(self.pointers(), before)
+
+    def test_loaded_old_runtime_refuses_after_pointer_switch(self) -> None:
+        old = self.initial()["release_id"]
+        with (self.source / "scripts/continual_learning_consolidate.py").open("a") as handle:
+            handle.write("\n# next addressed release\n")
+        new = self.run_install()["release_id"]
+        self.run_install("--rollback-to", old, "--expected-current", new)
+        (self.home / "agent-learnings.md").write_text("## Learned User Preferences\n- Synthetic seed.\n")
+        target = self.home / "AGENTS.md"
+        target.write_bytes(b"prior output")
+        route = self.root / "route.sh"
+        called = self.root / "route-called"
+        route.write_text(f"#!/bin/sh\ntouch '{called}'\nprintf '%s\\n' '{{\"roots\":[]}}'\n")
+        ready = self.root / "loaded-old"
+        main = self.runtime / "releases" / old / "scripts/continual_learning_consolidate.py"
+        program = f"import importlib.util,sys;from pathlib import Path;s=importlib.util.spec_from_file_location('loaded_old',Path({str(main)!r}));m=importlib.util.module_from_spec(s);sys.modules[s.name]=m;s.loader.exec_module(m);Path({str(ready)!r}).touch();m.consolidate_home(Path({str(self.home)!r}),Path({str(route)!r}))"
+        with (self.runtime / ".install.lock").open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            process = subprocess.Popen([sys.executable, "-B", "-c", program], env=self.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            self.addCleanup(self.stop_process, process)
+            try:
+                deadline = time.monotonic() + 5
+                while not ready.exists() and process.poll() is None and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                self.assertTrue(ready.exists())
+                self.assertIsNone(process.poll())
+                installer.atomic_link(self.runtime / "current", str(self.runtime / "releases" / new))
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+        try:
+            _, stderr = process.communicate(timeout=10)
+            self.assertNotEqual(process.returncode, 0)
+            self.assertIn("installed runtime changed before startup", stderr)
+            self.assertFalse(called.exists())
+            self.assertEqual(target.read_bytes(), b"prior output")
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.communicate()
+
+    def test_projection_holds_shared_install_lock(self) -> None:
+        self.initial()
+        (self.home / "agent-learnings.md").write_text("## Learned User Preferences\n- Synthetic seed.\n")
+        route = self.root / "blocking-route.sh"
+        entered, release = self.root / "entered", self.root / "continue"
+        route.write_text(f"#!/bin/sh\ntouch '{entered}'\nwhile [ ! -e '{release}' ]; do sleep 0.01; done\nprintf '%s\\n' '{{\"roots\":[]}}'\n")
+        process = subprocess.Popen([str(self.bin_dir / "continual-learning-consolidate"), "--home", str(self.home), "--agent-route", str(route), "--json"], env=self.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.addCleanup(self.stop_process, process)
+        try:
+            deadline = time.monotonic() + 5
+            while not entered.exists() and process.poll() is None and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertTrue(entered.exists())
+            with (self.runtime / ".install.lock").open("a") as lock:
+                with self.assertRaises(BlockingIOError):
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            release.touch()
+            stdout, stderr = process.communicate(timeout=10)
+            self.assertEqual(process.returncode, 0, stderr)
+            self.assertTrue(json.loads(stdout)["changed"])
+        finally:
+            release.touch()
+            if process.poll() is None:
+                process.kill()
+                process.communicate()
 
     def test_corrupted_release_and_occupied_bin_refuse(self) -> None:
         release = self.initial()["release_id"]

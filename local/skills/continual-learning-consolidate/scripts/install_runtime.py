@@ -9,6 +9,7 @@ import json
 import os
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -87,6 +88,26 @@ def atomic_link(path: Path, target: str | None) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def validate_target_policy(release: Path, policy: bytes) -> None:
+    # Run only the verified target's validator in an isolated Python process.
+    # Current-source validation alone cannot establish rollback compatibility.
+    program = (
+        "import hashlib,json,sys;sys.path.insert(0,sys.argv[1]);"
+        "import classifications as c;data=sys.stdin.buffer.read();"
+        "c.Policy(json.loads(data.decode('utf-8'),object_pairs_hook=c._unique_object),"
+        "hashlib.sha256(data).hexdigest())"
+    )
+    try:
+        result = subprocess.run(
+            [sys.executable, "-I", "-B", "-c", program, str(release / "scripts/lib")],
+            input=policy, capture_output=True, timeout=30, check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise ValueError("target runtime policy validation timed out") from exc
+    if result.returncode != 0:
+        raise ValueError("target runtime rejects classification policy")
+
+
 def install(args: argparse.Namespace) -> dict:
     root, bin_dir = args.runtime.resolve(), args.bin_dir.resolve()
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -152,6 +173,7 @@ def install(args: argparse.Namespace) -> dict:
                     if stage.exists():
                         shutil.rmtree(stage)
             verify_release(release, release_id)
+        validate_target_policy(release, candidate_policy)
         # All policy/source/path validation precedes changing live pointers.
         # Keep the old release and restore exact preimages on any local failure.
         try:

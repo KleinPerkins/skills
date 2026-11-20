@@ -91,10 +91,17 @@ The installer publishes under
 `~/.local/share/continual-learning-consolidate/releases/`, records a manifest and
 addresses **every Python dependency** (including policy validation and installer
 support), with required file modes in the manifest. It verifies reused releases, atomically replaces links and policy,
-restores preimages on a local pointer failure, uses a local installation lock and
-retains old releases. Policy bytes are separate private data with mode `0600`;
+restores preimages on a local pointer failure, and retains old releases. The
+installer holds the exclusive installation lock; installed runtimes hold its
+shared side through policy loading, discovery and projection. A process that
+loaded a superseded release before waiting refuses before reading policy.
+Rollback validates policy with the verified target release before activation. Policy bytes are separate private data with mode `0600`;
 the JSON receipt binds their hash to the release digest. `current` and
 `~/.local/bin/continual-learning-consolidate` point at the installed release.
+
+Pause a legacy job before its first migration to this runtime: older releases
+do not participate in the new shared installation lock. Verify that pause
+through the owner job tooling and preserve it through qualification.
 
 `--no-schedule` performs no scheduler operation and does not run consolidation.
 It preserves an existing paused job, its schedule and capture configuration.

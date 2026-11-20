@@ -9,6 +9,8 @@ used as memory input.
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
+import fcntl
 import json
 import os
 import stat
@@ -401,6 +403,22 @@ def _atomic_write(path: Path, content: bytes) -> None:
         raise
 
 
+@contextmanager
+def _runtime_snapshot():
+    release = SCRIPT_DIR.parent
+    if release.parent.name != "releases" or len(release.name) != 64:
+        yield  # Source-tree tests/runs are outside installed pointer activation.
+        return
+    runtime = release.parent.parent
+    with (runtime / ".install.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_SH)
+        # A process can load the old script before blocking on the installer.
+        # Refuse that snapshot after the exclusive publisher changes current.
+        if (runtime / "current").resolve(strict=False) != release:
+            raise ConsolidationError("installed runtime changed before startup; retry")
+        yield
+
+
 def consolidate_home(
     home: Path,
     agent_route: Path,
@@ -410,27 +428,28 @@ def consolidate_home(
     runner: Callable[..., Any] = subprocess.run,
 ) -> dict[str, Any]:
     """Consolidate once. All validation and scanning precede the atomic write."""
-    home = home.expanduser().resolve(strict=False)
-    target = home / "AGENTS.md"
-    if policy_path is None:
-        policy_path = home / ".local/share/continual-learning-consolidate/classifications.json"
-    try:
-        policy = classifications.load_policy(policy_path)
-    except classifications.PolicyError as exc:
-        raise ConsolidationError(str(exc)) from exc
-    payload = _route_payload(agent_route.expanduser(), runner=runner)
-    content, report = _projection(home, payload, policy)
+    with _runtime_snapshot():
+        home = home.expanduser().resolve(strict=False)
+        target = home / "AGENTS.md"
+        if policy_path is None:
+            policy_path = home / ".local/share/continual-learning-consolidate/classifications.json"
+        try:
+            policy = classifications.load_policy(policy_path)
+        except classifications.PolicyError as exc:
+            raise ConsolidationError(str(exc)) from exc
+        payload = _route_payload(agent_route.expanduser(), runner=runner)
+        content, report = _projection(home, payload, policy)
 
-    previous = target.read_bytes() if target.is_file() else None
-    changed = previous != content
-    if changed and not dry_run:
-        _atomic_write(target, content)
-    return {
-        **report,
-        "target": str(target),
-        "changed": changed,
-        "dry_run": dry_run,
-    }
+        previous = target.read_bytes() if target.is_file() else None
+        changed = previous != content
+        if changed and not dry_run:
+            _atomic_write(target, content)
+        return {
+            **report,
+            "target": str(target),
+            "changed": changed,
+            "dry_run": dry_run,
+        }
 
 
 def _parser() -> argparse.ArgumentParser:
