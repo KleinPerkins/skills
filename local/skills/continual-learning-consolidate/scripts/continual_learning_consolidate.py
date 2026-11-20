@@ -426,13 +426,20 @@ def _atomic_write(path: Path, content: bytes) -> None:
         raise
 
 
+def _installed_runtime_root() -> Path | None:
+    release = SCRIPT_DIR.parent
+    if release.parent.name == "releases" and len(release.name) == 64:
+        return release.parent.parent
+    return None
+
+
 @contextmanager
 def _runtime_snapshot():
     release = SCRIPT_DIR.parent
-    if release.parent.name != "releases" or len(release.name) != 64:
+    runtime = _installed_runtime_root()
+    if runtime is None:
         yield  # Source-tree tests/runs are outside installed pointer activation.
         return
-    runtime = release.parent.parent
     with (runtime / ".install.lock").open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_SH)
         lock.seek(0)
@@ -466,7 +473,8 @@ def consolidate_home(
         home = home.expanduser().resolve(strict=False)
         target = home / "AGENTS.md"
         if policy_path is None:
-            policy_path = home / ".local/share/continual-learning-consolidate/classifications.json"
+            runtime_root = _installed_runtime_root() or home / ".local/share/continual-learning-consolidate"
+            policy_path = runtime_root / "classifications.json"
         try:
             policy = classifications.load_policy(policy_path)
         except classifications.PolicyError as exc:

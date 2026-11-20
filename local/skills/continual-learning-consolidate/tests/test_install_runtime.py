@@ -79,6 +79,17 @@ class InstallTests(unittest.TestCase):
         self.assertEqual((self.runtime / "classifications.json").stat().st_mode & 0o777, 0o600)
         self.assertFalse(list((self.runtime / "releases").rglob("__pycache__")))
 
+    def test_custom_runtime_uses_its_installed_default_policy(self) -> None:
+        self.runtime = self.root / "custom-runtime"
+        self.env["CONTINUAL_LEARNING_CONSOLIDATE_RUNTIME"] = str(self.runtime)
+        receipt = self.initial()
+        (self.home / "agent-learnings.md").write_text("## Learned User Preferences\n- Synthetic seed.\n")
+        route = self.root / "route.sh"
+        route.write_text("#!/bin/sh\nprintf '%s\\n' '{\"roots\":[]}'\n")
+        result = subprocess.run([str(self.bin_dir / "continual-learning-consolidate"), "--home", str(self.home), "--agent-route", str(route), "--json"], env=self.env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["classification_sha256"], receipt["classification_sha256"])
+
     def test_all_executable_dependencies_are_addressed_and_reusable(self) -> None:
         previous = self.initial()["release_id"]
         self.assertEqual(self.run_install()["release_id"], previous)

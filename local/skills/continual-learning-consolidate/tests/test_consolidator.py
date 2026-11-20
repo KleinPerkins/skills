@@ -40,6 +40,7 @@ class Harness:
         self.commands: list[list[str]] = []
         self.policy_path = self.home / ".local/share/continual-learning-consolidate/classifications.json"
         self.policy_path.parent.mkdir(parents=True)
+        self.policy_path.touch(mode=0o600)
         self.policy = {"schema": "memory-source-classification/v1", "repositories": [], "excluded_paths": []}
 
     def seed(self, *bullets: str) -> None:
@@ -92,6 +93,7 @@ class Harness:
     def run(self, *, dry_run: bool = False, write_policy: bool = True) -> dict[str, object]:
         if write_policy:
             self.policy_path.write_text(json.dumps(self.policy))
+            self.policy_path.chmod(0o600)
         return consolidator.consolidate_home(
             self.home,
             self.route,
@@ -403,6 +405,28 @@ class ClassificationTests(unittest.TestCase):
             self.assertEqual(report["workspace_sources"], 1)
             self.assertEqual(report["unknown_or_excluded_roots"], 1)
 
+    def test_non_ssh_url_userinfo_is_rejected_and_ssh_login_is_allowed(self) -> None:
+        normalize = consolidator.classifications.normalize_origin
+        for scheme in ["https", "http", "git"]:
+            locator = f"{scheme}://{'synthetic-user'}@example.com/owner/repository"
+            with self.assertRaises(consolidator.classifications.PolicyError): normalize(locator)
+        self.assertEqual(normalize("ssh://git@example.com/owner/repository"), "example.com/owner/repository")
+
+    def test_policy_requires_current_user_and_private_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            h.run()
+            h.policy_path.chmod(0o644)
+            with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+            h.policy_path.chmod(0o600)
+            original_stat = os.fstat
+            def foreign_owner(descriptor):
+                info = original_stat(descriptor)
+                return SimpleNamespace(st_mode=info.st_mode, st_uid=info.st_uid + 1)
+            with mock.patch.object(consolidator.classifications.os, "fstat", side_effect=foreign_owner):
+                with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)
+
     def test_unknowns_never_open_memory_or_corroborate(self) -> None:
         for change in ["unassigned", "unknown", "missing-primary", "missing-common", "changed-common", "changed-origin"]:
             with self.subTest(change=change), tempfile.TemporaryDirectory() as directory:
@@ -641,8 +665,10 @@ class ClassificationTests(unittest.TestCase):
                 h.seed("Keep a durable machine-local seed.")
                 other = h.home / "other-policy.json"
                 other.write_text(json.dumps(h.policy))
+                other.chmod(0o600)
+                h.policy_path.unlink()
                 if shape == "symlink": h.policy_path.symlink_to(other)
-                else: os.mkfifo(h.policy_path)
+                else: os.mkfifo(h.policy_path, mode=0o600)
                 target = h.home / "AGENTS.md"
                 target.write_bytes(b"prior output")
                 with self.assertRaises(consolidator.ConsolidationError): h.run(write_policy=False)

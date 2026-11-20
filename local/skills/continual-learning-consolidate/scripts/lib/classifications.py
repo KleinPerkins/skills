@@ -34,7 +34,8 @@ def normalize_origin(value: object) -> str:
             parsed = urlsplit(value)
             if parsed.scheme not in {"ssh", "https", "http", "git"} or not parsed.hostname:
                 raise PolicyError("unsupported origin locator")
-            if parsed.query or parsed.fragment or parsed.password:
+            if (parsed.query or parsed.fragment or parsed.password
+                    or (parsed.username is not None and parsed.scheme != "ssh")):
                 raise PolicyError("origin must not contain credentials, query or fragment")
             host = parsed.hostname
             if ":" in host:
@@ -182,8 +183,11 @@ def load_policy(path: Path) -> Policy:
     try:
         descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
         with os.fdopen(descriptor, "rb") as handle:
-            if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+            info = os.fstat(handle.fileno())
+            if not stat.S_ISREG(info.st_mode):
                 raise PolicyError("classification policy must be a regular file")
+            if info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o600:
+                raise PolicyError("classification policy must be current-user owned with mode 0600")
             data = handle.read()
         payload = json.loads(data.decode("utf-8"), object_pairs_hook=_unique_object)
         return Policy(payload, hashlib.sha256(data).hexdigest())
