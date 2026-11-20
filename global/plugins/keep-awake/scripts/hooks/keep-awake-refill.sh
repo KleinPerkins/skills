@@ -330,8 +330,17 @@ fork_caffeinate() {
   (
     set -m
     "$CAFFEINATE" "${caffeinate_flags[@]}" -t "$DURATION_SECONDS" </dev/null >/dev/null 2>&1 &
-    echo $! >"$pidfile"
-  )
+    candidate_pid=$!
+    # Keep the parent alive long enough to reap an immediate startup failure.
+    # An orphan can still answer kill -0 while exiting (or as a zombie), which
+    # would otherwise let a failed replacement retire the working old process.
+    "$SLEEP" 0.05
+    if ! kill -0 "$candidate_pid" >/dev/null 2>&1; then
+      wait "$candidate_pid" 2>/dev/null || true
+      exit 1
+    fi
+    echo "$candidate_pid" >"$pidfile"
+  ) >/dev/null 2>&1 || return 1
   NEW_CAFFEINATE_PID=""
   IFS= read -r NEW_CAFFEINATE_PID <"$pidfile" 2>/dev/null || NEW_CAFFEINATE_PID=""
   "$RM" -f "$pidfile" >/dev/null 2>&1 || true
