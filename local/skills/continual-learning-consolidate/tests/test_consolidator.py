@@ -412,6 +412,23 @@ class ClassificationTests(unittest.TestCase):
             self.assertEqual(report["unknown_or_excluded_roots"], 2)
             self.assertEqual(report["workspace_sources"], 1)
 
+    def test_active_memory_symlink_cannot_read_excluded_storage(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            h = Harness(Path(directory))
+            h.seed("Keep a durable machine-local seed.")
+            active = h.source("active", "Example/active", "Temporary source.")
+            recovery = h.home / "recovery"
+            recovery.mkdir()
+            excluded = recovery / "agent-learnings.md"
+            excluded.write_bytes(b"\xff")
+            h.policy["excluded_paths"] = [str(recovery)]
+            candidate = active / "agent-learnings.md"
+            candidate.unlink()
+            candidate.symlink_to(excluded)
+            report = h.run()
+            self.assertEqual(report["unknown_or_excluded_roots"], 1)
+            self.assertEqual(report["workspace_sources"], 0)
+
     def test_invalid_policy_preserves_output_and_precedes_seed_reads(self) -> None:
         cases = ["missing", "json", "schema", "classification", "duplicate-id", "common-conflict", "primary-conflict", "origin-conflict", "duplicate-key", "excluded-binding", "noncanonical", "extra-field"]
         for case in cases:

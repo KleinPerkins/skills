@@ -13,6 +13,8 @@ The runtime makes no Git, GitHub or network calls.
 4. Excluded storage, unknown assignments and stale/unmatched bindings are skipped
    **before opening workspace memory**. Exclude all recovery/archive-only stores
    and retired roots explicitly, including aliases of an otherwise active ID.
+   Workspace memory symlinks are skipped so active roots cannot read through an
+   alias into excluded storage or another repository.
 5. Workspace memory needs two distinct accepted repository IDs and at least one
    personal source. Worktrees and equivalent clones share their accepted ID;
    normalized origins corroborate bindings and never create an assignment.

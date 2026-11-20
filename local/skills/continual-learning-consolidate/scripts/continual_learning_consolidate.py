@@ -138,6 +138,11 @@ def _workspace_sources(
         if candidate == seed_path or candidate in seen_paths:
             continue
         seen_paths.add(candidate)
+        if candidate.is_symlink():
+            # An active repository binding does not authorize reading a memory
+            # alias into recovery storage or another repository.
+            unknown_roots += 1
+            continue
         if not candidate.is_file():
             continue
         bullets = _read_bullets(candidate)
