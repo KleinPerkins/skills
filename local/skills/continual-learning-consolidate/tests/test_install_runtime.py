@@ -191,6 +191,28 @@ class InstallTests(unittest.TestCase):
                 process.kill()
                 process.communicate()
 
+    def test_loaded_script_bytes_cannot_borrow_new_symlink_identity(self) -> None:
+        old = self.initial()["release_id"]
+        source_main = self.source / "scripts/continual_learning_consolidate.py"
+        source_main.write_text(source_main.read_text().replace("edit agent-learnings.md sources", "edit only agent-learnings.md sources"))
+        self.run_install()
+        (self.home / "agent-learnings.md").write_text("## Learned User Preferences\n- Synthetic seed.\n")
+        target = self.home / "AGENTS.md"
+        target.write_bytes(b"prior output")
+        called = self.root / "route-called"
+        route = self.root / "route.sh"
+        route.write_text(f"#!/bin/sh\ntouch '{called}'\nprintf '%s\\n' '{{\"roots\":[]}}'\n")
+        old_main = self.runtime / "releases" / old / "scripts/continual_learning_consolidate.py"
+        binary = self.bin_dir / "continual-learning-consolidate"
+        # Model Python having read old bytes before current is resolved: the
+        # executed code is old, while __file__ still names the stable bin link.
+        program = f"import sys,types;from pathlib import Path;m=types.ModuleType('loaded_old');m.__file__={str(binary)!r};sys.modules[m.__name__]=m;exec(compile(Path({str(old_main)!r}).read_bytes(),m.__file__,'exec'),m.__dict__);m.consolidate_home(Path({str(self.home)!r}),Path({str(route)!r}))"
+        result = subprocess.run([sys.executable, "-B", "-c", program], env=self.env, capture_output=True, text=True, timeout=10)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("installed runtime changed before startup", result.stderr)
+        self.assertFalse(called.exists())
+        self.assertEqual(target.read_bytes(), b"prior output")
+
     def test_projection_holds_shared_install_lock(self) -> None:
         self.initial()
         (self.home / "agent-learnings.md").write_text("## Learned User Preferences\n- Synthetic seed.\n")

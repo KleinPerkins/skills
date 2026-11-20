@@ -29,6 +29,7 @@ import memory  # noqa: E402
 import classifications  # noqa: E402
 
 MANAGED_HEADER = "<!-- generated; edit agent-learnings.md sources, not this file -->\n"
+_LOADED_MODULE_CODE = sys._getframe().f_code
 
 
 class ConsolidationError(RuntimeError):
@@ -414,7 +415,15 @@ def _runtime_snapshot():
         fcntl.flock(lock, fcntl.LOCK_SH)
         # A process can load the old script before blocking on the installer.
         # Refuse that snapshot after the exclusive publisher changes current.
-        if (runtime / "current").resolve(strict=False) != release:
+        # The bin/current symlinks can change after Python reads the script but
+        # before SCRIPT_DIR is resolved. Compare the executing module too.
+        current_code = compile(
+            (release / "scripts/continual_learning_consolidate.py").read_bytes(),
+            _LOADED_MODULE_CODE.co_filename, "exec", dont_inherit=True,
+            optimize=sys.flags.optimize,
+        )
+        if ((runtime / "current").resolve(strict=False) != release
+                or current_code != _LOADED_MODULE_CODE):
             raise ConsolidationError("installed runtime changed before startup; retry")
         yield
 
