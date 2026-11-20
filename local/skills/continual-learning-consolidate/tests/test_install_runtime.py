@@ -388,6 +388,36 @@ class InstallTests(unittest.TestCase):
         self.assertIn("inverse_error", recovery["binary"])
         self.assertTrue((self.runtime / ".install.lock").read_bytes())
 
+    def test_marker_clear_sync_failure_restores_preimages_and_blocks_if_persistent(self) -> None:
+        self.initial()
+        before = self.pointers()
+        with (self.source / "scripts/lib/memory.py").open("a") as handle:
+            handle.write("\n# release for marker-clear failure\n")
+        args = SimpleNamespace(runtime=self.runtime, bin_dir=self.bin_dir, expected_current=None,
+                               policy=None, expected_policy_sha256=None, rollback_to=None, source=self.source)
+        sync = installer.os.fsync
+        for persistent in [False, True]:
+            failed = False
+            def fail_empty_marker(fd):
+                nonlocal failed
+                info = os.fstat(fd)
+                marker_info = (self.runtime / ".install.lock").stat()
+                if (info.st_dev, info.st_ino) == (marker_info.st_dev, marker_info.st_ino) and info.st_size == 0 and (persistent or not failed):
+                    failed = True
+                    raise OSError("synthetic marker clear fsync failure")
+                sync(fd)
+            with self.subTest(persistent=persistent), mock.patch.object(installer.os, "fsync", side_effect=fail_empty_marker):
+                with self.assertRaises(ValueError) as caught:
+                    installer.install(args)
+            self.assertTrue(failed)
+            recovery = json.loads(str(caught.exception).split("recovery=", 1)[1])
+            self.assertEqual(self.pointers(), before)
+            self.assertEqual(recovery["runtime_blocked"], persistent)
+            self.assertEqual(bool((self.runtime / ".install.lock").read_bytes()), persistent)
+        # A subsequent verified install can clear the failed-recovery marker.
+        installer.install(args)
+        self.assertEqual((self.runtime / ".install.lock").read_bytes(), b"")
+
     def test_candidate_policy_inputs_are_bounded_regular_nofollow_files(self) -> None:
         self.initial()
         before = self.pointers()

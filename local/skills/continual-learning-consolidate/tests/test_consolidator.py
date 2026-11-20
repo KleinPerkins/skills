@@ -630,6 +630,57 @@ class ClassificationTests(unittest.TestCase):
             self.assertEqual(report["unknown_or_excluded_roots"], 1)
             self.assertEqual(report["workspace_sources"], 0)
 
+    def test_relative_git_pointer_family_stays_anchored_after_directory_replacement(self) -> None:
+        for pointer_kind in ["primary", "commondir", "gitdir"]:
+            with self.subTest(pointer_kind=pointer_kind), tempfile.TemporaryDirectory() as directory:
+                h = Harness(Path(directory))
+                h.seed("Keep a durable machine-local seed.")
+                primary = h.source("primary", "Example/primary", "Primary memory.")
+                common = primary / ".git"
+                linked = h.home / "linked"
+                linked.mkdir()
+                admin = common / "worktrees/slot"
+                admin.mkdir(parents=True)
+                (linked / ".git").write_text("gitdir: ../primary/.git/worktrees/slot\n")
+                (admin / "commondir").write_text("../..\n")
+                (admin / "gitdir").write_text("../../../../linked/.git\n")
+                (linked / "agent-learnings.md").write_text(learned("Linked memory."))
+                h.roots = [dict(h.roots[0], abs_path=str(linked))]
+                self.assertEqual(h.run()["workspace_sources"], 1)
+                # The original descriptor's relative target is deliberately
+                # invalid. Only the replacement pathname would validate it.
+                if pointer_kind == "primary":
+                    common.rename(h.home / "accepted-common")
+                    common = h.home / "accepted-common"
+                    (primary / ".git").write_text("gitdir: store\n")
+                    (primary / "store").mkdir()
+                    h.policy["repositories"][0]["active_bindings"][0]["git_common_dir"] = str(common)
+                    h.roots = [dict(h.roots[0], abs_path=str(primary), git_common_dir=str(common))]
+                    target, filename = primary, ".git"
+                else:
+                    target, filename = admin, pointer_kind
+                    (admin / filename).write_text("redirect" + ("/.git" if pointer_kind == "gitdir" else "") + "\n")
+                    (admin / "redirect").mkdir()
+                original = consolidator._pointer_at
+                swapped = False
+                def replace_after_read(fd, name):
+                    nonlocal swapped
+                    value = original(fd, name)
+                    if name == filename and not swapped:
+                        swapped = True
+                        target.rename(target.with_name(target.name + "-held"))
+                        target.mkdir()
+                        # Replacement points at accepted directory; the opened
+                        # original still points at its unrelated child.
+                        (target / ("store" if pointer_kind == "primary" else "redirect")).symlink_to(
+                            linked if pointer_kind == "gitdir" else common, target_is_directory=True)
+                    return value
+                with mock.patch.object(consolidator, "_pointer_at", side_effect=replace_after_read):
+                    report = h.run()
+                self.assertTrue(swapped)
+                self.assertEqual(report["workspace_sources"], 0)
+                self.assertEqual(report["unknown_or_excluded_roots"], 1)
+
     def test_loop_resolution_is_domain_blocked_without_memory_reads(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             h = Harness(Path(directory))

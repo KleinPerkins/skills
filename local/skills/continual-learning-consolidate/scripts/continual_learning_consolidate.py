@@ -73,6 +73,31 @@ def _same_directory(left: int, right: int) -> bool:
     return (a.st_dev, a.st_ino) == (b.st_dev, b.st_ino)
 
 
+def _git_directory_at(directory: int, pointer: str) -> int:
+    """Resolve Git's relative pointers from the directory that supplied them.
+
+    Unlike policy aliases, Git pointers legitimately contain '..'. Traverse
+    those components through descriptors too; never rebase them on a pathname
+    that may now name a replacement directory. Symlinks remain inadmissible.
+    """
+    path = Path(pointer)
+    if not pointer:
+        raise ValueError("empty Git directory pointer")
+    descriptor = (os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                  if path.is_absolute() else os.dup(directory))
+    components = path.parts[1:] if path.is_absolute() else path.parts
+    try:
+        for component in components:
+            child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                            dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        return descriptor
+    except Exception:
+        os.close(descriptor)
+        raise
+
+
 def _primary_owns_common(primary: Path, primary_fd: int, common_fd: int) -> bool:
     info = os.stat(".git", dir_fd=primary_fd, follow_symlinks=False)
     if stat.S_ISDIR(info.st_mode):
@@ -82,7 +107,7 @@ def _primary_owns_common(primary: Path, primary_fd: int, common_fd: int) -> bool
         pointer = _pointer_at(primary_fd, ".git")
         if not pointer.startswith("gitdir: "):
             return False
-        git_fd = _open_directory((primary / pointer[len("gitdir: "):]).resolve(strict=False))
+        git_fd = _git_directory_at(primary_fd, pointer[len("gitdir: "):])
     try:
         return _same_directory(git_fd, common_fd)
     finally:
@@ -110,23 +135,31 @@ def _root_matches_binding(root: Path, metadata: dict[str, Any], root_fd: int) ->
             pointer = _pointer_at(root_fd, ".git")
             if not pointer.startswith("gitdir: "):
                 return False
-            admin = (root / pointer[len("gitdir: "):]).resolve(strict=False)
-            if admin.parent != common / "worktrees":
-                return False
-            worktrees_fd = os.open("worktrees", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                   dir_fd=common_fd)
+            admin_fd = _git_directory_at(root_fd, pointer[len("gitdir: "):])
             try:
-                admin_fd = os.open(admin.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                   dir_fd=worktrees_fd)
-            finally:
-                os.close(worktrees_fd)
-            try:
-                declared_common = (admin / _pointer_at(admin_fd, "commondir")).resolve(strict=False)
-                backpointer = (admin / _pointer_at(admin_fd, "gitdir")).resolve(strict=False)
-                if declared_common != common or backpointer != root / ".git":
+                # The pointer must name a direct registration in this opened
+                # common store, not a same-spelled replacement on disk.
+                parent_fd = _git_directory_at(admin_fd, "..")
+                try:
+                    worktrees_fd = os.open("worktrees", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                           dir_fd=common_fd)
+                    try:
+                        if not _same_directory(parent_fd, worktrees_fd):
+                            return False
+                    finally:
+                        os.close(worktrees_fd)
+                finally:
+                    os.close(parent_fd)
+                declared_fd = _git_directory_at(admin_fd, _pointer_at(admin_fd, "commondir"))
+                try:
+                    if not _same_directory(declared_fd, common_fd):
+                        return False
+                finally:
+                    os.close(declared_fd)
+                backpointer = Path(_pointer_at(admin_fd, "gitdir"))
+                if backpointer.name != ".git":
                     return False
-                # Bind the registered backpointer to the directory already open.
-                observed_fd = _open_directory(backpointer.parent)
+                observed_fd = _git_directory_at(admin_fd, str(backpointer.parent))
                 try:
                     return _same_directory(observed_fd, root_fd)
                 finally:

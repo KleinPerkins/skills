@@ -153,7 +153,19 @@ def recovery_marker(lock, pending: bool) -> None:
         if not lock.read(1):
             lock.write("pending recovery\n")
     else:
-        lock.truncate(0)
+        try:
+            lock.truncate(0)
+            lock.flush()
+            os.fsync(lock.fileno())
+        except Exception:
+            # A failed clear must not expose publication as complete. Restore
+            # the blocking bit before recovery or before releasing the lock.
+            lock.seek(0)
+            lock.write("pending recovery\n")
+            lock.flush()
+            os.fsync(lock.fileno())
+            raise
+        return
     lock.flush()
     os.fsync(lock.fileno())
 
@@ -268,6 +280,8 @@ def install(args: argparse.Namespace) -> dict:
                     or link_preimage(binary) != managed_binary
                     or read_policy_preimage(policy) != (candidate_policy, 0o600)):
                 raise ValueError("published runtime/policy verification failed")
+            # Clearing is part of publication: its failure also runs inverses.
+            recovery_marker(lock, False)
         except Exception as failure:
             inverses = {
                 "current": lambda: atomic_link(current, previous_current),
@@ -302,8 +316,6 @@ def install(args: argparse.Namespace) -> dict:
             lock.seek(0)
             recovery["runtime_blocked"] = bool(lock.read(1))
             raise ValueError("installation failed; recovery=" + json.dumps(recovery, sort_keys=True)) from failure
-        # A verified successful retry can repair a previously incomplete state.
-        recovery_marker(lock, False)
         return {"release_id": release_id, "classification_sha256": file_hash(candidate_policy),
                 "previous_release": previous_current, "runtime": str(root)}
 
