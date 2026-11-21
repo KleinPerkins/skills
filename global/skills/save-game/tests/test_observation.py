@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import _support
-from engine import canonical, durability, ids, lifecycle, observation, paths, schemas, transaction
+from engine import canonical, durability, identity as identity_mod, ids, lifecycle, observation, paths, schemas, transaction
 from engine.schemas_validate import SchemaValidationError
 from engine.lock import workstream_lock
 from test_reconcile import ReconcileTestCase, TASK_ID, _candidate_builder
@@ -115,6 +115,29 @@ class ObservationTests(ReconcileTestCase):
         marker.unlink()
         _support._git(self.repo, "commit", "--allow-empty", "-qm", "changed head")
         self.observe("LIVE_STATE_CHANGED")
+
+    def test_final_git_conflict_check_refuses_late_conflict_or_unavailable_read(self):
+        self.adopt()
+        self._flush()
+        run_git = identity_mod._run_git
+        for final_read, expected in (("", "MATCH"), ("unmerged index entry", "GIT_CONFLICT"),
+                                     (None, "WORKSTREAM_UNAVAILABLE")):
+            with self.subTest(final_read=final_read):
+                reads = []
+                def observed_git(root, *args):
+                    if args == ("--no-optional-locks", "ls-files", "--unmerged"):
+                        reads.append(args)
+                        return "" if len(reads) == 1 else final_read
+                    return run_git(root, *args)
+                before = self.snapshot()
+                with patch.object(identity_mod, "_run_git", side_effect=observed_git):
+                    reply = observation.observe_reconcile(
+                        self.repo_key, self.clone_key, self.workstream_key,
+                        task_id=TASK_ID, identity=self.identity,
+                    )
+                self.assertEqual(reply["status"], expected)
+                self.assertEqual("checkpoint" in reply, expected == "MATCH")
+                self.assertEqual(self.snapshot(), before)
 
     def test_missing_finalized_evidence_cannot_be_skipped(self):
         self.adopt()

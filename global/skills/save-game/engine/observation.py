@@ -77,6 +77,15 @@ def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
                     or lifecycle.read_registration(repo_key, clone_key) != registration
                     or identity_mod.resolve_root_identity(identity.physical_root) != fresh_identity):
                 return result("LIVE_STATE_CHANGED")
+            # An index conflict can appear without changing HEAD or an operation
+            # marker. Sample it again after the final identity stability check.
+            final_conflicts = identity_mod._run_git(
+                identity.physical_root, "--no-optional-locks", "ls-files", "--unmerged",
+            )
+            if final_conflicts:
+                return result("GIT_CONFLICT")
+            if final_conflicts is None:
+                return result("WORKSTREAM_UNAVAILABLE")
             if (current["generation"] != checkpoint["active_state_generation"]
                     or current["current_digest"] != checkpoint["active_state_digest"]):
                 return result("CHECKPOINT_STALE")
