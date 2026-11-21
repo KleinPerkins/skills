@@ -85,7 +85,8 @@ class CapabilityMetadataTests(unittest.TestCase):
 
     def test_real_manifest_inventory_matches_explicit_allowlist(self) -> None:
         paths = discover_metadata(REPO)
-        self.assertEqual(len(paths), 39)
+        self.assertEqual(len(paths), 40)
+        self.assertIn(REPO / "local/tools/private-distribution/meta.yml", paths)
         observed = set()
         observed_quoted = set()
         runtime_contracts = []
@@ -239,7 +240,7 @@ class CapabilityMetadataTests(unittest.TestCase):
 
     def test_action_plan_is_deterministic_complete_and_space_safe(self) -> None:
         manifests = build_action_plan(REPO)
-        self.assertEqual(len(manifests), 39)
+        self.assertEqual(len(manifests), 40)
         self.assertEqual(
             [manifest.directory for manifest in manifests],
             sorted(manifest.directory for manifest in manifests),
@@ -251,6 +252,13 @@ class CapabilityMetadataTests(unittest.TestCase):
         self.assertEqual(
             (isokit.expose_cursor, isokit.expose_claude, isokit.expose_codex),
             ("1", "1", "1"),
+        )
+        distribution = next(
+            manifest for manifest in manifests if manifest.capability_id == "private-distribution"
+        )
+        self.assertEqual(
+            (distribution.expose_cursor, distribution.expose_claude, distribution.expose_codex),
+            ("0", "0", "0"),
         )
         self.assertEqual(render_action_plan(REPO), render_action_plan(REPO))
         self.assertTrue(

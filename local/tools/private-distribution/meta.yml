@@ -1,0 +1,14 @@
+schema: kp-capability/v1
+id: private-distribution
+kind: tool
+flavor: 1
+scope: local
+owner: KleinPerkins
+install: install.sh
+post_mgmt: none
+shape: snapshot
+sync_policy: none
+expose: none
+provenance_source: "github.com/KleinPerkins/machine-monitor"
+provenance_ref: 4f26c15527ef6912434e3953de6169aed8244e28
+provenance_trust: owner-authorized-adaptation
