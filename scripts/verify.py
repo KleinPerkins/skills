@@ -58,8 +58,8 @@ def policy(root=ROOT):
             closed(command,'id argv')
             require(isinstance(command['id'],str) and command['id'] and isinstance(command['argv'],list) and command['argv'] and all(isinstance(a,str) and a for a in command['argv']),'invalid command')
     require(len(members)==len(set(members)),'duplicate coverage ownership')
-    for folder,owner in [('global/skills/save-game/tests','save-game'),('global/skills/swarm/tests','capability-tests'),('global/plugins/keep-awake/tests','capability-tests'),('local/skills/continual-learning-consolidate/tests','capability-tests'),('scripts/tests','capability-tests')]:
-        pattern='test_ci_delivery*.py' if folder=='scripts/tests' else 'test_*.py'
+    for folder,owner in [('global/skills/save-game/tests','save-game'),('global/skills/swarm/tests','capability-tests'),('global/plugins/keep-awake/tests','capability-tests'),('local/skills/continual-learning-consolidate/tests','capability-tests'),('scripts/tests','capability-tests'),('local/tools/private-distribution/tests','capability-tests')]:
+        pattern=('test_ci_delivery*.py' if folder=='scripts/tests' else '*.test.mjs' if folder=='local/tools/private-distribution/tests' else 'test_*.py')
         found={str(p.relative_to(root)) for p in (root/folder).glob(pattern)}
         declared=set(next(s['coverage'] for s in m['shards'] if s['id']==owner))
         require(found and found<=declared,'test inventory differs from source: '+folder)

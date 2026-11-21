@@ -123,6 +123,14 @@
           "run": "python3 -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r .github/ci-requirements.txt"
         },
         {
+          "name": "Set up Node for private distribution source tests",
+          "uses": "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "with": {
+            "node-version": "24",
+            "package-manager-cache": false
+          }
+        },
+        {
           "name": "Run capability-tests",
           "id": "verify",
           "env": {
