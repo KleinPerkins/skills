@@ -5,7 +5,8 @@ import {profile} from './contract.mjs';
 const WORKER_NAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 const ACCOUNT_ID = /^[0-9a-f]{32}$/;
 const DATABASE_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-const COMPATIBILITY_DATE = '2026-11-16';
+// Match the Machine Monitor reference and the supported Wrangler 4.158.0 runtime.
+const COMPATIBILITY_DATE = '2026-11-07';
 
 export function workersFreeConfig({configuration, accountId, accountSubdomain, workerName, databaseName, databaseId}) {
   const product = profile(configuration);

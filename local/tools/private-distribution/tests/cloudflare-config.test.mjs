@@ -17,6 +17,7 @@ test('renders one exact named origin with unconditional Worker-first assets and 
   const configuration = workersFreeConfig(inputs);
   assert.equal(configuration.name, inputs.workerName);
   assert.equal(configuration.account_id, inputs.accountId);
+  assert.equal(configuration.compatibility_date, '2026-11-07');
   assert.equal(configuration.preview_urls, false);
   assert.equal(configuration.workers_dev, true);
   assert.deepEqual(configuration.assets, {directory: './private-assets', binding: 'ASSETS',
