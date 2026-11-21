@@ -6,7 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import _support
-from engine import canonical, durability, ids, lifecycle, paths, transaction
+from engine import canonical, durability, ids, lifecycle, observation, paths, schemas, transaction
+from engine.schemas_validate import SchemaValidationError
 from engine.lock import workstream_lock
 from test_reconcile import ReconcileTestCase, TASK_ID, _candidate_builder
 
@@ -38,6 +39,22 @@ class ObservationTests(ReconcileTestCase):
         self.assertEqual(record["schema"], "save-game-reconcile-observation/v1")
         self.assertEqual("checkpoint" in record, status == "MATCH")
         return record
+
+    def test_validation_requires_checkpoint_exactly_for_match(self):
+        fixture = _support.SKILL_DIR / "tests/fixtures/reconcile-observation.v1/valid.json"
+        matched = json.loads(fixture.read_bytes())
+        observation.validate_observation(matched)
+        without_checkpoint = {key: value for key, value in matched.items() if key != "checkpoint"}
+        with self.assertRaises(SchemaValidationError):
+            observation.validate_observation(without_checkpoint)
+        statuses = schemas.load_schema("reconcile-observation.v1")["properties"]["status"]["enum"]
+        for status in statuses:
+            if status == "MATCH":
+                continue
+            with self.subTest(status=status):
+                observation.validate_observation(without_checkpoint | {"status": status})
+                with self.assertRaises(SchemaValidationError):
+                    observation.validate_observation(matched | {"status": status})
 
     def test_closed_match_binds_the_exact_current_index_checkpoint(self):
         self.adopt()

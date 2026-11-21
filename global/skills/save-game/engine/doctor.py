@@ -80,7 +80,7 @@ def _brief_failure(completed: subprocess.CompletedProcess) -> str:
 
 
 def check_schema_files(skill_dir: Optional[Path] = None) -> List[CheckResult]:
-    """Check the closed eleven-schema inventory, JSON parsing, and base shape."""
+    """Check the closed twelve-schema inventory, JSON parsing, and base shape."""
 
     root = _default_skill_dir() if skill_dir is None else Path(skill_dir)
     schema_dir = root / "engine" / "schemas"

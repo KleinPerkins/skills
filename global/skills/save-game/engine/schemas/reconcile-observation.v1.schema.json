@@ -4,6 +4,10 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "status", "repo_key", "clone_key", "workstream_key"],
+  "$comment": "The engine observation validator also enforces this conditional because its shared structural validator implements a smaller draft-07 subset.",
+  "if": { "properties": { "status": { "enum": ["MATCH"] } } },
+  "then": { "required": ["checkpoint"] },
+  "else": { "not": { "required": ["checkpoint"] } },
   "properties": {
     "schema": { "type": "string", "enum": ["save-game-reconcile-observation/v1"] },
     "status": { "type": "string", "enum": [

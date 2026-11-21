@@ -7,6 +7,17 @@ from .lock import LockTimeoutError, observe_workstream_lock
 from .schemas_validate import SchemaValidationError
 
 
+def validate_observation(value: dict) -> None:
+    """Validate the closed shape and the observation's status/pointer invariant.
+
+    The shared stdlib validator checks the engine's structural schema subset.
+    Enforce this schema's additional draft-07 conditional here as well.
+    """
+    schemas.validate_as(value, "reconcile-observation.v1")
+    if (value["status"] == "MATCH") != ("checkpoint" in value):
+        raise SchemaValidationError(["checkpoint is required exactly for MATCH"])
+
+
 def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
                       task_id: str, identity: identity_mod.RootIdentity) -> dict:
     def result(status: str, *, checkpoint: dict | None = None) -> dict:
@@ -23,7 +34,7 @@ def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
                 "digest": "sha256:" + canonical.sha256_hex(canonical.canonical_bytes(checkpoint)),
                 "generation": checkpoint["active_state_generation"],
             }
-        schemas.validate_as(value, "reconcile-observation.v1")
+        validate_observation(value)
         return value
 
     try:

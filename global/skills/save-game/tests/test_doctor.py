@@ -114,16 +114,12 @@ class TestEngineDoctor(unittest.TestCase):
         self.assertIn("not proved by this doctor", acceptance["statement"])
 
     def test_schema_inventory_constant_is_exact(self):
+        discovered_schema_files = {
+            path.name
+            for path in (_support.SKILL_DIR / "engine" / "schemas").glob("*.schema.json")
+        }
         self.assertEqual(len(doctor.EXPECTED_SCHEMA_FILES), 12)
-        self.assertEqual(
-            set(doctor.EXPECTED_SCHEMA_FILES),
-            {
-                path.name
-                for path in (_support.SKILL_DIR / "engine" / "schemas").glob(
-                    "*.schema.json"
-                )
-            },
-        )
+        self.assertEqual(set(doctor.EXPECTED_SCHEMA_FILES), discovered_schema_files)
 
 
 if __name__ == "__main__":
