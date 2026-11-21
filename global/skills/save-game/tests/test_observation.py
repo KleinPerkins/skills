@@ -182,6 +182,43 @@ class ObservationTests(ReconcileTestCase):
         prepared.write_bytes(raw)
         self.observe("MATCH")
 
+    def test_operation_bound_excludes_reserved_quarantine_directory(self):
+        self.adopt()
+        self._flush()
+        journal = paths.journal_workstream_dir(self.repo_key, self.clone_key, self.workstream_key)
+        prepared = json.loads((next(journal.iterdir()) / "prepared.json").read_bytes())
+        (journal / "quarantine").mkdir(mode=0o700)
+        def aborted_fixture(number):
+            operation = journal / f"op-boundary-{number}"
+            operation.mkdir(mode=0o700)
+            records = {
+                "prepared.json": prepared | {"operation_id": operation.name},
+                "aborted.json": {
+                    "schema": "save-game-journal-aborted/v1", "operation_id": operation.name,
+                    "workstream_key": self.workstream_key, "created_at": prepared["created_at"],
+                    "reason": "other", "old_digest": prepared["old_digest"],
+                    "attempted_new_digest": prepared["new_digest"],
+                },
+            }
+            for name, document in records.items():
+                path = operation / name
+                path.write_bytes(canonical.canonical_bytes(document))
+                path.chmod(0o600)
+        for number in range(1023):
+            aborted_fixture(number)
+        def assert_observation(status):
+            before = self.snapshot()
+            reply = observation.observe_reconcile(
+                self.repo_key, self.clone_key, self.workstream_key,
+                task_id=TASK_ID, identity=self.identity,
+            )
+            self.assertEqual(reply["status"], status)
+            self.assertEqual("checkpoint" in reply, status == "MATCH")
+            self.assertEqual(self.snapshot(), before)
+        assert_observation("MATCH")
+        aborted_fixture(1023)
+        assert_observation("INVALID_EVIDENCE")
+
     def test_incomparable_current_checkpoints_do_not_select_a_pointer(self):
         self.adopt()
         receipt = self._flush()

@@ -174,7 +174,11 @@ def resolve_checkpoint(repo_key: str, clone_key: str, workstream_key: str,
     lineage: list[tuple[int, str, str]] = []
     if strict and not stat.S_ISDIR(journal_dir.lstat().st_mode):
         raise ValueError("invalid journal directory")
-    entries = list(islice(journal_dir.iterdir(), 1025)) if strict else list(journal_dir.iterdir())
+    if strict:
+        operations = (entry for entry in journal_dir.iterdir() if entry.name != "quarantine")
+        entries = list(islice(operations, 1025))
+    else:
+        entries = list(journal_dir.iterdir())
     if strict and len(entries) > 1024:
         raise ValueError("journal exceeds observation limit")
     for entry in sorted(entries):
