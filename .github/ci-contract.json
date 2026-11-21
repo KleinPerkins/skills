@@ -79,6 +79,14 @@
           "test_ci_delivery*.py",
           "-v"
         ]
+      },
+      {
+        "id": "private-distribution",
+        "argv": [
+          "bash",
+          "local/tools/private-distribution/install.sh",
+          "--check"
+        ]
       }
     ]
   },

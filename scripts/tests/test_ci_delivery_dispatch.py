@@ -46,7 +46,7 @@ class DeliveryTests(unittest.TestCase):
         c,_,_=ci.policy()
         self.assertEqual([x['argv'] for x in c['commands']['baseline']],[['bash','.github/scripts/verify-skills.sh']])
         self.assertEqual([x['argv'] for x in c['commands']['save-game']],[['make','-C','global/skills/save-game','test']])
-        self.assertEqual([x['id'] for x in c['commands']['capability-tests']],['swarm-full','keep-awake','consolidator','delivery-admission'])
+        self.assertEqual([x['id'] for x in c['commands']['capability-tests']],['swarm-full','keep-awake','consolidator','delivery-admission','private-distribution'])
         self.assertEqual(c['commands']['capability-tests'][0]['argv'],['bash','global/skills/swarm/tests/run_tests.sh'])
         baseline=(ROOT/'.github/scripts/verify-skills.sh').read_text()
         self.assertIn('--portable-source-contract',baseline)

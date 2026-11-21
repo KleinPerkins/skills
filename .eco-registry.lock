@@ -23,6 +23,7 @@ operator-voice  37b59a09d5c79f70c255b42fec8890ef8edd37701bdf13c3515d6562d79e7f13
 pdf  a1063870ac483a1c8116c3b66950601b50e5cae0e97058db38d81ace3952af40  scope=global  shelf=skills  kind=skill  source_path=global/skills/pdf
 plan-refine  fe719f1315ce5d82ac6b57d48179ae7353b872cf675083d416b6356fdd227c36  scope=global  shelf=skills  kind=skill  source_path=global/skills/plan-refine
 pr-steward  94a7ac35c3f4e6e9df39de87603739b496742846cd1c33ecf5e18adc5e756cf5  scope=global  shelf=skills  kind=skill  source_path=global/skills/pr-steward
+private-distribution  6292605265fdeff5d7fd8dc62d126b3021c492db783aede41f6ad97c48316688  scope=local  shelf=tools  kind=tool  source_path=local/tools/private-distribution  shape=snapshot  sync_policy=none
 prompt-architect  61f806f2619f399db76bd232ab978a71592687ac01be268005ad7b6c50d7109f  scope=global  shelf=skills  kind=skill  source_path=global/skills/prompt-architect
 save-game  a4d04d02c840632e1054e8bae9d607bda2c7a62584bf0aebb8afe7a0595f3af7  scope=global  shelf=skills  kind=skill  source_path=global/skills/save-game
 session-close  45ff949988a0148dba5c8973c91a179067eed38affcac6204b15fb28ea1f7cf7  scope=local  shelf=skills  kind=skill  source_path=local/skills/session-close

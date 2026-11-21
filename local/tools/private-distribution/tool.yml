@@ -1,0 +1,13 @@
+schema: kp-tool/v1
+id: private-distribution
+name: Private distribution adapter
+scope: local
+entrypoint: install.sh
+description: Verifies the shared private archive transport and publication contract with disposable synthetic fixtures.
+inputs:
+  check:
+    description: Run the local fixture suite from this source checkout.
+    required: true
+outputs:
+  test_result:
+    description: Synthetic contract verification result.
