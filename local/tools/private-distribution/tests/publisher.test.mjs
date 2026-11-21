@@ -55,9 +55,15 @@ function scenario(t, clock = () => 1_000_000_000_000) {
     const manifest = {...identity, channel: 'qualification', qualified: false, version, build,
       qualification_id: `qual-${releaseId}`, schema: 'private-distribution/release/v1',
       source_revision: 'a'.repeat(40), archive: descriptor('archive'), first_install: descriptor('package')};
-    const receipt = {release_id: releaseId, source_revision: manifest.source_revision,
+    // Synthetic owner assertions exercise the contract; they do not claim live qualification.
+    const receipt = {schema: 'private-distribution/qualification/v1', app_id: product.app_id,
+      release_id: releaseId, source_revision: manifest.source_revision, build: manifest.build,
       qualification_id: manifest.qualification_id, archive_sha256: manifest.archive.sha256,
-      package_sha256: manifest.first_install.sha256, evidence_sha256: 'd'.repeat(64)};
+      archive_size: manifest.archive.size, package_sha256: manifest.first_install.sha256,
+      package_size: manifest.first_install.size, evidence_sha256: 'd'.repeat(64),
+      checks: {ci_required: true, merged_source: true, developer_id: true, notarization: true,
+        stapled_ticket: true, gatekeeper: true, archive_signature: true, recovery_packaged: true,
+        private_upgrade: true}};
     return {releaseId, manifest, archives, receipt};
   }
   return {db, assets, faults, create, release, verificationKey, publisher: create(configuration)};
@@ -229,4 +235,44 @@ test('publication rejects part metadata that exceeds the Worker read capacity', 
   }));
   assert.throws(() => serializePartTable(metadata), /Worker metadata limit/);
   assert.equal(JSON.parse(serializePartTable(metadata.slice(0, 2))).length, 2);
+});
+
+
+test('stable promotion requires every explicit owner qualification assertion', async t => {
+  const {publisher, release, db} = scenario(t);
+  const first = release('first', 1);
+  await stage(publisher, first);
+  await publisher.advanceQualification('first', initial);
+  const {release_id, source_revision, qualification_id, archive_sha256, package_sha256, evidence_sha256} = first.receipt;
+  const legacyDigestOnly = {release_id, source_revision, qualification_id, archive_sha256,
+    package_sha256, evidence_sha256};
+  const receipts = [legacyDigestOnly, {...first.receipt, checks: undefined}, {...first.receipt, checks: null}];
+  for (const check of Object.keys(first.receipt.checks)) {
+    for (const value of [undefined, false, 1, 'true']) {
+      const receipt = structuredClone(first.receipt);
+      if (value === undefined) delete receipt.checks[check];
+      else receipt.checks[check] = value;
+      receipts.push(receipt);
+    }
+  }
+  for (const receipt of receipts) {
+    await assert.rejects(publisher.promote('first', initial, receipt), /every required check/);
+    assert.deepEqual(publisher.pointer('stable'), initial);
+    assert.equal(db.prepare("SELECT count(*) AS count FROM releases WHERE channel='stable'").get().count, 0);
+  }
+});
+
+test('owner qualification receipt must bind the exact product and both artifacts', async t => {
+  const {publisher, release} = scenario(t);
+  const first = release('first', 1);
+  await stage(publisher, first);
+  await publisher.advanceQualification('first', initial);
+  const mismatches = {schema: 'other/qualification/v1', app_id: 'io.example.sibling',
+    release_id: 'other', source_revision: 'b'.repeat(40), build: 2, qualification_id: 'other',
+    archive_sha256: 'b'.repeat(64), archive_size: first.manifest.archive.size + 1,
+    package_sha256: 'b'.repeat(64), package_size: first.manifest.first_install.size + 1};
+  for (const [field, value] of Object.entries(mismatches)) {
+    await assert.rejects(publisher.promote('first', initial, {...first.receipt, [field]: value}), /exact staged release/);
+    assert.deepEqual(publisher.pointer('stable'), initial);
+  }
 });

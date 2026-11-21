@@ -9,6 +9,10 @@ const GRANT = /^[0-9a-f-]{36}$/;
 const ID = /^[A-Za-z0-9_-]{1,128}$/;
 const KINDS = [['archive', 'archive'], ['package', 'first_install']];
 const CHANNELS = ['stable', 'qualification'];
+// Owner-vetted assertions retained from the pinned macOS publisher contract.
+// These are not signed attestations or independent verification of live gates.
+const QUALIFICATION_CHECKS = ['ci_required', 'merged_source', 'developer_id', 'notarization',
+  'stapled_ticket', 'gatekeeper', 'archive_signature', 'recovery_packaged', 'private_upgrade'];
 
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
@@ -195,16 +199,22 @@ export function createPublisher({db, configuration, verificationKey, putPart, re
     });
   }
 
+  // This administrative API trusts its owner caller, which already controls db
+  // and the artifact ports. The owner must verify every gate before supplying
+  // this receipt. evidence_sha256 is an audit reference, not proof of those gates.
   async function promote(releaseId, expected, receipt) {
     const candidate = qualification(releaseId);
     const evidence = {
-      release_id: releaseId, source_revision: candidate.source_revision,
-      archive_sha256: candidate.archive.sha256, package_sha256: candidate.first_install.sha256,
+      schema: 'private-distribution/qualification/v1', app_id: app,
+      release_id: releaseId, source_revision: candidate.source_revision, build: candidate.build,
+      archive_sha256: candidate.archive.sha256, archive_size: candidate.archive.size,
+      package_sha256: candidate.first_install.sha256, package_size: candidate.first_install.size,
       qualification_id: candidate.qualification_id,
+      checks: Object.fromEntries(QUALIFICATION_CHECKS.map(check => [check, true])),
     };
     if (!receipt || !HASH.test(receipt.evidence_sha256 ?? '') ||
         compact(receipt) !== compact({...evidence, evidence_sha256: receipt.evidence_sha256})) {
-      throw new Error('Qualification receipt does not cover the exact staged release');
+      throw new Error('Owner qualification receipt must assert every required check for the exact staged release');
     }
     const evidenceJSON = compact(receipt);
     await readback(candidate, releaseId);

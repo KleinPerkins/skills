@@ -18,6 +18,28 @@ It runs against SQLite through explicit artifact ports. Before adopting a D1
 publisher, verify atomic provider transactions and scoped roles with a
 disposable sibling. The shared profile is pending live qualification.
 
+## Owner qualification boundary
+
+The publisher is an administrative SQLite fixture. Its caller owns the database,
+artifact ports and release decision; do not expose it to recipients or untrusted
+receipt submitters. As in the pinned Machine Monitor publisher, qualification is
+an owner-vetted receipt, not an independently authenticated attestation.
+
+Before calling `promote`, the owner must verify `ci_required`, `merged_source`,
+`developer_id`, `notarization`, `stapled_ticket`, `gatekeeper`, `archive_signature`,
+`recovery_packaged` and an actual `private_upgrade` for the exact staged artifacts.
+The closed `private-distribution/qualification/v1` receipt requires every check to
+be boolean `true` and binds the product, release, build, source revision,
+qualification ID, and both artifact hashes and sizes. `evidence_sha256` records an
+owner-retained evidence reference; its format check does not authenticate evidence
+or prove that a check ran. The owner must retain and inspect that evidence.
+
+The adapter rechecks exact signed archive bytes and enforces the channel transition.
+It cannot prevent a privileged owner from lying about checks or directly editing
+its database. Synthetic test receipts prove validation and state transitions only;
+consumer signing, live provider qualification and product release gates remain
+separate.
+
 ## Verify the source
 
 Use Node 24 with `node:sqlite` and run from the tool directory.
