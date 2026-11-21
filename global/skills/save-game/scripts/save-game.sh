@@ -14,4 +14,4 @@ if [ ! -f "$SKILL_DIR/engine/cli.py" ]; then
 fi
 
 export PYTHONPATH="${SKILL_DIR}${PYTHONPATH:+:$PYTHONPATH}"
-exec python3 -m engine.cli "$@"
+exec python3 -B -m engine.cli "$@"

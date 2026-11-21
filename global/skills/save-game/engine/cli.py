@@ -30,6 +30,7 @@ from . import flush as flush_mod
 from . import identity as identity_mod
 from . import index as index_mod
 from . import lifecycle
+from . import observation
 from . import reconcile as reconcile_mod
 from . import transaction
 
@@ -213,6 +214,10 @@ def cmd_compact_check(args: argparse.Namespace) -> int:
 def cmd_reconcile(args: argparse.Namespace) -> int:
     task_id = args.task_id or _DEFAULT_TASK_ID
     identity, repo_key, clone_key, workstream_key = _resolve_keys(task_id, args.root)
+    if args.observe:
+        result = observation.observe_reconcile(repo_key, clone_key, workstream_key, task_id=task_id, identity=identity)
+        _print(result)
+        return 0 if result["status"] == "MATCH" else 1
     triggers = args.trigger or ["resume"]
     receipt = reconcile_mod.run_reconcile(repo_key, clone_key, workstream_key, identity=identity, triggers=triggers)
     _print(receipt)
@@ -386,9 +391,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_compact.add_argument("--client-id", default="unknown", choices=_CLIENT_ID_CHOICES, help="Resolves the exact manual command + hook capability from adapters.py.")
     p_compact.set_defaults(func=cmd_compact_check)
 
-    p_reconcile = sub.add_parser("reconcile", help="Read-only bounded reconciliation; never creates a checkpoint.")
+    p_reconcile = sub.add_parser("reconcile", help="Reconcile current state, with explicit read-only observation available.")
     p_reconcile.add_argument("--task-id", default=None)
-    p_reconcile.add_argument("--trigger", action="append", default=None, help="Repeatable. Defaults to ['resume'].")
+    mode = p_reconcile.add_mutually_exclusive_group()
+    mode.add_argument("--trigger", action="append", default=None, help="Repeatable. Defaults to ['resume'].")
+    mode.add_argument("--observe", action="store_true", help="Read-only pointer evidence. Refuse incomplete transactions.")
     p_reconcile.set_defaults(func=cmd_reconcile)
 
     p_adopt = sub.add_parser("adopt", help="Preview or write the private clone-level registration (plan: 'Adoption').")

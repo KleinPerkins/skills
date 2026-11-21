@@ -35,6 +35,7 @@ EXPECTED_SCHEMA_FILES = (
     "journal-prepared.v1.schema.json",
     "promotion-candidate.v1.schema.json",
     "reconcile-receipt.v1.schema.json",
+    "reconcile-observation.v1.schema.json",
     "registration.v1.schema.json",
     "tombstone.v1.schema.json",
 )

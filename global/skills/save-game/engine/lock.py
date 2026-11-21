@@ -12,6 +12,7 @@ from __future__ import annotations
 import errno
 import fcntl
 import os
+import stat
 import time
 from contextlib import contextmanager
 
@@ -20,6 +21,32 @@ from . import durability, paths
 
 class LockTimeoutError(RuntimeError):
     """A bounded, non-blocking-retry acquire could not get the lock in time."""
+
+
+@contextmanager
+def observe_workstream_lock(workstream_key: str):
+    """Share the owner's existing lock without creating or changing its record."""
+    path = paths.lock_path(workstream_key)
+    flags = os.O_RDONLY | os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags)
+    try:
+        opened = os.fstat(fd)
+        if (not stat.S_ISREG(opened.st_mode) or opened.st_uid != os.getuid()
+                or stat.S_IMODE(opened.st_mode) != durability.FILE_MODE):
+            raise ValueError("unsafe observation lock")
+        try:
+            fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+        except BlockingIOError as exc:
+            raise LockTimeoutError("workstream writer active") from exc
+        def check_lock_path():
+            visible = path.lstat()
+            if (opened.st_dev, opened.st_ino) != (visible.st_dev, visible.st_ino):
+                raise ValueError("observation lock changed")
+        check_lock_path()
+        yield
+        check_lock_path()
+    finally:
+        os.close(fd)
 
 
 @contextmanager
