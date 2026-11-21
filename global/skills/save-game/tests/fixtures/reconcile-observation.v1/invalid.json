@@ -1,0 +1,13 @@
+{
+  "schema": "save-game-reconcile-observation/v1",
+  "status": "MATCH",
+  "repo_key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "clone_key": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "workstream_key": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "checkpoint": {
+    "id": "chk-observed",
+    "digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "generation": 1,
+    "objective": "Synthetic private payload"
+  }
+}

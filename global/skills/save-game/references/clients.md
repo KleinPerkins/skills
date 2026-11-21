@@ -56,7 +56,7 @@ resolution to this skill. It does not validate schema shape or run the engine.
 
 The engine doctor reports `pass`, `fail`, or `unknown` for:
 
-- all eleven expected schema files parsing as JSON and retaining the closed-object shape;
+- all twelve expected schema files parsing as JSON and retaining the closed-object shape;
 - clean imports of `engine/schemas_validate.py` and every top-level `engine/*.py` module;
 - both `scripts/save-game.sh` and `python3 -m engine.cli` completing throwaway
   `flush`, `index`, `compact-check`, and `reconcile` runs;
@@ -64,8 +64,21 @@ The engine doctor reports `pass`, `fail`, or `unknown` for:
   skill directory.
 
 The doctor uses temporary state for runtime checks and does not write to the inspected
-repository. A passing disk report proves prerequisites only. It cannot prove that a
-separately running client has discovered or invoked the skill.
+repository. A passing disk report proves prerequisites only. A client canary verifies
+whether the running client discovers and invokes the skill.
+
+## Observational resume integration
+
+For an integration that needs strictly observational resume evidence, use
+`save-game.sh --root <repository> reconcile --task-id <scope> --observe`.
+This checks enabled adoption and takes a nonblocking shared lock on an existing
+workstream. It returns `save-game-reconcile-observation/v1` with a bounded status
+and opaque scope keys. Exit zero and `MATCH` include the current checkpoint ID,
+canonical SHA-256 digest and generation. Other statuses exit one and carry no
+checkpoint. A busy workstream, changed Git state, ambiguous evidence or an
+unfinished write requires attention through the corresponding owner route.
+The observation performs no recovery. Ordinary `reconcile` retains its existing
+recovery behavior.
 
 ## Live-discovery canary
 

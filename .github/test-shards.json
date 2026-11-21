@@ -30,6 +30,7 @@
         "global/skills/save-game/tests/test_index.py",
         "global/skills/save-game/tests/test_lifecycle.py",
         "global/skills/save-game/tests/test_lock.py",
+        "global/skills/save-game/tests/test_observation.py",
         "global/skills/save-game/tests/test_paths.py",
         "global/skills/save-game/tests/test_privacy.py",
         "global/skills/save-game/tests/test_reconcile.py",
