@@ -4,7 +4,7 @@ __pycache__/
 .venv/
 node_modules/
 *.log
-!global/tools/dev-main-sync/Tests/DevMainSyncSelfTests/Fixtures/legacy-v1-latest.log
+!global/tools/dev-main-sync/Tests/ShadowSyncSelfTests/Fixtures/legacy-v1-latest.log
 
 # machine-local agent hook state (continual-learning, etc.)
 .cursor/hooks/state/
