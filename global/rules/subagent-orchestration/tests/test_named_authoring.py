@@ -125,10 +125,12 @@ class NamedAuthoringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "parent_incomplete"):
             self.observe()
 
-    def test_wrong_named_role_and_permissions_refuse(self):
+    def test_wrong_named_role_refuses(self):
         self.args["child_result"]["agentRole"] = "default"
         with self.assertRaisesRegex(ValueError, "child_identity_changed"):
             self.observe()
+
+    def test_wrong_parent_permissions_refuse(self):
         self.args["parent_result"]["sandbox"]["networkAccess"] = True
         with self.assertRaisesRegex(ValueError, "parent_permissions_changed"):
             self.observe()
