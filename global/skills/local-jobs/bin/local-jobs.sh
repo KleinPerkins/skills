@@ -21,6 +21,7 @@ Commands (aliases in parentheses):
   describe-types         Machine-readable type+schema superset as JSON (grounds agent-guided job creation)
   add-job (add)          Add/preview a job (--dry-run; command: --schedule HH:MM | --interval-seconds N)
   update-job (update)    Update schedule and/or enabled state (same typed schedule flags)
+  delete-fetch-if-current Remove one fetch record matching its previewed revision
   delete-job (delete)    Remove a job instance (requires --confirm)
   run-job (run)          Run a job now (--id <id> | --all) [--dry-run]
   enable-canvas-runs     Opt in to the silent dashboard "Run now" bridge
@@ -525,6 +526,7 @@ main() {
     add) cmd_add "$@" ;;
     update) cmd_update "$@" ;;
     delete) cmd_delete "$@" ;;
+    delete-fetch-if-current) dispatch_handler incremental-git-fetch delete-if-current "$@" ;;
     run) cmd_run "$@" ;;
     enable-canvas-runs) cmd_enable_canvas_runs "$@" ;;
     disable-canvas-runs) cmd_disable_canvas_runs "$@" ;;

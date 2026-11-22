@@ -48,6 +48,14 @@ When the fetch configuration, global agent plist and loaded agent are all absent
 the dashboard shows the global fetch scheduler disabled and the doctor reports it
 unconfigured. A configured fetch or staged plist still needs its loaded agent.
 
+For repository retirement, `view-jobs --json` includes an opaque
+`removal_revision` on each fetch instance that inherits the global schedule.
+Pass that value from the approved preview to
+`delete-fetch-if-current --id ID --if-revision REVISION --confirm`.
+The fetch backend compares the effective record and store while holding its
+configuration lock. A changed record, duplicate ID or dedicated schedule stops
+the operation. The global scheduler continues serving its other repositories.
+
 ## Command schedules
 
 Generic command jobs accept exactly one schedule form:
