@@ -687,6 +687,22 @@ config.write_text(yaml.safe_dump(data))
 custom = config.read_bytes()
 assert "removal_revision" not in current()
 assert delete(initial, "--confirm").returncode and config.read_bytes() == custom
+
+# Read, execution lookup, and deletion all retain the version contract.
+for version in (0, "invalid", 2):
+    data = yaml.safe_load(before)
+    data["version"] = version
+    config.write_text(yaml.safe_dump(data))
+    saved = config.read_bytes()
+    for operation in [("view",), ("repo", "reference")]:
+        result = call(backend, *operation, check=False)
+        if version == 2:
+            assert result.returncode == 0 and "loading forward-compatibly" in result.stderr
+        else:
+            assert result.returncode and "unsupported config version" in result.stderr
+    if version != 2:
+        assert delete(initial, "--confirm").returncode
+    assert config.read_bytes() == saved
 PY
   [[ "$rc" == 0 ]] && ok "conditional retirement and competing store writers" || bad "conditional fetch retirement"
 }

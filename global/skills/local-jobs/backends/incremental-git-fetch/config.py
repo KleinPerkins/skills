@@ -90,11 +90,13 @@ def _check_version(data: dict[str, Any]) -> None:
 
 
 def load_raw_config(path: str | None = None) -> dict[str, Any]:
+    """Read and validate the schema before any view or mutation uses this store."""
     config_file = config_path(path)
-    if not config_file.is_file():
-        return default_raw_config()
-    with config_file.open() as handle:
-        data = yaml.safe_load(handle) or {}
+    if config_file.is_file():
+        with config_file.open() as handle:
+            data = yaml.safe_load(handle) or {}
+    else:
+        data = default_raw_config()
     _check_version(data)
     return data
 
