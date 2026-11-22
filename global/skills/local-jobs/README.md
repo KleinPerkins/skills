@@ -109,6 +109,17 @@ git-ignore-aware payload sync into consumers. The tracked bridge scripts,
 launchd writer, and canvas template are copied; generated canvases and
 `*.canvas.data.json` sidecars are excluded.
 
+## Inspect saved job declarations
+
+`scripts/local-jobs.sh view-jobs --config-only --json` lists saved job IDs and types.
+For fetch jobs it returns the declared path and base directory as written. It reads
+the base registry and default job stores without opening a checkout, running a job
+handler, or contacting launchd. Command arguments and environment values stay private.
+An alternate store, registry overlay, ambiguous ID or unreadable file produces an
+incomplete result and a nonzero exit. A complete list covers saved base declarations
+only. Resolving a path, establishing job ownership, and checking live scheduler state
+require their own observations. The result supplies no removal revision.
+
 ## Dependencies
 
 - `python3` with PyYAML

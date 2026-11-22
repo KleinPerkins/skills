@@ -13,6 +13,7 @@ Usage: local-jobs.sh <command> [options]
 Commands (aliases in parentheses):
   view                   Open the Cursor dashboard canvas (regenerated from live state)
   view-jobs              List managed instances + discovered launchd agents (--json)
+                         Use --config-only for saved declarations without inspecting targets
   dashboard              Rich status payload (--json, --brief for plain-English summary)
   explain-job            Narrative troubleshooting for one job (--id <id> [--type])
   resolve-instance       Fuzzy job discovery (--query <text> [--json])
@@ -82,8 +83,23 @@ dispatch_handler() {
 }
 
 cmd_view_jobs() {
-  local json=0
-  while [[ $# -gt 0 ]]; do case "$1" in --json) json=1 ;; *) die "unknown view-jobs option: $1" ;; esac; shift; done
+  local json=0 config_only=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --json) json=1 ;;
+      --config-only) config_only=1 ;;
+      *) die "unknown view-jobs option: $1" ;;
+    esac
+    shift
+  done
+  if (( config_only )); then
+    if (( json )); then
+      "$LOCAL_JOBS_PYTHON" -B "$SCRIPT_DIR/../lib/configured.py" --json
+    else
+      "$LOCAL_JOBS_PYTHON" -B "$SCRIPT_DIR/../lib/configured.py"
+    fi
+    return
+  fi
   if (( json == 1 )); then registry_py view --json; else registry_py view; fi
 }
 
