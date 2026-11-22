@@ -23,7 +23,9 @@ class NamedAuthoringTest(unittest.TestCase):
             "bundle_root": Path("/private/tmp/isolated/bundle"),
         }
         self.report = "## VERIFICATION PASSED\nPrivate checker content."
+        self.message_id = str(uuid4())
         self.args = {
+            "spawn_offer": self.spawn_offer(),
             "parent_result": {
                 "sandbox": {"type": "readOnly", "networkAccess": False},
                 "model": lane.MODEL,
@@ -37,12 +39,14 @@ class NamedAuthoringTest(unittest.TestCase):
                     "params": {
                         "threadId": self.child,
                         "turnId": self.child_turn,
-                        "item": {"type": "agentMessage", "text": self.report},
+                        "item": self.message(self.report),
                     },
                 },
                 {
                     "method": "turn/completed",
-                    "params": {"threadId": self.child, "turn": {"id": self.child_turn, "status": "completed"}},
+                    "params": {"threadId": self.child, "turn": {
+                        "id": self.child_turn, "status": "completed", "items": [self.message(self.report)],
+                    }},
                 },
                 self.event("completed"),
                 {
@@ -50,8 +54,12 @@ class NamedAuthoringTest(unittest.TestCase):
                     "params": {"threadId": self.parent, "turn": {"id": self.turn, "status": "completed"}},
                 },
             ],
-            "child_result": {"id": self.child, "agentRole": self.role},
+            "child_result": {"id": self.child, "agentRole": self.role, "parentThreadId": self.parent,
+                             "ephemeral": True, "status": {"type": "idle"}, "turns": []},
         }
+
+    def message(self, text):
+        return {"type": "agentMessage", "id": self.message_id, "text": text}
 
     def event(self, kind, **kwargs):
         return {
@@ -90,9 +98,10 @@ class NamedAuthoringTest(unittest.TestCase):
 
     def test_reports_closed_issues_verdict(self):
         message = self.args["events"][1]["params"]["item"]
-        message["text"] = "## ISSUES FOUND\nPrivate checker content."
+        terminal_message = self.args["events"][2]["params"]["turn"]["items"][0]
+        message["text"] = terminal_message["text"] = "## ISSUES FOUND\nPrivate checker content."
         self.assertEqual(self.observe().evidence["verdict"], "ISSUES FOUND")
-        message["text"] = "I think the review passed."
+        message["text"] = terminal_message["text"] = "I think the review passed."
         with self.assertRaisesRegex(ValueError, "checker_verdict_invalid"):
             self.observe()
 
@@ -146,7 +155,7 @@ class NamedAuthoringTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "foreign_child"):
                     self.observe(inputs)
 
-    def test_selector_requires_closed_native_schema_and_top_level_named_role(self):
+    def spawn_offer(self):
         props = {name: {"type": "string", "description": name} for name in lane.SPAWN_PROPERTIES}
         props["message"]["encrypted"] = True
         props["agent_type"]["description"] = (
@@ -154,8 +163,24 @@ class NamedAuthoringTest(unittest.TestCase):
         )
         schema = {"type": "object", "properties": props, "required": ["task_name", "message"],
                   "additionalProperties": False}
-        tool = {"type": "function", "name": "spawn_agent", "strict": False,
+        return {"type": "function", "name": "spawn_agent", "strict": False,
                 "description": "Fixture", "parameters": schema}
+
+    def test_observation_binds_the_offer_and_terminal_message(self):
+        first = self.observe()
+        self.assertEqual(first.evidence["selector_sha256"], lane.verify_spawn_offer(self.spawn_offer(), self.role))
+        self.args["spawn_offer"]["parameters"]["additionalProperties"] = True
+        with self.assertRaisesRegex(ValueError, "selector_unavailable"):
+            self.observe()
+        self.args["spawn_offer"] = self.spawn_offer()
+        terminal = self.args["events"][2]["params"]["turn"]
+        terminal["items"][0]["text"] = "## VERIFICATION PASSED\nUnrelated report."
+        with self.assertRaisesRegex(ValueError, "terminal_report_changed"):
+            self.observe()
+
+    def test_selector_requires_closed_native_schema_and_top_level_named_role(self):
+        tool = self.spawn_offer()
+        props = tool["parameters"]["properties"]
         lane.verify_spawn_offer(tool, self.role)
 
         for key, value in (("required", ["task_name"]), ("additionalProperties", True)):

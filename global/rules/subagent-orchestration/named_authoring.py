@@ -7,6 +7,7 @@ authorizes use in another process. The ordinary dispatch profiles are separate.
 
 from dataclasses import dataclass
 from hashlib import sha256
+import json
 from pathlib import Path
 import re
 import uuid
@@ -95,14 +96,17 @@ def verify_spawn_offer(tool, role):
     # This pinned build publishes a string selector and role roster, with no
     # enum. The actual child's machine-readable agentRole proves selection.
     names = []
+    _require(len(description) <= MAX_REPORT and separator and roster.endswith("\n}"), unavailable)
     for stanza in roster.split("\n}"):
         if not stanza:
             continue
         entry = re.fullmatch(r"([a-z0-9_-]+): \{\n.*", stanza.removeprefix("\n"), re.DOTALL)
         _require(entry is not None, unavailable)
         names.append(entry[1])
-    _require(len(description) <= MAX_REPORT and separator and roster.endswith("\n}")
-             and len(set(names)) == len(names) and role in names, unavailable)
+    _require(len(set(names)) == len(names) and role in names, unavailable)
+    encoded = json.dumps(tool, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+    _require(len(encoded) <= MAX_REPORT, unavailable)
+    return _digest(encoded)
 
 
 @dataclass(frozen=True)
@@ -114,15 +118,16 @@ class Observation:
 
 
 def observe_role(role, *, client_version, client_digest, package_digest, role_config, bundle_root,
-                 parent_result, parent_turn, events, child_result):
+                 spawn_offer, parent_result, parent_turn, events, child_result):
     """Decode only the supplied controller's live native, same-process events.
 
-    The caller passes completed item events from the current process and its
-    direct thread/start, turn/start (ID) and thread/read responses. Reports are
+    The caller passes the actual same-configuration function offer, live completed
+    events, and direct thread/start, turn/start and thread/read responses. Reports are
     private. Only the digest and closed status may be projected by this decoder.
     """
     role_digest = verify_role_input(role, client_version=client_version, client_digest=client_digest,
                                     package_digest=package_digest, role_config=role_config, bundle_root=bundle_root)
+    selector_digest = verify_spawn_offer(spawn_offer, role)
     _require(isinstance(parent_result, dict) and parent_result.get("model") == MODEL,
              "named_authoring_parent_changed")
     sandbox = parent_result.get("sandbox")
@@ -134,7 +139,9 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
              "named_authoring_parent_changed")
     parent_id = parent["id"]
     _require(isinstance(child_result, dict) and _thread_id(child_result.get("id"))
-             and child_result["id"] != parent_id and child_result.get("agentRole") == role,
+             and child_result["id"] != parent_id and child_result.get("agentRole") == role
+             and child_result.get("parentThreadId") == parent_id and child_result.get("ephemeral") is True
+             and child_result.get("status") == {"type": "idle"} and child_result.get("turns") == [],
              "named_authoring_child_identity_changed")
     child_id = child_result["id"]
 
@@ -142,6 +149,7 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
              "named_authoring_events_invalid")
     activities = []
     report = None
+    report_item = None
     child_turn = None
     child_completed = False
     settled = False
@@ -165,7 +173,17 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
                 turn = params.get("turn")
                 _require(not child_completed and not settled and activities and child_turn is not None
                          and isinstance(turn, dict) and turn.get("id") == child_turn
-                         and turn.get("status") == "completed", "named_authoring_child_incomplete")
+                         and turn.get("status") == "completed" and turn.get("error") is None,
+                         "named_authoring_child_incomplete")
+                # Ephemeral thread/read has no history. The native terminal
+                # turn payload is a second readback of its completed message.
+                items = turn.get("items")
+                _require(isinstance(items, list) and all(isinstance(item, dict) for item in items),
+                         "named_authoring_terminal_report_changed")
+                messages = [item for item in items if item.get("type") == "agentMessage"]
+                _require(messages and messages[-1].get("id") == report_item
+                         and messages[-1].get("text") == report.decode("utf-8"),
+                         "named_authoring_terminal_report_changed")
                 child_completed = True
             if thread == parent_id:
                 turn = params.get("turn")
@@ -192,6 +210,7 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
             turn = params.get("turnId")
             _require(not settled and not child_completed and activities == ["started"]
                      and _thread_id(turn) and (child_turn is None or child_turn == turn)
+                     and type(item.get("id")) is str and 0 < len(item["id"]) <= 128
                      and isinstance(item.get("text"), str), "named_authoring_report_invalid")
             child_turn = turn
             try:
@@ -200,6 +219,7 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
                 raise ValueError("named_authoring_report_invalid") from exc
             _require(0 < len(raw) <= MAX_REPORT, "named_authoring_report_invalid")
             report = raw
+            report_item = item["id"]
     _require(settled and report is not None, "named_authoring_parent_incomplete")
     first_line = report.strip().split(b"\n", 1)[0]
     verdict = None
@@ -214,7 +234,7 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
             "schema": "skills/gsd-named-authoring-observation/v1",
             "client_version": client_version, "client_sha256": client_digest,
             "package_sha256": package_digest, "role": role, "role_sha256": role_digest,
-            "tool": TOOL, "model": MODEL, "effort": EFFORT,
+            "tool": TOOL, "selector_sha256": selector_digest, "model": MODEL, "effort": EFFORT,
             "verdict": verdict, "report_sha256": _digest(report),
         },
         report=report,
