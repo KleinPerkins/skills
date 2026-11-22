@@ -1,0 +1,149 @@
+import copy
+import importlib.util
+from pathlib import Path
+import unittest
+from unittest.mock import patch
+from uuid import uuid4
+
+ROOT = Path(__file__).resolve().parents[1]
+spec = importlib.util.spec_from_file_location("named_authoring", ROOT / "named_authoring.py")
+lane = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(lane)
+
+
+class NamedAuthoringTest(unittest.TestCase):
+    def setUp(self):
+        self.parent, self.turn, self.child, self.child_turn = (str(uuid4()) for _ in range(4))
+        self.role = "gsd-plan-checker"
+        self.settings = {
+            "client_version": lane.CLIENT_VERSION,
+            "client_digest": lane.CLIENT_SHA256,
+            "package_digest": lane.PACKAGE_SHA256,
+            "role_config": b"fixture /private/tmp/isolated/bundle/role",
+            "bundle_root": Path("/private/tmp/isolated/bundle"),
+        }
+        self.report = "## VERIFICATION PASSED\nPrivate checker content."
+        self.args = {
+            "parent_result": {
+                "sandbox": {"type": "readOnly", "networkAccess": False},
+                "model": lane.MODEL,
+                "thread": {"id": self.parent},
+            },
+            "parent_turn": self.turn,
+            "events": [
+                self.event("started", model=lane.MODEL, reasoningEffort=lane.EFFORT),
+                {
+                    "method": "item/completed",
+                    "params": {
+                        "threadId": self.child,
+                        "turnId": self.child_turn,
+                        "item": {"type": "agentMessage", "text": self.report},
+                    },
+                },
+                {
+                    "method": "turn/completed",
+                    "params": {"threadId": self.child, "turn": {"id": self.child_turn, "status": "completed"}},
+                },
+                self.event("completed"),
+                {
+                    "method": "turn/completed",
+                    "params": {"threadId": self.parent, "turn": {"id": self.turn, "status": "completed"}},
+                },
+            ],
+            "child_result": {"id": self.child, "agentRole": self.role},
+        }
+
+    def event(self, kind, **kwargs):
+        return {
+            "method": "item/completed",
+            "params": {
+                "threadId": self.parent,
+                "turnId": self.turn,
+                "item": {"type": "subAgentActivity", "kind": kind, "agentThreadId": self.child, **kwargs},
+            },
+        }
+
+    def observe(self, inputs=None):
+        with patch.dict(lane.ROLE_DIGESTS, {self.role: lane._digest(b"fixture ${PACKAGE_OPERATION}/bundle/role")}):
+            return lane.observe_role(self.role, **self.settings, **(self.args if inputs is None else inputs))
+
+    def test_actual_child_report_is_kept_separate_from_closed_evidence(self):
+        observed = self.observe()
+        self.assertEqual(observed.evidence["verdict"], "VERIFICATION PASSED")
+        self.assertEqual(observed.evidence["role"], self.role)
+        self.assertEqual(observed.report, self.report.encode())
+        self.assertNotIn("Private checker content", repr(observed.evidence))
+        self.assertNotIn(self.child, repr(observed.evidence))
+
+    def test_refuses_parent_echo_as_child_report(self):
+        self.args["events"][1]["params"]["threadId"] = self.parent
+        with self.assertRaisesRegex(ValueError, "child_incomplete"):
+            self.observe()
+
+    def test_native_child_terminal_notifications_may_arrive_in_either_order(self):
+        events = self.args["events"]
+        events[2], events[3] = events[3], events[2]
+        self.assertEqual(self.observe().report, self.report.encode())
+        events.pop(3)
+        with self.assertRaisesRegex(ValueError, "parent_incomplete"):
+            self.observe()
+
+    def test_reports_closed_issues_verdict(self):
+        message = self.args["events"][1]["params"]["item"]
+        message["text"] = "## ISSUES FOUND\nPrivate checker content."
+        self.assertEqual(self.observe().evidence["verdict"], "ISSUES FOUND")
+        message["text"] = "I think the review passed."
+        with self.assertRaisesRegex(ValueError, "checker_verdict_invalid"):
+            self.observe()
+
+    def test_refuses_other_settings_or_incomplete_run(self):
+        for changes, error in (
+            ({"agentThreadId": str(uuid4())}, "foreign_child"),
+            ({"model": "different"}, "child_model_or_effort_changed"),
+            ({"reasoningEffort": "low"}, "child_model_or_effort_changed"),
+        ):
+            with self.subTest(changes=changes):
+                inputs = copy.deepcopy(self.args)
+                inputs["events"][0]["params"]["item"].update(changes)
+                with self.assertRaisesRegex(ValueError, error):
+                    self.observe(inputs)
+        self.args["events"].pop()
+        with self.assertRaisesRegex(ValueError, "parent_incomplete"):
+            self.observe()
+
+    def test_wrong_named_role_and_permissions_refuse(self):
+        self.args["child_result"]["agentRole"] = "default"
+        with self.assertRaisesRegex(ValueError, "child_identity_changed"):
+            self.observe()
+        self.args["parent_result"]["sandbox"]["networkAccess"] = True
+        with self.assertRaisesRegex(ValueError, "parent_permissions_changed"):
+            self.observe()
+
+    def test_native_permission_callback_refuses(self):
+        self.args["events"].insert(1, {"method": "item/commandExecution/requestApproval", "id": 40})
+        with self.assertRaisesRegex(ValueError, "unexpected_client_request"):
+            self.observe()
+
+    def test_owner_pins_reject_changed_role_or_build(self):
+        with self.assertRaisesRegex(ValueError, "role_changed"):
+            lane.verify_role_input(self.role, **self.settings)
+        self.settings["client_version"] = "0.171.1"
+        with self.assertRaisesRegex(ValueError, "client_unqualified"):
+            self.observe()
+
+    def test_selector_requires_the_named_tool_profile(self):
+        props = {name: {"type": "string"} for name in lane.SPAWN_PROPERTIES}
+        props["agent_type"]["description"] = "Available role: gsd-plan-checker"
+        tool = {"name": "spawn_agent", "parameters": {"properties": props}}
+        lane.verify_spawn_offer(tool, self.role)
+        for other in ("Available role: gsd-plan-checker-other", "Available role: default"):
+            props["agent_type"]["description"] = other
+            with self.assertRaisesRegex(ValueError, "selector_unavailable"):
+                lane.verify_spawn_offer(tool, self.role)
+        del props["agent_type"]
+        with self.assertRaisesRegex(ValueError, "selector_unavailable"):
+            lane.verify_spawn_offer(tool, self.role)
+
+
+if __name__ == "__main__":
+    unittest.main()
