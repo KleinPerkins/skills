@@ -43,6 +43,11 @@ scripts/local-jobs.sh enable-canvas-runs    # optional: silent Run now buttons i
 scripts/local-jobs.sh doctor --plain
 ```
 
+An installation can run command jobs without setting up incremental Git fetch.
+When the fetch configuration, global agent plist and loaded agent are all absent,
+the dashboard shows the global fetch scheduler disabled and the doctor reports it
+unconfigured. A configured fetch or staged plist still needs its loaded agent.
+
 ## Command schedules
 
 Generic command jobs accept exactly one schedule form:
