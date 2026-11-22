@@ -16,7 +16,11 @@ configuration, package and execution scope.
   content pin. Preserve the raw role digest as evidence of the loaded file.
 - Measure the native `collaboration.spawn_agent` selector with the same binary
   and process configuration. Pass the observed `spawn_agent` function from
-  that namespace to `verify_spawn_offer`. Missing selector, wrong namespace,
+  that namespace to `verify_spawn_offer`. It checks the complete closed
+  function shape, including required arguments and the exact advertised role
+  entry. The pinned build exposes a string selector without an enum. Its
+  direct child result must supply the matching machine-readable `agentRole`
+  before the decoder accepts a report. Missing selector, wrong namespace,
   renamed role or changed schema stop the caller. No ordinary-role fallback.
 - Start a fresh ephemeral parent at the approved isolated root with read-only
   and network-denied permissions. Bind the measured configuration directly to

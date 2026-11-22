@@ -74,20 +74,35 @@ def verify_role_input(role, *, client_version, client_digest, package_digest, ro
 def verify_spawn_offer(tool, role):
     """Check the exact native function schema observed by the controller."""
     _require(type(role) is str and role in ROLE_DIGESTS, "named_authoring_role_unqualified")
-    _require(isinstance(tool, dict) and tool.get("name") == "spawn_agent",
-             "named_authoring_selector_unavailable")
-    parameters = tool.get("parameters")
-    props = parameters.get("properties") if isinstance(parameters, dict) else None
-    _require(isinstance(props, dict) and set(props) == SPAWN_PROPERTIES,
-             "named_authoring_selector_unavailable")
-    for name in SPAWN_PROPERTIES:
-        field = props[name]
-        _require(isinstance(field, dict) and field.get("type") == "string",
-                 "named_authoring_selector_unavailable")
-    description = props["agent_type"].get("description")
-    _require(type(description) is str and len(description) <= MAX_REPORT
-             and re.search(r"(?<![\w-])" + re.escape(role) + r"(?![\w-])", description),
-             "named_authoring_selector_unavailable")
+    unavailable = "named_authoring_selector_unavailable"
+    _require(isinstance(tool, dict) and set(tool) == {"type", "name", "description", "strict", "parameters"}
+             and tool["type"] == "function" and tool["name"] == "spawn_agent"
+             and tool["strict"] is False and type(tool["description"]) is str, unavailable)
+    parameters = tool["parameters"]
+    _require(isinstance(parameters, dict)
+             and set(parameters) == {"type", "properties", "required", "additionalProperties"}
+             and parameters["type"] == "object" and parameters["additionalProperties"] is False
+             and parameters["required"] == ["task_name", "message"], unavailable)
+    props = parameters["properties"]
+    _require(isinstance(props, dict) and set(props) == SPAWN_PROPERTIES, unavailable)
+    for name, field in props.items():
+        expected = {"type", "description", "encrypted"} if name == "message" else {"type", "description"}
+        _require(isinstance(field, dict) and set(field) == expected and field["type"] == "string"
+                 and type(field["description"]) is str
+                 and (name != "message" or field["encrypted"] is True), unavailable)
+    description = props["agent_type"]["description"]
+    _, separator, roster = description.partition("\nAvailable roles:\n")
+    # This pinned build publishes a string selector and role roster, with no
+    # enum. The actual child's machine-readable agentRole proves selection.
+    names = []
+    for stanza in roster.split("\n}"):
+        if not stanza:
+            continue
+        entry = re.fullmatch(r"([a-z0-9_-]+): \{\n.*", stanza.removeprefix("\n"), re.DOTALL)
+        _require(entry is not None, unavailable)
+        names.append(entry[1])
+    _require(len(description) <= MAX_REPORT and separator and roster.endswith("\n}")
+             and len(set(names)) == len(names) and role in names, unavailable)
 
 
 @dataclass(frozen=True)
@@ -133,11 +148,18 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
     for event in events:
         _require(isinstance(event, dict) and "id" not in event, "named_authoring_unexpected_client_request")
         method = event.get("method")
+        params = event.get("params")
+        if isinstance(params, dict):
+            if "threadId" in params:
+                _require(params["threadId"] in (parent_id, child_id), "named_authoring_foreign_child")
+            if method == "thread/started":
+                started = params.get("thread")
+                _require(isinstance(started, dict) and started.get("id") in (parent_id, child_id),
+                         "named_authoring_foreign_child")
         if method not in ("item/completed", "turn/completed"):
             continue
-        params = event.get("params")
-        _require(isinstance(params, dict), "named_authoring_events_invalid")
-        thread = params.get("threadId")
+        _require(isinstance(params, dict) and "threadId" in params, "named_authoring_events_invalid")
+        thread = params["threadId"]
         if method == "turn/completed":
             if thread == child_id:
                 turn = params.get("turn")

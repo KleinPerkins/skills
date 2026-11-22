@@ -131,12 +131,44 @@ class NamedAuthoringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "client_unqualified"):
             self.observe()
 
-    def test_selector_requires_the_named_tool_profile(self):
-        props = {name: {"type": "string"} for name in lane.SPAWN_PROPERTIES}
-        props["agent_type"]["description"] = "Available role: gsd-plan-checker"
-        tool = {"name": "spawn_agent", "parameters": {"properties": props}}
+    def test_foreign_child_items_turns_and_starts_refuse(self):
+        foreign = str(uuid4())
+        for event in (
+            {"method": "item/completed", "params": {
+                "threadId": foreign, "item": {"type": "agentMessage", "text": "other"}}},
+            {"method": "turn/completed", "params": {
+                "threadId": foreign, "turn": {"id": str(uuid4()), "status": "completed"}}},
+            {"method": "thread/started", "params": {"thread": {"id": foreign}}},
+        ):
+            with self.subTest(method=event["method"]):
+                inputs = copy.deepcopy(self.args)
+                inputs["events"].insert(1, event)
+                with self.assertRaisesRegex(ValueError, "foreign_child"):
+                    self.observe(inputs)
+
+    def test_selector_requires_closed_native_schema_and_top_level_named_role(self):
+        props = {name: {"type": "string", "description": name} for name in lane.SPAWN_PROPERTIES}
+        props["message"]["encrypted"] = True
+        props["agent_type"]["description"] = (
+            "Role selector.\nAvailable roles:\ngsd-plan-checker: {\nFixture\n}\ndefault: {\nGeneral\n}"
+        )
+        schema = {"type": "object", "properties": props, "required": ["task_name", "message"],
+                  "additionalProperties": False}
+        tool = {"type": "function", "name": "spawn_agent", "strict": False,
+                "description": "Fixture", "parameters": schema}
         lane.verify_spawn_offer(tool, self.role)
-        for other in ("Available role: gsd-plan-checker-other", "Available role: default"):
+
+        for key, value in (("required", ["task_name"]), ("additionalProperties", True)):
+            with self.subTest(key=key):
+                invalid = copy.deepcopy(tool)
+                invalid["parameters"][key] = value
+                with self.assertRaisesRegex(ValueError, "selector_unavailable"):
+                    lane.verify_spawn_offer(invalid, self.role)
+        for other in (
+            "gsd-plan-checker mentioned but unavailable",
+            "Types.\nAvailable roles:\ndefault: {\nCalls gsd-plan-checker\n}",
+            "Types.\nAvailable roles:\ngsd-plan-checker-other: {\nOther\n}",
+        ):
             props["agent_type"]["description"] = other
             with self.assertRaisesRegex(ValueError, "selector_unavailable"):
                 lane.verify_spawn_offer(tool, self.role)
