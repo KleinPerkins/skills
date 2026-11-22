@@ -54,7 +54,8 @@ class ConfigurationInventory(unittest.TestCase):
         self.write("command", {"instances": [{"id": "run", "program": str(target),
                    "args": ["private-arg"], "env": {"OPTION": "private-value"}}]})
         expected = [{"id": "reference", "type": "incremental-git-fetch",
-                     "declared_path": "alias/../repo", "declared_root": str(target)},
+                     "declared_path": "alias/../repo", "declared_root": str(target),
+                     "declared_root_source": "global.dev_root"},
                     {"id": "run", "type": "command"}]
         self.assertEqual(expected, self.view()["instances"])
         def guard(original):
@@ -68,6 +69,26 @@ class ConfigurationInventory(unittest.TestCase):
              patch.object(os, "lstat", guard(os.lstat)), patch.object(os, "readlink", guard(os.readlink)), \
              patch.object(subprocess, "Popen", side_effect=AssertionError("unexpected dispatch")):
             self.assertEqual(expected, configured.snapshot()["instances"])
+
+    def test_root_precedence_matches_the_fetch_backend(self):
+        backend = PACKAGE / "backends/incremental-git-fetch/config.py"
+        config = self.write("incremental-git-fetch", {"repos": [{"id": "ref", "path": "child"}]})
+        fallback = str(self.root / "fallback")
+        stored = str(self.root / "stored")
+        for fixed, env_root, expected_root, source in [
+            (stored, fallback, stored, "global.dev_root"),
+            (None, fallback, fallback, "LOCAL_JOBS_IGF_DEV_ROOT"),
+            (None, "", ".", "working-directory"),
+        ]:
+            with self.subTest(source=source):
+                config.write_text(yaml.safe_dump({"global": {"dev_root": fixed},
+                                                  "repos": [{"id": "ref", "path": "child"}]}))
+                env = {"LOCAL_JOBS_IGF_DEV_ROOT": env_root, "LOCAL_JOBS_IGF_CONFIG": str(config)}
+                row, = self.view(**env)["instances"]
+                self.assertEqual((expected_root, source), (row["declared_root"], row["declared_root_source"]))
+                actual = subprocess.check_output([sys.executable, str(backend), "repo", "ref"], text=True,
+                                                 cwd=self.root, env={**self.env, **env})
+                self.assertEqual(str((self.root / expected_root / "child").resolve()), json.loads(actual)["path"])
 
     def test_ambiguous_and_damaged_stores_do_not_return_partial_success(self):
         self.write("command", {"instances": [{"id": "same"}]})

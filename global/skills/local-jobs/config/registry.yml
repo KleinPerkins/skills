@@ -16,7 +16,7 @@ job_types:
       override: LOCAL_JOBS_IGF_CONFIG
       forward_compatible_versions: true
       checkout_field: path
-      checkout_root_override: LOCAL_JOBS_IGF_DEV_ROOT
+      checkout_root_fallback_env: LOCAL_JOBS_IGF_DEV_ROOT
 
   command:
     description: Generic scheduled command (arbitrary program + schedule, self-managed plist)

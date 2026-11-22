@@ -117,10 +117,18 @@ def declared_rows(kind: str, spec: dict, state: Path) -> list[dict]:
         field = spec.get("checkout_field")
         if field:
             declared = record.get(field, defaults.get(field))
-            root = options.get("dev_root") or os.environ.get(spec["checkout_root_override"]) or "."
+            # Match the fetch backend's normalized_config: its stored dev_root
+            # wins, then the environment fallback, then its working directory.
+            root = options.get("dev_root")
+            source = "global.dev_root"
+            if not root:
+                source = spec["checkout_root_fallback_env"]
+                root = os.environ.get(source)
+            if not root:
+                root, source = ".", "working-directory"
             if not isinstance(declared, str) or not declared or not isinstance(root, str):
                 raise Unavailable("invalid checkout declaration")
-            row.update(declared_path=declared, declared_root=root)
+            row.update(declared_path=declared, declared_root=root, declared_root_source=source)
         rows.append(row)
     return rows
 
