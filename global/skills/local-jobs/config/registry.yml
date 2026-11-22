@@ -11,7 +11,16 @@ job_types:
   incremental-git-fetch:
     description: Incremental filtered git fetch for configured reference repos
     handler: handlers/incremental-git-fetch.sh
+    configuration:
+      collection: repos
+      override: LOCAL_JOBS_IGF_CONFIG
+      forward_compatible_versions: true
+      checkout_field: path
+      checkout_root_fallback_env: LOCAL_JOBS_IGF_DEV_ROOT
 
   command:
     description: Generic scheduled command (arbitrary program + schedule, self-managed plist)
     handler: handlers/command.sh
+    configuration:
+      collection: instances
+      override: LOCAL_JOBS_COMMAND_CONFIG

@@ -707,6 +707,10 @@ PY
   [[ "$rc" == 0 ]] && ok "conditional retirement and competing store writers" || bad "conditional fetch retirement"
 }
 
+test_configured_inventory() {
+  "$PY" -B "$REAL_HOME/tests/test_configured.py" && ok "configuration-only inventory" || bad "configuration-only inventory"
+}
+
 test_overlay_authoring() {
   echo "== overlay authoring =="
   CLI add-job-type --type sample --cardinality multi >/dev/null 2>&1 && ok "scaffold overlay type" || bad "scaffold overlay type"
@@ -2215,6 +2219,7 @@ main() {
     test_fetch_stable_head_telemetry
     test_fetch_update_atomicity
     test_fetch_conditional_retirement
+    test_configured_inventory
     test_overlay_authoring
     test_canvas_templates
     test_canvas_tsc_smoke
