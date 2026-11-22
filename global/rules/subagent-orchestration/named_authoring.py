@@ -141,13 +141,13 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
         if method == "turn/completed":
             if thread == child_id:
                 turn = params.get("turn")
-                _require(not child_completed and activities == ["started"] and child_turn is not None
+                _require(not child_completed and not settled and activities and child_turn is not None
                          and isinstance(turn, dict) and turn.get("id") == child_turn
                          and turn.get("status") == "completed", "named_authoring_child_incomplete")
                 child_completed = True
             if thread == parent_id:
                 turn = params.get("turn")
-                _require(not settled and activities == ["started", "completed"] and report is not None
+                _require(not settled and child_completed and activities == ["started", "completed"] and report is not None
                          and isinstance(turn, dict) and turn.get("id") == parent_turn
                          and turn.get("status") == "completed", "named_authoring_parent_incomplete")
                 settled = True
@@ -163,7 +163,7 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
                 _require(not activities and item.get("model") == MODEL and item.get("reasoningEffort") == EFFORT,
                          "named_authoring_child_model_or_effort_changed")
             else:
-                _require(phase == "completed" and activities == ["started"] and child_completed and report is not None,
+                _require(phase == "completed" and activities == ["started"] and report is not None,
                          "named_authoring_child_incomplete")
             activities.append(phase)
         elif item.get("type") == "agentMessage" and thread == child_id:

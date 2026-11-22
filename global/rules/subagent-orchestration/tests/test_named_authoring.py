@@ -80,6 +80,14 @@ class NamedAuthoringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "child_incomplete"):
             self.observe()
 
+    def test_native_child_terminal_notifications_may_arrive_in_either_order(self):
+        events = self.args["events"]
+        events[2], events[3] = events[3], events[2]
+        self.assertEqual(self.observe().report, self.report.encode())
+        events.pop(3)
+        with self.assertRaisesRegex(ValueError, "parent_incomplete"):
+            self.observe()
+
     def test_reports_closed_issues_verdict(self):
         message = self.args["events"][1]["params"]["item"]
         message["text"] = "## ISSUES FOUND\nPrivate checker content."
