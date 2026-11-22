@@ -59,7 +59,9 @@ def verify_role_input(role, *, client_version, client_digest, package_digest, ro
     _require(package_digest == PACKAGE_SHA256, "named_authoring_package_changed")
     _require(type(role) is str and role in ROLE_DIGESTS, "named_authoring_role_unqualified")
     _require(isinstance(bundle_root, Path) and bundle_root.is_absolute()
-             and len(bundle_root.parts) > 2 and ".." not in bundle_root.parts,
+             and len(bundle_root.parts) > 2
+             and all(re.fullmatch(r"[a-zA-Z0-9._-]+", part) and part not in (".", "..")
+                     for part in bundle_root.parts[1:]),
              "named_authoring_bundle_root_invalid")
     config_digest = _digest(role_config)
     # The verified upstream emitter inserts the absolute operation/bundle path.

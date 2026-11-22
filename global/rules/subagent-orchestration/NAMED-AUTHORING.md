@@ -12,8 +12,9 @@ configuration, package and execution scope.
 - Verify the resolved Codex binary and the sealed package and role inventory.
   Pass the actual version, digests, role configuration bytes and the absolute
   bundle directory to `verify_role_input`. The emitter inserts the destination
-  in the TOML. Normalize only that exact delimited bundle prefix for the
-  content pin. Preserve the raw role digest as evidence of the loaded file.
+  in the TOML. Use absolute paths whose components contain only ASCII
+  letters, digits, periods, underscores or hyphens. Normalize only that exact
+  delimited bundle prefix for the content pin. Preserve the raw role digest as evidence of the loaded file.
 - Measure the native `collaboration.spawn_agent` selector with the same binary
   and process configuration. Pass the observed `spawn_agent` function from
   that namespace to `verify_spawn_offer`. It checks the complete closed

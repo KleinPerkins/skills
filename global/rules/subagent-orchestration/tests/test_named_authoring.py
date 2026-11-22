@@ -155,6 +155,17 @@ class NamedAuthoringTest(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "foreign_child"):
                     self.observe(inputs)
 
+    def test_bundle_prefix_cannot_supply_toml_or_shell_syntax(self):
+        for component in ('with"quote', "new\nline", "with\\escape", "$(command)", "with space", ".."):
+            with self.subTest(component=component):
+                root = Path("/private/tmp") / component / "bundle"
+                settings = self.settings | {
+                    "bundle_root": root,
+                    "role_config": f"fixture {root}/role".encode(),
+                }
+                with self.assertRaisesRegex(ValueError, "bundle_root_invalid"):
+                    lane.verify_role_input(self.role, **settings)
+
     def spawn_offer(self):
         props = {name: {"type": "string", "description": name} for name in lane.SPAWN_PROPERTIES}
         props["message"]["encrypted"] = True
