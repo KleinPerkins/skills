@@ -191,7 +191,8 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
                 turn = params.get("turn")
                 _require(not settled and child_completed and activities == ["started", "completed"] and report is not None
                          and isinstance(turn, dict) and turn.get("id") == parent_turn
-                         and turn.get("status") == "completed", "named_authoring_parent_incomplete")
+                         and turn.get("status") == "completed" and turn.get("error") is None,
+                         "named_authoring_parent_incomplete")
                 settled = True
             continue
 

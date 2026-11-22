@@ -96,6 +96,11 @@ class NamedAuthoringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "parent_incomplete"):
             self.observe()
 
+    def test_errored_terminal_parent_refuses_even_with_a_completed_child(self):
+        self.args["events"][-1]["params"]["turn"]["error"] = {"message": "Fixture failure"}
+        with self.assertRaisesRegex(ValueError, "parent_incomplete"):
+            self.observe()
+
     def test_reports_closed_issues_verdict(self):
         message = self.args["events"][1]["params"]["item"]
         terminal_message = self.args["events"][2]["params"]["turn"]["items"][0]
