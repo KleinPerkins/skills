@@ -94,6 +94,11 @@ class NamedAuthoringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "foreign_child"):
             self.observe()
 
+    def test_parent_interaction_after_child_completion_refuses(self):
+        self.args["events"].insert(3, self.event("interacted"))
+        with self.assertRaisesRegex(ValueError, "foreign_child"):
+            self.observe()
+
     def test_actual_child_report_is_kept_separate_from_closed_evidence(self):
         observed = self.observe()
         self.assertEqual(observed.evidence["verdict"], "VERIFICATION PASSED")

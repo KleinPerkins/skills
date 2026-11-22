@@ -204,14 +204,14 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
             if phase == "interacted":
                 # The app-server can report a message from either participant
                 # about the other. This does not create or settle a child.
-                _require(not settled and activities == ["started"]
+                _require(not settled and not child_completed and activities == ["started"]
                          and (thread, peer) in ((parent_id, child_id), (child_id, parent_id)),
                          "named_authoring_foreign_child")
                 turn = params.get("turnId")
                 if thread == parent_id:
                     _require(turn == parent_turn, "named_authoring_parent_changed")
                 else:
-                    _require(not child_completed and _thread_id(turn)
+                    _require(_thread_id(turn)
                              and (child_turn is None or child_turn == turn), "named_authoring_child_incomplete")
                     child_turn = turn
                 continue
