@@ -608,6 +608,105 @@ PY
     || bad "rejected global mixed update changed config"
 }
 
+test_fetch_conditional_retirement() {
+  echo "== conditional retirement of an inherited fetch =="
+  local rc=0
+  "$PY" - "$SB" <<'PY' || rc=$?
+import concurrent.futures
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import yaml
+
+home = Path(sys.argv[1])
+config = home / "state/jobs/retirement.yml"
+original = yaml.safe_load(Path(os.environ["LOCAL_JOBS_IGF_CONFIG"]).read_text())
+original["repos"] = [row for row in original["repos"] if row["id"] == "reference"]
+config.write_text(yaml.safe_dump(original))
+env = dict(os.environ, LOCAL_JOBS_IGF_CONFIG=str(config))
+cli = [str(home / "bin/local-jobs.sh")]
+backend = [sys.executable, str(home / "backends/incremental-git-fetch/config.py")]
+
+def call(program, *args, check=True):
+    return subprocess.run([*program, *args], env=env, capture_output=True, text=True,
+                          check=check, timeout=30)
+
+def current():
+    rows = json.loads(call(cli, "view-jobs", "--json").stdout)["instances"]
+    return next(row for row in rows if row["id"] == "reference")
+
+def delete(revision, *args, check=False):
+    return call(cli, "delete-fetch-if-current", "--id", "reference",
+                "--if-revision", revision, *args, check=check)
+
+initial = current()["removal_revision"]
+assert re.fullmatch("[0-9a-f]{64}", initial)
+before = config.read_bytes()
+for revision, extra in [(initial, []), ("wrong", ["--confirm"]),
+                        (initial, ["--confirm", "--purge-launchd"])]:
+    assert delete(revision, *extra).returncode and config.read_bytes() == before
+
+call(cli, "update-job", "--type", "incremental-git-fetch", "--id", "reference",
+     "--description", "reassigned")
+reassigned = config.read_bytes()
+assert current()["removal_revision"] != initial
+assert delete(initial, "--confirm").returncode and config.read_bytes() == reassigned
+
+# All writers to the shared YAML must serialize their read and replacement.
+def add_peer(number):
+    call(backend, "add", "--id", f"peer-{number}", "--path", "reference", "--branch", "main")
+with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+    list(pool.map(add_peer, range(12)))
+revision = current()["removal_revision"]
+peers = {f"peer-{number}" for number in range(12)}
+assert {r["id"] for r in yaml.safe_load(config.read_text())["repos"]} == peers | {"reference"}
+# A concurrent owner edit must either win and survive, or observe removal.
+with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+    edit = pool.submit(call, backend, "set-fields", "--id", "reference", "--description",
+                       "new assignment", check=False)
+    retire = pool.submit(delete, revision, "--confirm")
+    changed, removed = edit.result().returncode == 0, retire.result().returncode == 0
+assert changed != removed
+if changed:
+    assert current()["description"] == "new assignment"
+    delete(current()["removal_revision"], "--confirm", check=True)
+assert {r["id"] for r in yaml.safe_load(config.read_text())["repos"]} == peers
+
+# A duplicated row or a dedicated agent requires separate owner reconciliation.
+data = yaml.safe_load(before)
+data["repos"].append(dict(data["repos"][0]))
+config.write_text(yaml.safe_dump(data))
+duplicate = config.read_bytes()
+assert delete(initial, "--confirm").returncode and config.read_bytes() == duplicate
+data["repos"].pop()
+data["repos"][0]["schedule"] = {"hour": 9, "minute": 30}
+config.write_text(yaml.safe_dump(data))
+custom = config.read_bytes()
+assert "removal_revision" not in current()
+assert delete(initial, "--confirm").returncode and config.read_bytes() == custom
+
+# Read, execution lookup, and deletion all retain the version contract.
+for version in (0, "invalid", 2):
+    data = yaml.safe_load(before)
+    data["version"] = version
+    config.write_text(yaml.safe_dump(data))
+    saved = config.read_bytes()
+    for operation in [("view",), ("repo", "reference")]:
+        result = call(backend, *operation, check=False)
+        if version == 2:
+            assert result.returncode == 0 and "loading forward-compatibly" in result.stderr
+        else:
+            assert result.returncode and "unsupported config version" in result.stderr
+    if version != 2:
+        assert delete(initial, "--confirm").returncode
+    assert config.read_bytes() == saved
+PY
+  [[ "$rc" == 0 ]] && ok "conditional retirement and competing store writers" || bad "conditional fetch retirement"
+}
+
 test_overlay_authoring() {
   echo "== overlay authoring =="
   CLI add-job-type --type sample --cardinality multi >/dev/null 2>&1 && ok "scaffold overlay type" || bad "scaffold overlay type"
@@ -2115,6 +2214,7 @@ main() {
     test_fetch_tags
     test_fetch_stable_head_telemetry
     test_fetch_update_atomicity
+    test_fetch_conditional_retirement
     test_overlay_authoring
     test_canvas_templates
     test_canvas_tsc_smoke

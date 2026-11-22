@@ -4,9 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
+import hashlib
 import json
 import os
+import stat
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -86,20 +90,31 @@ def _check_version(data: dict[str, Any]) -> None:
 
 
 def load_raw_config(path: str | None = None) -> dict[str, Any]:
+    """Read and validate the schema before any view or mutation uses this store."""
     config_file = config_path(path)
-    if not config_file.is_file():
-        return default_raw_config()
-    with config_file.open() as handle:
-        data = yaml.safe_load(handle) or {}
+    if config_file.is_file():
+        with config_file.open() as handle:
+            data = yaml.safe_load(handle) or {}
+    else:
+        data = default_raw_config()
     _check_version(data)
     return data
 
 
 def save_raw_config(data: dict[str, Any], path: str | None = None) -> Path:
-    config_file = config_path(path)
+    config_file = config_path(path).resolve()
     config_file.parent.mkdir(parents=True, exist_ok=True)
-    with config_file.open("w") as handle:
-        yaml.safe_dump(data, handle, default_flow_style=False, sort_keys=False)
+    with tempfile.NamedTemporaryFile(mode="w", dir=config_file.parent, delete=False) as output:
+        temporary = Path(output.name)
+        try:
+            if config_file.exists():
+                os.fchmod(output.fileno(), stat.S_IMODE(config_file.stat().st_mode))
+            yaml.safe_dump(data, output, default_flow_style=False, sort_keys=False)
+            output.flush()
+            os.fsync(output.fileno())
+            os.replace(temporary, config_file)
+        finally:
+            temporary.unlink(missing_ok=True)
     return config_file
 
 
@@ -112,17 +127,14 @@ def find_repo_index(data: dict[str, Any], repo_id: str) -> int:
 
 
 def load_config(path: str | None = None) -> dict[str, Any]:
-    config_file = config_path(path)
-    if not config_file.is_file():
-        data = default_raw_config()
-    else:
-        with config_file.open() as handle:
-            data = yaml.safe_load(handle) or {}
-        _check_version(data)
+    return normalized_config(load_raw_config(path))
 
+
+def normalized_config(raw: dict[str, Any]) -> dict[str, Any]:
+    data = dict(raw)
     defaults = data.get("defaults") or {}
     repos = data.get("repos") or []
-    global_cfg = data.get("global") or {}
+    global_cfg = dict(data.get("global") or {})
 
     dev_root = os.path.expanduser(
         global_cfg.get("dev_root") or os.environ.get("LOCAL_JOBS_IGF_DEV_ROOT") or "."
@@ -261,6 +273,12 @@ def deque_tail(path: Path, max_lines: int) -> list[str]:
         return list(deque(handle, maxlen=max_lines))
 
 
+def removal_revision(repo: dict[str, Any]) -> str:
+    record = {"store": str(config_path().resolve()), "repo": repo}
+    encoded = yaml.safe_dump(record, sort_keys=True, allow_unicode=True).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def cmd_view() -> int:
     cfg = load_config()
     global_cfg = cfg.get("global") or {}
@@ -291,6 +309,8 @@ def cmd_view() -> int:
             entry["display_name"] = repo["display_name"]
         if repo.get("description"):
             entry["description"] = repo["description"]
+        if repo.get("schedule", "inherit") == "inherit":
+            entry["removal_revision"] = removal_revision(repo)
         repos_out.append(entry)
 
     payload = {
@@ -363,6 +383,15 @@ def cmd_add(args: argparse.Namespace) -> int:
 def cmd_remove(args: argparse.Namespace) -> int:
     data = load_raw_config()
     index = find_repo_index(data, args.id)
+    if args.if_revision is not None:
+        matches = [row for row in data["repos"] if row.get("id") == args.id]
+        if len(matches) != 1:
+            raise SystemExit("conditional removal needs one unique fetch id")
+        selected = normalized_config({**data, "repos": matches})["repos"][0]
+        if selected.get("schedule", "inherit") != "inherit":
+            raise SystemExit("retire the dedicated launch agent through its owner first")
+        if removal_revision(selected) != args.if_revision:
+            raise SystemExit("fetch record changed since the preview; nothing removed")
     removed = data["repos"].pop(index)
 
     if args.dry_run:
@@ -532,6 +561,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     remove_p = sub.add_parser("remove")
     remove_p.add_argument("--id", required=True)
+    remove_p.add_argument("--if-revision")
     remove_p.add_argument("--purge-launchd", action="store_true")
     remove_p.add_argument("--dry-run", action="store_true")
 
@@ -595,6 +625,20 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
 
+    mutating = {"add", "remove", "enable", "disable", "set-fetch-tags", "set-schedule", "set-fields"}
+    if args.command in mutating and not args.dry_run:
+        # Keep comparison, read-modify-write and replacement in one owner transaction.
+        # A sibling lock survives replacement of the YAML file itself.
+        target = config_path().resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        lock_fd = os.open(target.with_name(target.name + ".lock"), os.O_CREAT | os.O_RDWR, 0o600)
+        with os.fdopen(lock_fd, "r+") as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            return dispatch(args)
+    return dispatch(args)
+
+
+def dispatch(args: argparse.Namespace) -> int:
     if args.command == "list":
         return cmd_list()
     if args.command == "validate":

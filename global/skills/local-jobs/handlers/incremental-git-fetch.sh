@@ -162,6 +162,8 @@ for repo in view.get("repos") or []:
         "log_paths": {"stdout": out_log, "stderr": err_log},
         "last_run_hint": repo.get("last_run_hint"),
     }
+    if "removal_revision" in repo:
+        inst["removal_revision"] = repo["removal_revision"]
     if repo.get("display_name"):
         inst["display_name"] = repo["display_name"]
     if repo.get("description"):
@@ -532,12 +534,14 @@ case "${1:-}" in
     fi
     igf_emit update "${id:-__global__}"
     ;;
-  delete)
+  delete|delete-if-current)
+    verb="$1"
     shift
-    id="" purge=0 confirm=0
+    id="" purge=0 confirm=0 revision=""
     while [[ $# -gt 0 ]]; do
       case "$1" in
         --id) shift; id="${1:-}" ;;
+        --if-revision) shift; revision="${1:-}" ;;
         --purge-launchd) purge=1 ;;
         --confirm) confirm=1 ;;
         *) die "unknown delete option: $1" ;;
@@ -548,6 +552,12 @@ case "${1:-}" in
     [[ "$id" != "__global__" ]] || die "cannot delete global scheduler"
     (( confirm == 1 )) || die "delete requires --confirm (destructive)"
     args=(remove --id "$id")
+    if [[ "$verb" == delete-if-current ]]; then
+      [[ "$revision" =~ ^[0-9a-f]{64}$ && "$purge" == 0 ]] || die "conditional deletion requires one fetch revision and preserves launch agents"
+      args+=(--if-revision "$revision")
+    elif [[ -n "$revision" ]]; then
+      die "use delete-if-current with a fetch revision"
+    fi
     (( purge == 1 )) && args+=(--purge-launchd)
     output="$(igf_config "${args[@]}")"
     printf '%s\n' "$output"
