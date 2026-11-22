@@ -199,9 +199,24 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
         item = params.get("item")
         _require(isinstance(item, dict), "named_authoring_events_invalid")
         if item.get("type") == "subAgentActivity":
-            _require(not settled and thread == parent_id and params.get("turnId") == parent_turn
-                     and item.get("agentThreadId") == child_id, "named_authoring_foreign_child")
             phase = item.get("kind")
+            peer = item.get("agentThreadId")
+            if phase == "interacted":
+                # The app-server can report a message from either participant
+                # about the other. This does not create or settle a child.
+                _require(not settled and not child_completed and activities == ["started"]
+                         and (thread, peer) in ((parent_id, child_id), (child_id, parent_id)),
+                         "named_authoring_foreign_child")
+                turn = params.get("turnId")
+                if thread == parent_id:
+                    _require(turn == parent_turn, "named_authoring_parent_changed")
+                else:
+                    _require(_thread_id(turn)
+                             and (child_turn is None or child_turn == turn), "named_authoring_child_incomplete")
+                    child_turn = turn
+                continue
+            _require(not settled and thread == parent_id and params.get("turnId") == parent_turn
+                     and peer == child_id, "named_authoring_foreign_child")
             if phase == "started":
                 _require(not activities and item.get("model") == MODEL and item.get("reasoningEffort") == EFFORT,
                          "named_authoring_child_model_or_effort_changed")

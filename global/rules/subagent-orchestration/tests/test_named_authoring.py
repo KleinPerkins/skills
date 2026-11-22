@@ -75,6 +75,30 @@ class NamedAuthoringTest(unittest.TestCase):
         with patch.dict(lane.ROLE_DIGESTS, {self.role: lane._digest(b"fixture ${PACKAGE_OPERATION}/bundle/role")}):
             return lane.observe_role(self.role, **self.settings, **(self.args if inputs is None else inputs))
 
+    def test_native_interactions_between_verified_participants_are_not_new_children(self):
+        reply = {
+            "method": "item/completed",
+            "params": {
+                "threadId": self.child, "turnId": self.child_turn,
+                "item": {"type": "subAgentActivity", "kind": "interacted", "agentThreadId": self.parent},
+            },
+        }
+        self.args["events"][1:1] = [self.event("interacted"), reply]
+        self.assertEqual(self.observe().report, self.report.encode())
+
+        reply["params"]["turnId"] = str(uuid4())
+        with self.assertRaisesRegex(ValueError, "report_invalid"):
+            self.observe()
+        reply["params"]["turnId"] = self.child_turn
+        reply["params"]["item"]["agentThreadId"] = str(uuid4())
+        with self.assertRaisesRegex(ValueError, "foreign_child"):
+            self.observe()
+
+    def test_parent_interaction_after_child_completion_refuses(self):
+        self.args["events"].insert(3, self.event("interacted"))
+        with self.assertRaisesRegex(ValueError, "foreign_child"):
+            self.observe()
+
     def test_actual_child_report_is_kept_separate_from_closed_evidence(self):
         observed = self.observe()
         self.assertEqual(observed.evidence["verdict"], "VERIFICATION PASSED")
