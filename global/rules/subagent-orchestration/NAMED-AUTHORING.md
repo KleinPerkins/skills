@@ -31,14 +31,16 @@ configuration, package and execution scope.
   for isolation, pinned runtime resolution, fresh context and child cleanup.
   Use only the measured model and effort. An offered selector is discovery
   evidence. A completed child must establish the actual named role.
-- Call `observe_role` using live events and the actual thread responses from
-  the single owned process. Supply the parent start response, parent turn ID,
-  completed item and turn notifications, and the direct child read response.
-  The decoder requires a completed child turn, a child result for the same
-  role, checked model and effort, and a terminal parent. Permission callbacks,
-  a foreign child, an incomplete turn, or a parent echo without a child
-  message cause refusal. Do not accept files or caller-supplied event JSON as
-  native evidence. Cancel and reap the process on either success or refusal.
+- Call `observe_role` using the verified function offer and live events from
+  the owned process. Supply the parent start response and turn ID, the
+  completed item and turn notifications, and a direct read of the idle
+  ephemeral child with its parent and role. The completed child turn must
+  contain the exact final message identifier and text. Ephemeral child
+  thread reads supply identity without turn history. An interaction can
+  name the verified parent and child as peers within their observed turns.
+  Interactions carry no creation, completion or verdict evidence. Permission
+  callbacks, foreign peers, an incomplete turn or a parent echo refuse.
+  Cancel and reap the process on either success or refusal.
 - Keep the actual report in the caller's private state. `Observation.evidence`
   contains only the pinned source identities, role, actual selection,
   terminal checker verdict and report digest. The result carries no apply
