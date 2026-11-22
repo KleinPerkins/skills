@@ -242,8 +242,3 @@ def observe_role(role, *, client_version, client_digest, package_digest, role_co
         },
         report=report,
     )
-
-
-def source_digest():
-    """The consumer pins the exact owner file and the protocol it supplies."""
-    return _digest(Path(__file__).read_bytes())

@@ -10,7 +10,9 @@ configuration, package and execution scope.
 ## Caller responsibilities
 
 - Verify the resolved Codex binary and the sealed package and role inventory.
-  Pass the actual version, digests, role configuration bytes and the absolute
+  Authenticate the module bytes before loading them and bind their digest
+  in the caller-owned release record. Pass the actual version, digests,
+  role configuration bytes and the absolute
   bundle directory to `verify_role_input`. The emitter inserts the destination
   in the TOML. Use absolute paths whose components contain only ASCII
   letters, digits, periods, underscores or hyphens. Normalize only that exact
