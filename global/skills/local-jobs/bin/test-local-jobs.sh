@@ -224,6 +224,41 @@ test_conformance() {
   done < <("$PY" "$SB/lib/registry.py" job-types)
 }
 
+test_unconfigured_fetch_scheduler() {
+  echo "== fetch scheduler on a command-only installation =="
+  local LOCAL_JOBS_IGF_CONFIG="$SB/state/jobs/unconfigured-fetch.yml"
+  local LOCAL_JOBS_LAUNCHD_DISABLE=0
+  local LOCAL_JOBS_LAUNCHAGENTS_DIR="$SB/empty-fetch-agents"
+  export LOCAL_JOBS_IGF_CONFIG LOCAL_JOBS_LAUNCHD_DISABLE LOCAL_JOBS_LAUNCHAGENTS_DIR
+  local out label
+  mkdir -p "$LOCAL_JOBS_LAUNCHAGENTS_DIR"
+  label="$("$PY" "$SB/lib/registry.py" label-root).git-fetch"
+  H incremental-git-fetch list-instances | "$PY" -c '
+import json, sys
+row, = json.load(sys.stdin)
+assert row["id"] == "__global__" and row["enabled"] is False and row["launchd_loaded"] is False
+' && ok "unconfigured sweep is dormant" || bad "unconfigured sweep reported as enabled"
+  if out="$(CLI doctor --plain 2>&1)" && [[ "$out" == *"doctor: PASS"* ]]; then
+    ok "full doctor passes on a command-only host"
+  else
+    bad "unconfigured fetch failed full doctor: $out"
+  fi
+  [[ ! -e "$LOCAL_JOBS_IGF_CONFIG" && ! -e "$LOCAL_JOBS_LAUNCHAGENTS_DIR/$label.plist" ]] \
+    && ok "readback preserved unconfigured fetch" || bad "fetch readback created configuration"
+
+  # A retained plist or explicit configuration makes a missing agent real drift.
+  touch "$LOCAL_JOBS_LAUNCHAGENTS_DIR/$label.plist"
+  if H incremental-git-fetch doctor >/dev/null 2>&1; then bad "missing staged agent passed"; else ok "missing staged agent refused"; fi
+  rm "$LOCAL_JOBS_LAUNCHAGENTS_DIR/$label.plist"
+  cp "$SB/state/jobs/incremental-git-fetch.yml" "$LOCAL_JOBS_IGF_CONFIG"
+  H incremental-git-fetch list-instances | "$PY" -c '
+import json, sys
+row = next(r for r in json.load(sys.stdin) if r["id"] == "__global__")
+assert row["enabled"] is True and row["launchd_loaded"] is False
+' && ok "configured missing sweep remains visible" || bad "configured sweep was hidden"
+  if H incremental-git-fetch doctor >/dev/null 2>&1; then bad "missing configured agent passed"; else ok "missing configured agent refused"; fi
+}
+
 test_handler_log_override() {
   echo "== generic fetch handler preserves the scoped log-directory override =="
   local logs="$SB/explicit-fetch-logs"
@@ -2070,6 +2105,7 @@ main() {
   local tests=(
     test_base_registry
     test_conformance
+    test_unconfigured_fetch_scheduler
     test_handler_log_override
     test_command_lifecycle
     test_command_interval_lifecycle

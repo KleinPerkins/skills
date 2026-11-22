@@ -46,6 +46,16 @@ is_loaded() {
   launchctl print "$(uid_domain)/$1" >/dev/null 2>&1
 }
 
+# A new installation can use only the command handler. A fetch configuration or
+# retained scheduler plist still requires its agent even when launchd reports it unloaded.
+global_scheduler_configured() {
+  [[ -e "$LOCAL_JOBS_IGF_CONFIG" || -L "$LOCAL_JOBS_IGF_CONFIG" ]] && return 0
+  local plist
+  # On lookup failure keep the existing missing-agent diagnosis.
+  plist="$("$LOCAL_JOBS_PYTHON" "$LOCAL_JOBS_HOME/lib/launchd.py" plist-path --label "$LABEL_PREFIX")" || return 0
+  [[ -e "$plist" || -L "$plist" ]]
+}
+
 parse_schedule() {
   local raw="$1"
   case "$raw" in
@@ -79,11 +89,13 @@ print(json.dumps({
 }
 
 cmd_list_instances() {
-  local view loaded_global
+  local view loaded_global global_enabled
   view="$(igf_config view)"
   loaded_global=false
   is_loaded "$LABEL_PREFIX" && loaded_global=true
-  GLOBAL_LOADED="$loaded_global" PREFIX="$LABEL_PREFIX" OUT_LOG="$OUT_LOG" ERR_LOG="$ERR_LOG" VIEW="$view" \
+  global_enabled="$loaded_global"
+  global_scheduler_configured && global_enabled=true
+  GLOBAL_ENABLED="$global_enabled" GLOBAL_LOADED="$loaded_global" PREFIX="$LABEL_PREFIX" OUT_LOG="$OUT_LOG" ERR_LOG="$ERR_LOG" VIEW="$view" \
     "$LOCAL_JOBS_PYTHON" -c 'import json, os, subprocess
 
 view = json.loads(os.environ["VIEW"])
@@ -108,7 +120,7 @@ global_inst = {
     "id": "__global__",
     "type": "incremental-git-fetch",
     "role": "global_scheduler",
-    "enabled": True,
+    "enabled": os.environ["GLOBAL_ENABLED"] == "true",
     "schedule": {
         "window_start_hour": launchd.get("window_start_hour", 18),
         "window_end_hour": launchd.get("window_end_hour", 24),
@@ -604,6 +616,7 @@ case "${1:-}" in
     if [[ "${LOCAL_JOBS_LAUNCHD_DISABLE:-0}" == "1" ]]; then
       printf 'global agent: skipped (launchd disabled)\n'
     elif is_loaded "$LABEL_PREFIX"; then printf 'global agent: loaded (%s)\n' "$LABEL_PREFIX"
+    elif ! global_scheduler_configured; then printf 'global agent: not configured\n'
     else printf 'global agent: not loaded (%s)\n' "$LABEL_PREFIX"; issues=$((issues+1)); fi
     doctor_status=PASS; (( issues == 0 )) || doctor_status=FAIL
     "$LOCAL_JOBS_PYTHON" "$LOCAL_JOBS_HOME/lib/events.py" emit --kind status --type incremental-git-fetch \
