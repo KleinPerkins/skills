@@ -9,6 +9,8 @@ from .contracts import (Refusal, fail, config, json_load, snapshot, encode, dige
                         now, timestamp, integer, entity_id, INPUT_MAX, FIELDS, result as validate_result)
 from .deadline import deadline, tighten
 from .io_safe import read_file, load_snapshot, Publisher, directory, outside_repositories
+from .receipt_store import AdmittedPublisher
+from .checkout_admission import validate_input_diagnostics
 from .adapters import (repository_identity, normalize_remote, typed, parse_metadata,
                        make_observation, git_records, identity_representations)
 
@@ -27,6 +29,7 @@ def _merge(records):
         if e['id'] not in entities: entities[e['id']]=copy.deepcopy(e)
         else:
             dest=entities[e['id']]
+            dest['conflicts']=sorted(set(dest['conflicts'])|set(e['conflicts']))
             if dest['parent']!=e['parent']:
                 # Parent observations are represented as declared belongs_to edges,
                 # so conflicting source owners remain explicit and inspectable.
@@ -54,10 +57,19 @@ def refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
         return _refresh(config_path,cache_path,clock=clock,before_replace=before_replace)
 
 
-def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
+def refresh_admitted(config_path, cache_path, admission, *, before_replace=None):
+    admission.validate()
+    with deadline(60):
+        return _refresh(config_path, cache_path, before_replace=before_replace, admission=admission)
+
+
+def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None,admission=None):
     start=clock()
     outside_repositories(os.path.dirname(config_path))
-    cfg=config(json_load(read_file(config_path,INPUT_MAX,True)))
+    config_bytes = read_file(config_path, INPUT_MAX, True)
+    if admission and digest(config_bytes) != admission.config_digest:
+        fail('invalid_input')
+    cfg=config(json_load(config_bytes))
     tighten(cfg['bounds']['refresh_seconds'])
     if os.path.normpath(config_path)==os.path.normpath(cache_path): fail('unsafe_path',3)
     # State may not live within an explicitly indexed location, even if it has
@@ -69,7 +81,8 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
         return any(path==p or path.startswith(p+'/') for p in cfg['exclude_paths'])
     def budget():
         if clock()-start>cfg['bounds']['refresh_seconds']: fail('bound_exceeded',3)
-    with Publisher(cache_path,cfg['bounds']['snapshot_bytes']) as publisher:
+    publisher_class = AdmittedPublisher if admission else Publisher
+    with publisher_class(cache_path,cfg['bounds']['snapshot_bytes']) as publisher:
         try: old=load_snapshot(cache_path)
         except Refusal:
             # Absence may start a cache. Corruption must not silently discard facts.
@@ -78,6 +91,37 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
             else: fail('unavailable',3)
         old_inputs={x['key']:x for x in old['inputs']} if old else {}
         inputs=[]; reasons=set(); parsed=0; reused=0; when=now()
+        used_checkouts = set()
+        current_checkouts = set()
+        input_diagnostics = {}
+
+        def target_read(root, locations, collect):
+            if admission is None:
+                return collect()
+            return admission.read(root['path'], locations, collect)
+
+        def inspect_root(path, reader):
+            opener = directory if reader is None else reader.directory
+            with opener(path):
+                pass
+
+        def metadata_read(path, reader):
+            read = read_file if reader is None else reader.read_file
+            return read(path, cfg['bounds']['input_bytes'])
+
+        def note(key, reason, state=None):
+            if admission is not None:
+                input_diagnostics[key] = {"reason":reason, "state":state or (
+                    "omitted" if reason == "excluded" else "unavailable")}
+
+        def skip_root(root, key, reason):
+            reasons.add(reason)
+            note(key, reason)
+            if root['git']:
+                note(key+'/git', reason)
+            for source in root['sources']:
+                file_reason = 'excluded' if excluded(root['path']+'/'+source['path']) else reason
+                note(key+'/'+source['path'], file_reason)
         def authorization(root, source=None, adapter='inventory'):
             # This is authorization scope, separate from input content and field
             # eligibility. A reused key alone can never authorize old facts.
@@ -95,6 +139,7 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
         def retain(key, auth, reason, eligible=None):
             reasons.add(reason)
             prior=prior_input(key,auth)
+            note(key, reason, "stale" if prior is not None else None)
             if prior is not None:
                 old_input=copy.deepcopy(prior); old_input['state']='stale'
                 old_input['records']=_mark(old_input['records'],'stale')
@@ -112,7 +157,7 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
         def retain_sources(root,key,reason):
             for source in root['sources']:
                 if excluded(root['path']+'/'+source['path']):
-                    reasons.add('excluded'); continue
+                    reasons.add('excluded'); note(key+'/'+source['path'], 'excluded'); continue
                 retain(key+'/'+source['path'],authorization(root,source),reason,set(source['fields']))
 
         for root in cfg['roots']:
@@ -122,12 +167,12 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
             # A stale inventory's contradictory Git origin can only be detected
             # by the separately permitted fixed metadata probe below.
             scopes=[root['path']]+(list(root['git'].values()) if root['git'] else [])
-            if any(excluded(p) for p in scopes): reasons.add('excluded'); continue
+            if any(excluded(p) for p in scopes): skip_root(root,key,'excluded'); continue
             if root['scope']!='permitted' or root['identity'] is None:
-                reasons.add('unknown_scope'); continue
+                skip_root(root,key,'unknown_scope'); continue
             identity=repository_identity(root)
             if identity_representations(root) & set(cfg['exclude_identities']):
-                reasons.add('excluded'); continue
+                skip_root(root,key,'excluded'); continue
             rid=typed('repository',identity)
             bind=digest(encode(root)); root_auth=authorization(root)
             base=[{'id':rid,'kind':'repository','parent':None,'observations':[
@@ -140,8 +185,11 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
                 if field in root['storage_fields']:
                     base[0]['observations'].append(make_observation(field,root[field],'declared',root['inventory'],key,None,bind,when))
             try:
-                with directory(root['path']): pass
-            except Refusal:
+                target_read(root, (('checkout', root['path']),), lambda reader=None: inspect_root(root['path'], reader))
+            except Refusal as exc:
+                if admission and exc.code == 'excluded':
+                    skip_root(root,key,'excluded'); continue
+                used_checkouts.add(root['path'])
                 retain(key,root_auth,'source_failed',set(root['storage_fields'])|{'identity','location'})
                 retain_sources(root,key,'source_failed')
                 if root['git']: retain(key+'/git',authorization(root,adapter='git'),'source_failed')
@@ -152,13 +200,21 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
                 gkey=key+'/git'; git_auth=authorization(root,adapter='git')
                 try:
                     budget()
-                    binding,records,was_reused=git_records(root,rid,when,cfg['bounds']['input_bytes'],excluded,prior_input(gkey,git_auth))
+                    locations = (('checkout', root['path']), ('git_directory', root['git']['git_dir']),
+                                 ('common_directory', root['git']['common_dir']))
+                    if admission is not None and root['git']['git_dir'] != root['git']['common_dir']:
+                        work = root['git']['git_dir']
+                        locations += (('linked_gitfile', root['path']+'/.git'),
+                                      ('linked_common_pointer', work+'/commondir'),
+                                      ('linked_reverse_pointer', work+'/gitdir'))
+                    binding,records,was_reused=target_read(root, locations, lambda reader=None: git_records(
+                        root,rid,when,cfg['bounds']['input_bytes'],excluded,prior_input(gkey,git_auth),reader=reader))
                     observed={o['value'] for entity in records for o in entity['observations']
                               if o['field']=='identity' and o['source_kind']=='git' and o['state']=='current'}
                     if observed & set(cfg['exclude_identities']):
                         # Nothing from this root, including prior inventory or
                         # source facts, survives a discovered excluded identity.
-                        reasons.add('excluded'); continue
+                        skip_root(root,key,'excluded'); continue
                     observed_remote=next(iter(observed),None)
                     if observed_remote is None and (remote or root['identity']['provider']):
                         fail('unknown_scope',3)
@@ -168,17 +224,24 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
                     identity_conflict=(observed_remote is not None and (remote is None or observed_remote!='remote:'+remote))
                     if identity_conflict:
                         reasons.add('source_failed'); base[0]['conflicts']=['identity']
+                        note(key, 'source_failed', 'conflict')
                     reused+=int(was_reused); parsed+=int(not was_reused)
                     git_input={'key':gkey,'digest':binding,'authorization_digest':git_auth,'state':'current','records':records}
                 except Refusal as exc:
+                    if admission and exc.code == 'excluded':
+                        skip_root(root,key,'excluded'); continue
+                    used_checkouts.add(root['path'])
                     retain(key,root_auth,exc.code,set(root['storage_fields'])|{'identity','location'})
                     retain(gkey,git_auth,exc.code)
                     retain_sources(root,key,exc.code)
                     # Unknown/failed fixed Git metadata is never permission to
                     # mine the tree under an unverified cached identity.
                     continue
+            used_checkouts.add(root['path'])
+            current_checkouts.add(root['path'])
             inputs.append({'key':key,'digest':bind,'authorization_digest':root_auth,'state':'current','records':base})
-            if git_input: inputs.append(git_input)
+            if git_input:
+                inputs.append(git_input)
             if identity_conflict:
                 retain_sources(root,key,'source_failed')
                 continue
@@ -186,9 +249,10 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
             for source in root['sources']:
                 budget(); skey=key+'/'+source['path']; source_auth=authorization(root,source)
                 path=root['path']+'/'+source['path']
-                if excluded(path): reasons.add('excluded'); continue
+                if excluded(path): reasons.add('excluded'); note(skey,'excluded'); continue
                 try:
-                    data=read_file(path,cfg['bounds']['input_bytes'])
+                    data=target_read(root, (('source', path),),
+                                     lambda reader=None: metadata_read(path, reader))
                     binding=digest(data+encode({'source':source,'root':bind}))
                     prior=prior_input(skey,source_auth)
                     if source['adapter'] in {'yaml','capability-yaml','skill-frontmatter'}:
@@ -221,7 +285,11 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
                                 entity['conflicts']=[f for f in entity['conflicts'] if f in set(source['fields'])]
                             records.extend(missing)
                     inputs.append({'key':skey,'digest':binding,'authorization_digest':source_auth,'state':'current','records':records})
-                except Refusal as exc: retain(skey,source_auth,exc.code,set(source['fields']))
+                except Refusal as exc:
+                    if admission and exc.code == 'excluded':
+                        reasons.add('excluded'); note(skey,'excluded')
+                    else:
+                        retain(skey,source_auth,exc.code,set(source['fields']))
         budget()
         entities=_merge([e for i in inputs for e in i['records']])
         if len(entities)>cfg['bounds']['entities']: fail('bound_exceeded',3)
@@ -229,14 +297,26 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None):
                'observed_at':when,'coverage':'partial' if reasons else 'complete',
                'inputs':inputs,'entities':entities,'reasons':sorted(reasons)}
         snapshot(value); budget()
+        if admission:
+            validate_input_diagnostics(input_diagnostics, value['inputs'])
         def publication_gate():
             budget()
             if before_replace: before_replace()
             budget()
-        data=publisher.publish(value,publication_gate)
-        return validate_result({'schema':'ecosystem-index/result/v1','command':'refresh','status':value['coverage'],
-                'coverage':value['coverage'],'reasons':sorted(reasons),'generation':value['generation'],
-                'snapshot_digest':digest(data),'counts':{'entities':len(entities),'parsed':parsed,'reused':reused}})
+        def result_for(data):
+            return validate_result({'schema':'ecosystem-index/result/v1','command':'refresh','status':value['coverage'],
+                    'coverage':value['coverage'],'reasons':sorted(reasons),'generation':value['generation'],
+                    'snapshot_digest':digest(data),'counts':{'entities':len(entities),'parsed':parsed,'reused':reused}})
+        def commit(replace, data):
+            receipt = admission.receipt(result_for(data), when, input_diagnostics)
+            def publish_pair(verify_current):
+                publisher.save_receipt(admission, receipt)
+                verify_current()
+                return replace()
+            return admission.publish(tuple(sorted(used_checkouts)), frozenset(current_checkouts), publish_pair)
+        data=publisher.publish(value,publication_gate,commit=commit if admission else None)
+        result = result_for(data)
+        return admission.receipt(result, when, input_diagnostics) if admission else result
 
 
 # Selective reuse from the previous scorer: token sets, conservative singulars

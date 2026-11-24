@@ -155,6 +155,23 @@ class ConsumerPackages(unittest.TestCase):
             self.assert_unavailable(self.check(self.skill(name)))
         self.assertEqual(tree_state(self.base), before)
 
+    def test_guarded_index_modules_are_required_by_retained_diagnostics(self):
+        index = self.root / TOOL_RELATIVE.parent
+        for filename in ("checkout_admission.py", "receipt_store.py"):
+            with self.subTest(module=filename):
+                module = index / "lib" / filename
+                held = self.base / filename
+                module.rename(held)
+                try:
+                    before = tree_state(self.base)
+                    result = self.check(self.skill("ecosystem-search"), "--doctor")
+                    provider = self.check(index, "--check")
+                    self.assertEqual(tree_state(self.base), before)
+                    self.assert_unavailable(result)
+                    self.assertEqual(provider.returncode, 3, provider.stdout + provider.stderr)
+                finally:
+                    held.rename(module)
+
     def test_missing_skill_payload_refuses(self):
         for name in CONSUMERS:
             (self.skill(name) / "SKILL.md").unlink()

@@ -143,32 +143,52 @@ def identity_representations(root):
     return result
 
 
-def git_records(root,repo_id,when,maximum,excluded,prior=None):
+def validate_git_pointer(raw, base, expected, *, prefix=''):
+    """Compare one fixed Git pointer lexically without following its destination."""
+    try:
+        value = raw.decode('utf-8').rstrip('\r\n')
+    except UnicodeError:
+        fail('source_failed', 3)
+    if not value.startswith(prefix):
+        fail('source_failed', 3)
+    value = value[len(prefix):]
+    if not value or value != value.strip() or any(c in value for c in '\r\n\0'):
+        fail('source_failed', 3)
+    if os.path.normpath(os.path.join(base, value)) != expected:
+        fail('source_failed', 3)
+
+
+def git_records(root,repo_id,when,maximum,excluded,prior=None,*,reader=None):
     """Read only exact pre-authorized metadata paths; ignore config includes.
 
     Common/per-worktree paths are independent scopes supplied by the operator.
     There is no `git` process, ref traversal, discovery or command execution.
     """
+    opener = directory if reader is None else reader.directory
+    read = read_file if reader is None else reader.read_file
     g=root['git']
     if not g: return []
     probe_paths=[root['path']+'/.git',g['common_dir']+'/config']
-    if g['common_dir']!=g['git_dir']: probe_paths.append(g['git_dir']+'/commondir')
+    if g['common_dir']!=g['git_dir']:
+        probe_paths.append(g['git_dir']+'/commondir')
+        if reader is not None:
+            probe_paths.append(g['git_dir']+'/gitdir')
     if any(excluded(p) for p in probe_paths): fail('excluded',3)
     for path in (g['common_dir'],g['git_dir']):
         if excluded(path): fail('excluded',3)
-        with directory(path): pass
+        with opener(path): pass
     common=g['common_dir']; work=g['git_dir']
     layout={'root':root['path'],'common_dir':common,'git_dir':work,'config':digest(encode(root))}
     # Verify the supplied physical layout without resolving arbitrary discovered
     # destinations. Unsupported forms are partial, never guessed.
-    with directory(root['path']) as rootfd:
+    with opener(root['path']) as rootfd:
         try: marker=os.stat('.git',dir_fd=rootfd,follow_symlinks=False)
         except OSError: fail('source_failed',3)
     if stat.S_ISDIR(marker.st_mode):
         layout['marker']='directory'
         if work!=root['path']+'/.git': fail('source_failed',3)
     elif stat.S_ISREG(marker.st_mode):
-        marker_data=read_file(root['path']+'/.git',4096)
+        marker_data=read(root['path']+'/.git',4096)
         layout['marker']=digest(marker_data)
         try: line=marker_data.decode('utf-8').strip()
         except UnicodeError: fail('source_failed',3)
@@ -177,12 +197,16 @@ def git_records(root,repo_id,when,maximum,excluded,prior=None):
         if os.path.normpath(os.path.join(root['path'],target))!=work: fail('source_failed',3)
     else: fail('unsafe_path',3)
     if common!=work:
-        commondir=read_file(work+'/commondir',4096)
+        commondir=read(work+'/commondir',4096)
         layout['commondir']=digest(commondir)
         try: target=commondir.decode('utf-8').strip()
         except UnicodeError: fail('source_failed',3)
         if '\n' in target or os.path.normpath(os.path.join(work,target))!=common: fail('source_failed',3)
-    data=read_file(common+'/config',maximum)
+        if reader is not None:
+            reverse = read(work+'/gitdir',4096)
+            validate_git_pointer(reverse, work, root['path']+'/.git')
+            layout['reverse_gitdir'] = digest(reverse)
+    data=read(common+'/config',maximum)
     layout['git_config']=digest(data)
     binding=digest(encode(layout))
     if prior and prior['digest']==binding:

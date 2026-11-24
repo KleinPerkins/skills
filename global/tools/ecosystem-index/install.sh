@@ -8,7 +8,9 @@ esac
 if [[ $# -gt 1 ]]; then printf '%s\n' 'Unsupported lifecycle arguments.' >&2; exit 2; fi
 source_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 command -v python3 >/dev/null || { printf '%s\n' 'Python 3 unavailable.' >&2; exit 3; }
-for file in ecosystem_index.py lib/contracts.py lib/engine.py lib/io_safe.py lib/adapters.py tool.yml requirements.txt; do
+[[ ! -L "$source_dir/lib" ]] || { printf '%s\n' 'Source prerequisite unavailable.' >&2; exit 3; }
+for file in ecosystem_index.py lib/__init__.py lib/contracts.py lib/engine.py lib/io_safe.py \
+  lib/adapters.py lib/deadline.py lib/checkout_admission.py lib/receipt_store.py tool.yml requirements.txt; do
   [[ -f "$source_dir/$file" && ! -L "$source_dir/$file" ]] || { printf '%s\n' 'Source prerequisite unavailable.' >&2; exit 3; }
 done
 python3 -B - <<'PY'
