@@ -277,8 +277,12 @@ def observation(o):
 
 @guarded
 def snapshot(value):
-    closed(value, {'schema','generation','observed_at','coverage','inputs','entities','reasons'})
+    closed(value, {'schema','generation','observed_at','coverage','inputs','entities','reasons'},
+           {'admitted_receipt_digest'})
     if value['schema'] != 'ecosystem-index/snapshot/v1': fail()
+    if 'admitted_receipt_digest' in value:
+        string(value['admitted_receipt_digest'],64)
+        if not re.fullmatch(r'[a-f0-9]{64}',value['admitted_receipt_digest']): fail()
     integer(value['generation'],1,2**53)
     timestamp(value['observed_at'])
     if value['coverage'] not in {'complete','partial'}: fail()

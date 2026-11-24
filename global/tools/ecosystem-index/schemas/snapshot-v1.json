@@ -456,6 +456,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
+    "admitted_receipt_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
     "coverage": {
       "enum": [
         "complete",

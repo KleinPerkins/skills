@@ -2,6 +2,7 @@
 import contextlib
 import signal
 import threading
+import time
 from .contracts import fail
 
 @contextlib.contextmanager
@@ -24,3 +25,20 @@ def deadline(seconds):
 def tighten(seconds):
     remaining,interval=signal.getitimer(signal.ITIMER_REAL)
     signal.setitimer(signal.ITIMER_REAL,max(0.000001,min(remaining,seconds)),interval)
+
+
+@contextlib.contextmanager
+def bound_until(expires):
+    """Use the tighter admitted operation deadline and restore the refresh budget."""
+    start = time.monotonic()
+    remaining, interval = signal.getitimer(signal.ITIMER_REAL)
+    if remaining <= 0 or interval:
+        fail("unavailable", 3)
+    if expires <= start:
+        fail("bound_exceeded", 3)
+    signal.setitimer(signal.ITIMER_REAL, min(remaining, expires - start))
+    try:
+        yield
+    finally:
+        elapsed = time.monotonic() - start
+        signal.setitimer(signal.ITIMER_REAL, max(0.000001, remaining - elapsed))

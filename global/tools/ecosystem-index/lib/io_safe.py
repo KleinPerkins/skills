@@ -135,21 +135,24 @@ class Publisher:
                 if not stat.S_ISREG(existing.st_mode) or existing.st_uid != os.getuid() or stat.S_IMODE(existing.st_mode)!=0o600:
                     fail('unsafe_path',3)
             except FileNotFoundError: pass
-            self.lock=self.name+'.lock'
-            try:
-                lockfd=os.open(self.lock,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,0o600,dir_fd=self.fd)
-            except FileExistsError:
-                fail('busy',3)
-            try:
-                st=os.fstat(lockfd); self.lock_identity=(st.st_dev,st.st_ino)
-                os.write(lockfd,secrets.token_hex(16).encode('ascii')); os.fsync(lockfd)
-            finally: os.close(lockfd)
+            self.acquire()
             return self
         except BaseException:
             self.__exit__(None,None,None)
             raise
 
-    def publish(self,value,before_replace=None):
+    def acquire(self):
+        self.lock=self.name+'.lock'
+        try:
+            lockfd=os.open(self.lock,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,0o600,dir_fd=self.fd)
+        except FileExistsError:
+            fail('busy',3)
+        try:
+            st=os.fstat(lockfd); self.lock_identity=(st.st_dev,st.st_ino)
+            os.write(lockfd,secrets.token_hex(16).encode('ascii')); os.fsync(lockfd)
+        finally: os.close(lockfd)
+
+    def publish(self,value,before_replace=None,*,commit=None):
         data=encode(snapshot(value))
         if len(data)>self.maximum: fail('bound_exceeded',3)
         self.temp='.'+self.name+'.'+secrets.token_hex(16)+'.tmp'
@@ -162,11 +165,13 @@ class Publisher:
             snapshot(json_load(readback,self.maximum))
             if data!=readback: fail('unavailable',3)
             if before_replace: before_replace()
-            os.replace(self.temp,self.name,src_dir_fd=self.fd,dst_dir_fd=self.fd)
-            self.temp=None
-            os.fsync(self.fd)
-            if read_at(self.fd,self.name,self.maximum,True)!=data: fail('unavailable',3)
-            return data
+            def replace():
+                os.replace(self.temp,self.name,src_dir_fd=self.fd,dst_dir_fd=self.fd)
+                self.temp=None
+                os.fsync(self.fd)
+                if read_at(self.fd,self.name,self.maximum,True)!=data: fail('unavailable',3)
+                return data
+            return commit(replace, data) if commit is not None else replace()
         finally:
             if self.temp is not None:
                 self.remove_temp()

@@ -44,6 +44,7 @@ try:
     tool_directory = 'global/tools/ecosystem-index/'
     required = ('ecosystem_index.py', 'lib/__init__.py', 'lib/contracts.py',
                 'lib/engine.py', 'lib/adapters.py', 'lib/io_safe.py', 'lib/deadline.py',
+                'lib/checkout_admission.py', 'lib/receipt_store.py',
                 'tool.yml', 'meta.yml', 'requirements.txt', 'schemas/config-v1.json',
                 'schemas/metadata-v1.json', 'schemas/snapshot-v1.json', 'schemas/result-v1.json')
     payloads = [tool_directory + part for part in required]
