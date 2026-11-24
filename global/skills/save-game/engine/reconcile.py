@@ -45,9 +45,14 @@ def _classify_root(current: Optional[dict], fresh_identity: identity_mod.RootIde
         return "STALE"
     if root.get("branch") != fresh_identity.branch:
         return "STALE"
-    if root.get("observed_head") == fresh_identity.observed_head[:64]:
+    saved_head = root.get("observed_head", "")
+    live_head = fresh_identity.observed_head[:64]
+    if saved_head == live_head:
         return "MATCH"
-    return "ADVANCED"  # same branch, HEAD moved forward: accept the newer live revision
+    ancestry = identity_mod.prove_ancestry(fresh_identity.physical_root, saved_head, live_head)
+    if ancestry is None:
+        return "UNKNOWN"
+    return "ADVANCED" if ancestry else "STALE"
 
 
 def run_reconcile(

@@ -122,6 +122,42 @@ class TestClassification(ReconcileTestCase):
         self.assertEqual(by_claim["root_ref_head"], "ADVANCED")
         self.assertIn("Refreshed", receipt["repairs"][0])
 
+    def test_same_branch_rewind_or_divergence_is_stale(self):
+        git = ["git", "-C", str(self.repo)]
+        parent = self.identity.observed_head
+        subprocess.run([*git, "commit", "-q", "--allow-empty", "-m", "saved tip"], check=True)
+        self.identity = identity_mod.resolve_root_identity(str(self.repo))
+        self._flush()
+        current_path = paths.current_path(self.repo_key, self.clone_key, self.workstream_key)
+        original = current_path.read_bytes()
+
+        subprocess.run([*git, "update-ref", "refs/heads/main", parent, self.identity.observed_head], check=True)
+        rewind = self._reconcile()
+        self.assertIn({"claim": "root_ref_head", "result": "STALE"}, rewind["classifications"])
+        self.assertEqual(current_path.read_bytes(), original)
+
+        subprocess.run([*git, "commit", "-q", "--allow-empty", "-m", "other tip"], check=True)
+        divergent = self._reconcile()
+        self.assertIn({"claim": "root_ref_head", "result": "STALE"}, divergent["classifications"])
+        self.assertEqual(current_path.read_bytes(), original)
+
+    def test_missing_saved_commit_is_unknown(self):
+        current = {"root": {"branch": self.identity.branch, "observed_head": "f" * 40}}
+        self.assertEqual(reconcile._classify_root(current, self.identity), "UNKNOWN")
+
+    def test_shallow_history_cannot_prove_a_negative_ancestry_result(self):
+        upstream = ["git", "-C", str(self.repo)]
+        saved = self.identity.observed_head
+        subprocess.run([*upstream, "commit", "-q", "--allow-empty", "-m", "descendant"], check=True)
+        clone = self.tmp / "shallow"
+        subprocess.run(["git", "clone", "-q", "--depth=1", self.repo.as_uri(), str(clone)], check=True)
+        local = ["git", "-C", str(clone)]
+        subprocess.run([*local, "fetch", "-q", self.repo.as_uri(), f"{saved}:refs/heads/saved"], check=True)
+        subprocess.run([*local, "cat-file", "-e", f"{saved}^{{commit}}"], check=True)
+        fresh = identity_mod.resolve_root_identity(str(clone))
+        current = {"root": {"branch": fresh.branch, "observed_head": saved}}
+        self.assertEqual(reconcile._classify_root(current, fresh), "UNKNOWN")
+
     def test_branch_change_is_stale_not_advanced(self):
         self._flush()
         subprocess.run(["git", "-C", str(self.repo), "checkout", "-q", "-b", "other-branch"], check=True)
