@@ -14,6 +14,16 @@ from .checkout_admission import validate_input_diagnostics
 LOCK_MARKER = b"skills-admitted-snapshot-lock/v1\n"
 
 
+def receipt_claims_digest(receipt):
+    """Bind the receipt claims without hashing the snapshot's digest into itself."""
+    claims = dict(receipt)
+    result = dict(claims["result"])
+    del claims["snapshot_digest"]
+    del result["snapshot_digest"]
+    claims["result"] = result
+    return digest(encode(claims))
+
+
 def receipt_name(snapshot_name, admission, snapshot_digest):
     key = encode([admission.inventory_version, admission.config_digest, admission.projection_digest,
                   admission.physical_binding_digest,
@@ -103,6 +113,7 @@ def load_qualified_snapshot(path, admission):
         result = validate_result(receipt["result"])
         diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], value["inputs"], projected_config)
         if (result["command"] != "refresh" or result["generation"] != value["generation"]
+                or value.get("admitted_receipt_digest") != receipt_claims_digest(receipt)
                 or result["snapshot_digest"] != snapshot_digest
                 or result["coverage"] != value["coverage"] or result["reasons"] != value["reasons"]
                 or result["counts"]["entities"] != len(value["entities"])
