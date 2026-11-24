@@ -6,4 +6,4 @@ scope: global
 owner: KleinPerkins
 install: install.sh
 post_mgmt: none
-expose: cursor
+expose: cursor codex

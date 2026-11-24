@@ -45,15 +45,23 @@ link_tool() {
     printf '[install:%s] FAIL expected link %s -> %s\n' "$NAME" "$link" "$SRC" >&2
     return 1
   fi
-  mkdir -p "$base"
-  if [ -L "$link" ] && [ "$(readlink "$link")" = "$SRC" ]; then return 0; fi
-  if [ -e "$link" ] && [ ! -L "$link" ]; then
-    printf '[install:%s] skip %s (real path)\n' "$NAME" "$link"
-    return 0
+  if [ -L "$link" ] && [ "$link" -ef "$SRC" ]; then return 0; fi
+  if [ -L "$link" ] || [ -e "$link" ]; then
+    printf '[install:%s] FAIL %s is occupied by an independent installation\n' "$NAME" "$link" >&2
+    return 1
   fi
-  rm -f "$link"
-  ln -s "$SRC" "$link"
-  printf '[install:%s] linked %s -> %s\n' "$NAME" "$link" "$SRC"
+  mkdir -p "$base" || return 1
+  # Create the literal slot without following a concurrent entry.
+  python3 - "$SRC" "$link" <<'PYLINK' || return 1
+import os
+import sys
+
+try:
+    os.symlink(sys.argv[1], sys.argv[2])
+except OSError as error:
+    sys.exit(f"PR Steward link was not created: {error}")
+PYLINK
+  printf '[install:%s] linked %s -> %s\n' "$NAME" "$link"
 }
 
 rc=0
