@@ -22,6 +22,7 @@ from . import canonical
 _GITHUB_REMOTE_RE = re.compile(
     r"^(?:git@|ssh://git@|https://|git://)?github\.com[:/]([^/]+)/(.+?)(?:\.git)?/?$"
 )
+_COMMIT_ID_RE = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})")
 
 
 @dataclass(frozen=True)
@@ -50,6 +51,32 @@ def _run_git(root: str, *args: str) -> Optional[str]:
     if out.returncode != 0:
         return None
     return out.stdout.strip()
+
+
+def prove_ancestry(root: str, saved_head: str, live_head: str) -> Optional[bool]:
+    """Return whether the live commit descends from the saved commit, using local history."""
+    if not _COMMIT_ID_RE.fullmatch(saved_head) or not _COMMIT_ID_RE.fullmatch(live_head):
+        return None
+    git = ["git", "--no-replace-objects", "-C", root]
+    env = {**os.environ, "GIT_NO_LAZY_FETCH": "1", "GIT_ALLOW_PROTOCOL": "", "GIT_OPTIONAL_LOCKS": "0"}
+    try:
+        proof = subprocess.run(
+            [*git, "merge-base", "--is-ancestor", saved_head, live_head],
+            env=env, capture_output=True, text=True, timeout=5,
+        )
+        if proof.returncode == 0:
+            return True
+        if proof.returncode != 1:
+            return None
+        shallow = subprocess.run(
+            [*git, "rev-parse", "--is-shallow-repository"],
+            env=env, capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if shallow.returncode == 0 and shallow.stdout.strip() == "false":
+        return False
+    return None
 
 
 def _proven_remote_identity(root: str) -> Optional[str]:
