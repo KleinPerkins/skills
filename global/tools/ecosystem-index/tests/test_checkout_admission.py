@@ -12,10 +12,11 @@ import unittest
 from test_index import Fixture
 from lib import engine
 from lib.checkout_admission import CheckoutAdmission
-from lib.contracts import Refusal, fail
+from lib.contracts import Refusal, encode, fail
 from lib.deadline import bound_until, deadline
 from lib.io_safe import Publisher
-from lib.receipt_store import load_qualified_snapshot, receipt_claims_digest, receipt_name
+from lib.receipt_store import (RECEIPT_INPUT_KEY, append_receipt_input, load_qualified_snapshot,
+                               receipt_input, receipt_name)
 
 
 class AdmittedCheckoutRefresh(Fixture):
@@ -54,7 +55,9 @@ class AdmittedCheckoutRefresh(Fixture):
         self.assertEqual(readback, receipt)
         self.assertEqual(receipt["snapshot_generation"], value["generation"])
         self.assertEqual(receipt["snapshot_digest"], sha256(self.cache.read_bytes()).hexdigest())
-        self.assertEqual(value["admitted_receipt_digest"], receipt_claims_digest(receipt))
+        self.assertNotIn("admitted_receipt_digest", value)
+        self.assertEqual([item for item in value["inputs"] if item["key"] == RECEIPT_INPUT_KEY],
+                         [receipt_input(admission, receipt)])
         self.assertEqual(receipt["inventory_digest"], self.authority[2])
 
     def test_config_mismatch_and_failed_final_gate_preserve_completed_snapshot(self):
@@ -130,7 +133,7 @@ class AdmittedCheckoutRefresh(Fixture):
             "inventory/fixture/eligible.json": {"state": "unavailable", "reason": "invalid_input"},
             "inventory/fixture/blocked.json": {"state": "omitted", "reason": "excluded"},
         })
-        self.assertEqual([row["key"] for row in value["inputs"]], ["inventory/fixture"])
+        self.assertEqual([row["key"] for row in value["inputs"]], ["inventory/fixture", RECEIPT_INPUT_KEY])
 
     def test_repeat_source_failure_retains_stale_reason_and_refuses_mismatched_receipt(self):
         admission = self.admission()
@@ -223,6 +226,40 @@ class AdmittedCheckoutRefresh(Fixture):
             load_qualified_snapshot(str(self.cache), admission)
         receipt.write_bytes(original)
         self.assertEqual(load_qualified_snapshot(str(self.cache), admission)[1], report)
+
+    def test_readback_accepts_earlier_commitment_and_refuses_mixed_forms(self):
+        admission = self.admission()
+        report = self.refresh(admission)
+        value = json.loads(self.cache.read_bytes())
+        commitment = receipt_input(admission, report)
+        value["admitted_receipt_digest"] = commitment["digest"]
+
+        def publish_fixture():
+            raw = encode(value)
+            self.cache.write_bytes(raw)
+            snapshot_digest = sha256(raw).hexdigest()
+            result = {**report["result"], "snapshot_digest": snapshot_digest}
+            expected = admission.receipt(result, value["observed_at"], report["input_diagnostics"])
+            destination = self.cache.with_name(receipt_name(self.cache.name, admission, snapshot_digest))
+            destination.write_bytes(encode(expected))
+            destination.chmod(0o600)
+            return expected
+
+        publish_fixture()
+        with self.assertRaisesRegex(Refusal, "unavailable"):
+            load_qualified_snapshot(str(self.cache), admission)
+        value["inputs"].remove(commitment)
+        expected = publish_fixture()
+        self.assertEqual(load_qualified_snapshot(str(self.cache), admission), (value, expected))
+
+    def test_receipt_commitment_does_not_overwrite_an_existing_input(self):
+        admission = self.admission()
+        report = self.refresh(admission)
+        existing = receipt_input(admission, report)
+        inputs = [existing]
+        with self.assertRaisesRegex(Refusal, "unavailable"):
+            append_receipt_input(inputs, admission, report)
+        self.assertEqual(inputs, [existing])
 
     def test_real_process_exit_after_pair_install_releases_admitted_lock(self):
         admission = self.admission()

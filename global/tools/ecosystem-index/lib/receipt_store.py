@@ -12,6 +12,7 @@ from .checkout_admission import validate_input_diagnostics
 
 
 LOCK_MARKER = b"skills-admitted-snapshot-lock/v1\n"
+RECEIPT_INPUT_KEY = "refresh/receipt"
 
 
 def receipt_claims_digest(receipt):
@@ -22,6 +23,25 @@ def receipt_claims_digest(receipt):
     del result["snapshot_digest"]
     claims["result"] = result
     return digest(encode(claims))
+
+
+def receipt_input(admission, receipt):
+    """Represent the private receipt commitment as a format-v1 input."""
+    return {
+        "key": RECEIPT_INPUT_KEY,
+        "digest": receipt_claims_digest(receipt),
+        "authorization_digest": admission.config_digest,
+        "state": "current",
+        "records": [],
+    }
+
+
+def append_receipt_input(inputs, admission, receipt):
+    # Configured keys start with inventory/. Refuse a collision before writing
+    # even if a future collector supplies another input namespace.
+    if any(item["key"] == RECEIPT_INPUT_KEY for item in inputs):
+        fail("unavailable", 3)
+    inputs.append(receipt_input(admission, receipt))
 
 
 def receipt_name(snapshot_name, admission, snapshot_digest):
@@ -111,9 +131,18 @@ def load_qualified_snapshot(path, admission):
     try:
         receipt = json_load(read_file(path_to_receipt, SNAPSHOT_MAX, True), SNAPSHOT_MAX)
         result = validate_result(receipt["result"])
-        diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], value["inputs"], projected_config)
+        inputs = [item for item in value["inputs"] if item["key"] != RECEIPT_INPUT_KEY]
+        commitments = [item for item in value["inputs"] if item["key"] == RECEIPT_INPUT_KEY]
+        expected = receipt_input(admission, receipt)
+        if "admitted_receipt_digest" in value:
+            # Read the short-lived top-level form during upgrade. A snapshot
+            # with two commitments has no single representation to qualify.
+            bound = not commitments and value["admitted_receipt_digest"] == expected["digest"]
+        else:
+            bound = commitments == [expected]
+        diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], inputs, projected_config)
         if (result["command"] != "refresh" or result["generation"] != value["generation"]
-                or value.get("admitted_receipt_digest") != receipt_claims_digest(receipt)
+                or not bound
                 or result["snapshot_digest"] != snapshot_digest
                 or result["coverage"] != value["coverage"] or result["reasons"] != value["reasons"]
                 or result["counts"]["entities"] != len(value["entities"])

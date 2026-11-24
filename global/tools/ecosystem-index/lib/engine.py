@@ -9,7 +9,7 @@ from .contracts import (Refusal, fail, config, json_load, snapshot, encode, dige
                         now, timestamp, integer, entity_id, INPUT_MAX, FIELDS, result as validate_result)
 from .deadline import deadline, tighten
 from .io_safe import read_file, load_snapshot, Publisher, directory, outside_repositories
-from .receipt_store import AdmittedPublisher, receipt_claims_digest
+from .receipt_store import AdmittedPublisher, append_receipt_input
 from .checkout_admission import validate_input_diagnostics
 from .adapters import (repository_identity, normalize_remote, typed, parse_metadata,
                        make_observation, git_records, identity_representations)
@@ -309,7 +309,7 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None,a
                     'snapshot_digest':snapshot_digest,'counts':{'entities':len(entities),'parsed':parsed,'reused':reused}})
         if admission:
             claims = admission.receipt(result_for('0' * 64), when, input_diagnostics)
-            value['admitted_receipt_digest'] = receipt_claims_digest(claims)
+            append_receipt_input(value['inputs'], admission, claims)
         def commit(replace, data):
             receipt = admission.receipt(result_for(digest(data)), when, input_diagnostics)
             def publish_pair(verify_current):
