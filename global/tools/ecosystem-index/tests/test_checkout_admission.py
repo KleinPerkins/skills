@@ -12,7 +12,7 @@ import unittest
 from test_index import Fixture
 from lib import engine
 from lib.checkout_admission import CheckoutAdmission
-from lib.contracts import Refusal, fail
+from lib.contracts import Refusal, encode, fail
 from lib.deadline import bound_until, deadline
 from lib.io_safe import Publisher
 from lib.receipt_store import RECEIPT_INPUT_KEY, load_qualified_snapshot, receipt_input, receipt_name
@@ -225,6 +225,31 @@ class AdmittedCheckoutRefresh(Fixture):
             load_qualified_snapshot(str(self.cache), admission)
         receipt.write_bytes(original)
         self.assertEqual(load_qualified_snapshot(str(self.cache), admission)[1], report)
+
+    def test_readback_accepts_earlier_commitment_and_refuses_mixed_forms(self):
+        admission = self.admission()
+        report = self.refresh(admission)
+        value = json.loads(self.cache.read_bytes())
+        commitment = receipt_input(admission, report)
+        value["admitted_receipt_digest"] = commitment["digest"]
+
+        def publish_fixture():
+            raw = encode(value)
+            self.cache.write_bytes(raw)
+            snapshot_digest = sha256(raw).hexdigest()
+            result = {**report["result"], "snapshot_digest": snapshot_digest}
+            expected = admission.receipt(result, value["observed_at"], report["input_diagnostics"])
+            destination = self.cache.with_name(receipt_name(self.cache.name, admission, snapshot_digest))
+            destination.write_bytes(encode(expected))
+            destination.chmod(0o600)
+            return expected
+
+        publish_fixture()
+        with self.assertRaisesRegex(Refusal, "unavailable"):
+            load_qualified_snapshot(str(self.cache), admission)
+        value["inputs"].remove(commitment)
+        expected = publish_fixture()
+        self.assertEqual(load_qualified_snapshot(str(self.cache), admission), (value, expected))
 
     def test_real_process_exit_after_pair_install_releases_admitted_lock(self):
         admission = self.admission()

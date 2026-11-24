@@ -125,9 +125,16 @@ def load_qualified_snapshot(path, admission):
         result = validate_result(receipt["result"])
         inputs = [item for item in value["inputs"] if item["key"] != RECEIPT_INPUT_KEY]
         commitments = [item for item in value["inputs"] if item["key"] == RECEIPT_INPUT_KEY]
+        expected = receipt_input(admission, receipt)
+        if "admitted_receipt_digest" in value:
+            # Read the short-lived top-level form during upgrade. A snapshot
+            # with two commitments has no single representation to qualify.
+            bound = not commitments and value["admitted_receipt_digest"] == expected["digest"]
+        else:
+            bound = commitments == [expected]
         diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], inputs, projected_config)
         if (result["command"] != "refresh" or result["generation"] != value["generation"]
-                or commitments != [receipt_input(admission, receipt)]
+                or not bound
                 or result["snapshot_digest"] != snapshot_digest
                 or result["coverage"] != value["coverage"] or result["reasons"] != value["reasons"]
                 or result["counts"]["entities"] != len(value["entities"])
