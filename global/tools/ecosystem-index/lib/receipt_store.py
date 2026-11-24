@@ -12,6 +12,28 @@ from .checkout_admission import validate_input_diagnostics
 
 
 LOCK_MARKER = b"skills-admitted-snapshot-lock/v1\n"
+RECEIPT_INPUT_KEY = "refresh/receipt"
+
+
+def receipt_claims_digest(receipt):
+    """Bind the receipt claims without hashing the snapshot's digest into itself."""
+    claims = dict(receipt)
+    result = dict(claims["result"])
+    del claims["snapshot_digest"]
+    del result["snapshot_digest"]
+    claims["result"] = result
+    return digest(encode(claims))
+
+
+def receipt_input(admission, receipt):
+    """Represent the private receipt commitment as a format-v1 input."""
+    return {
+        "key": RECEIPT_INPUT_KEY,
+        "digest": receipt_claims_digest(receipt),
+        "authorization_digest": admission.config_digest,
+        "state": "current",
+        "records": [],
+    }
 
 
 def receipt_name(snapshot_name, admission, snapshot_digest):
@@ -34,20 +56,6 @@ def install_record(fd, name, data):
             os.fsync(fd)
         finally:
             os.unlink(staged, dir_fd=fd)
-
-
-def checksum_name(receipt):
-    return receipt.removesuffix(".json") + ".sha"
-
-
-def install_matching_record(fd, name, data, limit):
-    try:
-        install_record(fd, name, data)
-    except FileExistsError:
-        if read_at(fd, name, limit, True) != data:
-            fail("unavailable", 3)
-        # A concurrent creator or interrupted retry may not have synced yet.
-        os.fsync(fd)
 
 
 class AdmittedPublisher(Publisher):
@@ -94,11 +102,14 @@ class AdmittedPublisher(Publisher):
         data = encode(receipt)
         if len(data) > SNAPSHOT_MAX:
             fail("bound_exceeded", 3)
-        checksum = (digest(data) + "\n").encode("ascii")
-        # Both private records must be durable before the caller replaces the
-        # snapshot. Their names bind the exact inventory and snapshot digest.
-        install_matching_record(self.fd, name, data, SNAPSHOT_MAX)
-        install_matching_record(self.fd, checksum_name(name), checksum, 65)
+        try:
+            install_record(self.fd, name, data)
+        except FileExistsError:
+            if read_at(self.fd, name, SNAPSHOT_MAX, True) != data:
+                fail("unavailable", 3)
+            # A concurrent creator or interrupted retry may have linked this
+            # file before syncing the directory.
+            os.fsync(self.fd)
 
 
 def load_qualified_snapshot(path, admission):
@@ -108,16 +119,15 @@ def load_qualified_snapshot(path, admission):
     value = snapshot(json_load(raw, SNAPSHOT_MAX))
     snapshot_digest = digest(raw)
     parent, name = os.path.split(path)
-    name = receipt_name(name, admission, snapshot_digest)
+    path_to_receipt = os.path.join(parent, receipt_name(name, admission, snapshot_digest))
     try:
-        raw_receipt = read_file(os.path.join(parent, name), SNAPSHOT_MAX, True)
-        checksum = read_file(os.path.join(parent, checksum_name(name)), 65, True)
-        if checksum != (digest(raw_receipt) + "\n").encode("ascii"):
-            fail("unavailable", 3)
-        receipt = json_load(raw_receipt, SNAPSHOT_MAX)
+        receipt = json_load(read_file(path_to_receipt, SNAPSHOT_MAX, True), SNAPSHOT_MAX)
         result = validate_result(receipt["result"])
-        diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], value["inputs"], projected_config)
+        inputs = [item for item in value["inputs"] if item["key"] != RECEIPT_INPUT_KEY]
+        commitments = [item for item in value["inputs"] if item["key"] == RECEIPT_INPUT_KEY]
+        diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], inputs, projected_config)
         if (result["command"] != "refresh" or result["generation"] != value["generation"]
+                or commitments != [receipt_input(admission, receipt)]
                 or result["snapshot_digest"] != snapshot_digest
                 or result["coverage"] != value["coverage"] or result["reasons"] != value["reasons"]
                 or result["counts"]["entities"] != len(value["entities"])

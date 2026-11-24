@@ -15,7 +15,7 @@ from lib.checkout_admission import CheckoutAdmission
 from lib.contracts import Refusal, fail
 from lib.deadline import bound_until, deadline
 from lib.io_safe import Publisher
-from lib.receipt_store import checksum_name, load_qualified_snapshot, receipt_name
+from lib.receipt_store import RECEIPT_INPUT_KEY, load_qualified_snapshot, receipt_input, receipt_name
 
 
 class AdmittedCheckoutRefresh(Fixture):
@@ -55,6 +55,8 @@ class AdmittedCheckoutRefresh(Fixture):
         self.assertEqual(receipt["snapshot_generation"], value["generation"])
         self.assertEqual(receipt["snapshot_digest"], sha256(self.cache.read_bytes()).hexdigest())
         self.assertNotIn("admitted_receipt_digest", value)
+        self.assertEqual([item for item in value["inputs"] if item["key"] == RECEIPT_INPUT_KEY],
+                         [receipt_input(admission, receipt)])
         self.assertEqual(receipt["inventory_digest"], self.authority[2])
 
     def test_config_mismatch_and_failed_final_gate_preserve_completed_snapshot(self):
@@ -130,7 +132,7 @@ class AdmittedCheckoutRefresh(Fixture):
             "inventory/fixture/eligible.json": {"state": "unavailable", "reason": "invalid_input"},
             "inventory/fixture/blocked.json": {"state": "omitted", "reason": "excluded"},
         })
-        self.assertEqual([row["key"] for row in value["inputs"]], ["inventory/fixture"])
+        self.assertEqual([row["key"] for row in value["inputs"]], ["inventory/fixture", RECEIPT_INPUT_KEY])
 
     def test_repeat_source_failure_retains_stale_reason_and_refuses_mismatched_receipt(self):
         admission = self.admission()
@@ -223,19 +225,6 @@ class AdmittedCheckoutRefresh(Fixture):
             load_qualified_snapshot(str(self.cache), admission)
         receipt.write_bytes(original)
         self.assertEqual(load_qualified_snapshot(str(self.cache), admission)[1], report)
-
-    def test_missing_receipt_checksum_requires_explicit_refresh(self):
-        admission = self.admission()
-        report = self.refresh(admission)
-        name = receipt_name(self.cache.name, admission, report["snapshot_digest"])
-        proof = self.cache.with_name(checksum_name(name))
-        original = self.cache.read_bytes()
-        proof.unlink()
-        with self.assertRaisesRegex(Refusal, "unavailable"):
-            load_qualified_snapshot(str(self.cache), admission)
-        self.assertEqual(self.cache.read_bytes(), original)
-        refreshed = self.refresh(admission)
-        self.assertEqual(load_qualified_snapshot(str(self.cache), admission)[1], refreshed)
 
     def test_real_process_exit_after_pair_install_releases_admitted_lock(self):
         admission = self.admission()

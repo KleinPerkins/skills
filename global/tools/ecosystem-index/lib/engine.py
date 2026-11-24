@@ -9,7 +9,7 @@ from .contracts import (Refusal, fail, config, json_load, snapshot, encode, dige
                         now, timestamp, integer, entity_id, INPUT_MAX, FIELDS, result as validate_result)
 from .deadline import deadline, tighten
 from .io_safe import read_file, load_snapshot, Publisher, directory, outside_repositories
-from .receipt_store import AdmittedPublisher
+from .receipt_store import AdmittedPublisher, receipt_input
 from .checkout_admission import validate_input_diagnostics
 from .adapters import (repository_identity, normalize_remote, typed, parse_metadata,
                        make_observation, git_records, identity_representations)
@@ -303,19 +303,22 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None,a
             budget()
             if before_replace: before_replace()
             budget()
-        def result_for(data):
+        def result_for(snapshot_digest):
             return validate_result({'schema':'ecosystem-index/result/v1','command':'refresh','status':value['coverage'],
                     'coverage':value['coverage'],'reasons':sorted(reasons),'generation':value['generation'],
-                    'snapshot_digest':digest(data),'counts':{'entities':len(entities),'parsed':parsed,'reused':reused}})
+                    'snapshot_digest':snapshot_digest,'counts':{'entities':len(entities),'parsed':parsed,'reused':reused}})
+        if admission:
+            claims = admission.receipt(result_for('0' * 64), when, input_diagnostics)
+            value['inputs'].append(receipt_input(admission, claims))
         def commit(replace, data):
-            receipt = admission.receipt(result_for(data), when, input_diagnostics)
+            receipt = admission.receipt(result_for(digest(data)), when, input_diagnostics)
             def publish_pair(verify_current):
                 publisher.save_receipt(admission, receipt)
                 verify_current()
                 return replace()
             return admission.publish(tuple(sorted(used_checkouts)), frozenset(current_checkouts), publish_pair)
         data=publisher.publish(value,publication_gate,commit=commit if admission else None)
-        result = result_for(data)
+        result = result_for(digest(data))
         return admission.receipt(result, when, input_diagnostics) if admission else result
 
 
