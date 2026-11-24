@@ -61,7 +61,7 @@ try:
 except OSError as error:
     sys.exit(f"PR Steward link was not created: {error}")
 PYLINK
-  printf '[install:%s] linked %s -> %s\n' "$NAME" "$link"
+  printf '[install:%s] linked %s -> %s\n' "$NAME" "$link" "$SRC"
 }
 
 rc=0
