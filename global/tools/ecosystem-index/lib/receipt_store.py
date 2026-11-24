@@ -36,6 +36,14 @@ def receipt_input(admission, receipt):
     }
 
 
+def append_receipt_input(inputs, admission, receipt):
+    # Configured keys start with inventory/. Refuse a collision before writing
+    # even if a future collector supplies another input namespace.
+    if any(item["key"] == RECEIPT_INPUT_KEY for item in inputs):
+        fail("unavailable", 3)
+    inputs.append(receipt_input(admission, receipt))
+
+
 def receipt_name(snapshot_name, admission, snapshot_digest):
     key = encode([admission.inventory_version, admission.config_digest, admission.projection_digest,
                   admission.physical_binding_digest,

@@ -15,7 +15,8 @@ from lib.checkout_admission import CheckoutAdmission
 from lib.contracts import Refusal, encode, fail
 from lib.deadline import bound_until, deadline
 from lib.io_safe import Publisher
-from lib.receipt_store import RECEIPT_INPUT_KEY, load_qualified_snapshot, receipt_input, receipt_name
+from lib.receipt_store import (RECEIPT_INPUT_KEY, append_receipt_input, load_qualified_snapshot,
+                               receipt_input, receipt_name)
 
 
 class AdmittedCheckoutRefresh(Fixture):
@@ -250,6 +251,15 @@ class AdmittedCheckoutRefresh(Fixture):
         value["inputs"].remove(commitment)
         expected = publish_fixture()
         self.assertEqual(load_qualified_snapshot(str(self.cache), admission), (value, expected))
+
+    def test_receipt_commitment_does_not_overwrite_an_existing_input(self):
+        admission = self.admission()
+        report = self.refresh(admission)
+        existing = receipt_input(admission, report)
+        inputs = [existing]
+        with self.assertRaisesRegex(Refusal, "unavailable"):
+            append_receipt_input(inputs, admission, report)
+        self.assertEqual(inputs, [existing])
 
     def test_real_process_exit_after_pair_install_releases_admitted_lock(self):
         admission = self.admission()
