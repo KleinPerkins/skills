@@ -1,10 +1,10 @@
 """Optional owner admission for Dev-projected Skills configurations."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import re
 from typing import Callable
 
-from .contracts import REASONS, fail, relative
+from .contracts import INPUT_MAX, REASONS, config, digest, fail, json_load, relative
 
 
 def checked_digest(value):
@@ -12,10 +12,19 @@ def checked_digest(value):
         fail("invalid_input")
 
 
-def validate_input_diagnostics(value, inputs):
+def validate_input_diagnostics(value, inputs, projected_config):
     if type(value) is not dict or len(value) > 50000:
         fail("unavailable", 3)
     snapshot_states = {item["key"]: item["state"] for item in inputs}
+    configured_keys = set()
+    for root in projected_config["roots"]:
+        key = "inventory/" + root["key"]
+        configured_keys.add(key)
+        if root["git"]:
+            configured_keys.add(key + "/git")
+        configured_keys.update(key + "/" + source["path"] for source in root["sources"])
+    if snapshot_states.keys() | value.keys() != configured_keys:
+        fail("unavailable", 3)
     for key, entry in value.items():
         if not isinstance(key, str) or not key.startswith("inventory/") or len(key) > 1024:
             fail("unavailable", 3)
@@ -50,6 +59,9 @@ class CheckoutAdmission:
     The owner revalidates live authority and holds its guard during each action.
     Physical qualification uses commit_current to recheck current checkout relationships
     after the receipt is prepared and before the snapshot is replaced.
+
+    The exact projected configuration binds the full input set, including
+    failures and policy omissions that have no snapshot record.
     """
 
     inventory_version: tuple[str, int, str]
@@ -60,14 +72,15 @@ class CheckoutAdmission:
     commit: Callable
     physical_binding_digest: str | None = None
     commit_current: Callable | None = None
+    config_bytes: bytes = field(kw_only=True, repr=False)
 
     def validate(self):
         if not isinstance(self.inventory_version, tuple) or len(self.inventory_version) != 3:
             fail("invalid_input")
-        policy, generation, digest = self.inventory_version
+        policy, generation, inventory_digest = self.inventory_version
         if not isinstance(policy, str) or not policy.strip() or type(generation) is not int or not 0 < generation < 2**63:
             fail("invalid_input")
-        checked_digest(digest)
+        checked_digest(inventory_digest)
         checked_digest(self.config_digest)
         checked_digest(self.projection_digest)
         if self.physical_binding_digest is not None:
@@ -80,6 +93,10 @@ class CheckoutAdmission:
             fail("invalid_input")
         if self.physical_binding_digest is not None and self.commit_current is None:
             fail("invalid_input")
+        if (type(self.config_bytes) is not bytes or not 0 < len(self.config_bytes) <= INPUT_MAX
+                or digest(self.config_bytes) != self.config_digest):
+            fail("invalid_input")
+        return config(json_load(self.config_bytes, INPUT_MAX))
 
     def read(self, checkout, locations, collect):
         return self.probe(self.inventory_version, checkout, locations, collect)

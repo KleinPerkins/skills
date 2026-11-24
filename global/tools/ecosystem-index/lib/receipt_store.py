@@ -92,7 +92,7 @@ class AdmittedPublisher(Publisher):
 
 def load_qualified_snapshot(path, admission):
     """Read a consistent snapshot and its exact receipt for the supplied binding."""
-    admission.validate()
+    projected_config = admission.validate()
     raw = read_file(path, SNAPSHOT_MAX, True)
     value = snapshot(json_load(raw, SNAPSHOT_MAX))
     snapshot_digest = digest(raw)
@@ -101,7 +101,7 @@ def load_qualified_snapshot(path, admission):
     try:
         receipt = json_load(read_file(path_to_receipt, SNAPSHOT_MAX, True), SNAPSHOT_MAX)
         result = validate_result(receipt["result"])
-        diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], value["inputs"])
+        diagnostics = validate_input_diagnostics(receipt["input_diagnostics"], value["inputs"], projected_config)
         if (result["command"] != "refresh" or result["generation"] != value["generation"]
                 or result["snapshot_digest"] != snapshot_digest
                 or result["coverage"] != value["coverage"] or result["reasons"] != value["reasons"]

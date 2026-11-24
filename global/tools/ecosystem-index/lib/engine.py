@@ -298,7 +298,7 @@ def _refresh(config_path,cache_path,*,clock=time.monotonic,before_replace=None,a
                'inputs':inputs,'entities':entities,'reasons':sorted(reasons)}
         snapshot(value); budget()
         if admission:
-            validate_input_diagnostics(input_diagnostics, value['inputs'])
+            validate_input_diagnostics(input_diagnostics, value['inputs'], cfg)
         def publication_gate():
             budget()
             if before_replace: before_replace()

@@ -37,8 +37,9 @@ class AdmittedCheckoutRefresh(Fixture):
             self.commits.append(checkouts)
             return publish()
 
-        return CheckoutAdmission(self.authority, sha256(self.cfgpath.read_bytes()).hexdigest(),
-                                 "c" * 64, self.revision, probe, commit)
+        raw = self.cfgpath.read_bytes()
+        return CheckoutAdmission(self.authority, sha256(raw).hexdigest(),
+                                 "c" * 64, self.revision, probe, commit, config_bytes=raw)
 
     def refresh(self, admission=None, **kwargs):
         return engine.refresh_admitted(str(self.cfgpath), str(self.cache), admission or self.admission(), **kwargs)
@@ -166,6 +167,30 @@ class AdmittedCheckoutRefresh(Fixture):
         self.assertEqual(unrelated_failed["input_diagnostics"], {
             "inventory/unrelated/eligible.json": {"state": "stale", "reason": "invalid_input"}})
 
+    def test_readback_refuses_unknown_or_missing_input_diagnostics(self):
+        self.source.write_text("{malformed")
+        admission = self.admission()
+        report = self.refresh(admission)
+        receipt = self.cache.with_name(receipt_name(self.cache.name, admission, report["snapshot_digest"]))
+        original = receipt.read_bytes()
+        for key, state, reason in (
+            ("inventory/fixture/not-configured.json", "unavailable", "invalid_input"),
+            ("inventory/unknown", "omitted", "excluded"),
+        ):
+            with self.subTest(key=key):
+                changed = json.loads(original)
+                changed["input_diagnostics"][key] = {"state": state, "reason": reason}
+                receipt.write_text(json.dumps(changed))
+                with self.assertRaisesRegex(Refusal, "unavailable"):
+                    load_qualified_snapshot(str(self.cache), admission)
+        changed = json.loads(original)
+        changed["input_diagnostics"].clear()
+        receipt.write_text(json.dumps(changed))
+        with self.assertRaisesRegex(Refusal, "unavailable"):
+            load_qualified_snapshot(str(self.cache), admission)
+        receipt.write_bytes(original)
+        self.assertEqual(load_qualified_snapshot(str(self.cache), admission)[1], report)
+
     def test_ordinary_and_admitted_writers_keep_distinct_locks(self):
         admission = self.admission()
         with Publisher(str(self.cache)):
@@ -187,9 +212,11 @@ from lib.checkout_admission import CheckoutAdmission
 from lib.receipt_store import AdmittedPublisher
 config, cache = sys.argv[1:]
 with open(config, 'rb') as stream:
-    digest = hashlib.sha256(stream.read()).hexdigest()
+    raw = stream.read()
+digest = hashlib.sha256(raw).hexdigest()
 admission = CheckoutAdmission(('example-policy', 1, 'a'*64), digest, 'c'*64, 'b'*40,
-    lambda version, checkout, paths, read: read(), lambda version, paths, publish: publish())
+    lambda version, checkout, paths, read: read(), lambda version, paths, publish: publish(),
+    config_bytes=raw)
 publish = AdmittedPublisher.publish
 def stop(self, *args, **kwargs):
     publish(self, *args, **kwargs)
