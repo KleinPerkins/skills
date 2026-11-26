@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "job-explain/v1"
+SYNTHESIS_VERSION = 1
 
 
 def cache_dir() -> Path:
@@ -55,6 +56,8 @@ def load_for_instance(inst: dict[str, Any]) -> dict[str, Any] | None:
         return None
     if data.get("schema") != SCHEMA:
         return None
+    if data.get("source") == "synthesize" and data.get("synthesis_version") != SYNTHESIS_VERSION:
+        return None
     if data.get("fingerprint") != fingerprint(inst):
         return None
     return data
@@ -68,6 +71,8 @@ def write(job_id: str, body: dict[str, Any]) -> Path:
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         **body,
     }
+    if payload.get("source") == "synthesize":
+        payload["synthesis_version"] = SYNTHESIS_VERSION
     tmp = path.with_suffix(f".{os.getpid()}.tmp")
     tmp.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     tmp.replace(path)

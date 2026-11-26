@@ -85,12 +85,6 @@ def _command_what(facts: GatherFacts) -> str:
     comment = facts.script_comment or ""
     script = facts.script_path or facts.program or ""
 
-    if "agent-route" in script or cid == "maintain":
-        return (
-            "This maintains the agent-route capability — the system that helps Cursor "
-            "discover and route work to the right agents and skills. It rescans what is "
-            "installed, refreshes the routing index, and runs a quick regression smoke test."
-        )
     if "orchestrator" in script or "session-hook" in script or cid == "orchestrator":
         return (
             "This keeps the ecosystem orchestrator's session hook healthy. It runs the "
@@ -102,14 +96,11 @@ def _command_what(facts: GatherFacts) -> str:
         cleaned = re.sub(r"^daily:\s*", "Each run ", cleaned, flags=re.I)
         if cleaned and not cleaned[0].isupper():
             cleaned = cleaned[0].upper() + cleaned[1:]
-        return f"This job runs a scheduled script on your Mac. {cleaned}."
+        return f"This job runs a script on your Mac. {cleaned}."
     if script:
         name = Path(script).name
-        return (
-            f"This runs the {name} program on a timer. It is a generic local-jobs command "
-            f"wrapper around that script."
-        )
-    return "This is a scheduled command job on your Mac."
+        return f"This job runs the {name} program on your Mac."
+    return "This job runs a command on your Mac."
 
 
 def _igf_what(facts: GatherFacts) -> str:
