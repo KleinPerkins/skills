@@ -38,10 +38,19 @@ class RootIdentity:
     operation_marker: str  # none | merge | rebase | cherry_pick | revert | bisect
 
 
+def _git_environment() -> dict[str, str]:
+    # An explicit root must not inherit a caller's repository, worktree,
+    # object store or Git configuration (for example, from a Git hook).
+    env = {name: value for name, value in os.environ.items() if not name.startswith("GIT_")}
+    env.update(GIT_NO_LAZY_FETCH="1", GIT_ALLOW_PROTOCOL="", GIT_OPTIONAL_LOCKS="0")
+    return env
+
+
 def _run_git(root: str, *args: str) -> Optional[str]:
     try:
         out = subprocess.run(
-            ["git", "-C", root, *args],
+            ["git", "--no-replace-objects", "-C", root, *args],
+            env=_git_environment(),
             capture_output=True,
             text=True,
             timeout=5,
@@ -58,7 +67,7 @@ def prove_ancestry(root: str, saved_head: str, live_head: str) -> Optional[bool]
     if not _COMMIT_ID_RE.fullmatch(saved_head) or not _COMMIT_ID_RE.fullmatch(live_head):
         return None
     git = ["git", "--no-replace-objects", "-C", root]
-    env = {**os.environ, "GIT_NO_LAZY_FETCH": "1", "GIT_ALLOW_PROTOCOL": "", "GIT_OPTIONAL_LOCKS": "0"}
+    env = _git_environment()
     try:
         proof = subprocess.run(
             [*git, "merge-base", "--is-ancestor", saved_head, live_head],

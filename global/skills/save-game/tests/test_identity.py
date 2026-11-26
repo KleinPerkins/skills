@@ -1,7 +1,10 @@
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _support import make_bare_git_repo, make_git_repo  # noqa: E402
@@ -26,8 +29,6 @@ class TestResolveRootIdentityBranch(unittest.TestCase):
             repo = make_git_repo(tmp)
             ident = identity.resolve_root_identity(str(repo))
             head = ident.observed_head
-            import subprocess
-
             subprocess.run(["git", "-C", str(repo), "checkout", "-q", head], check=True)
             detached = identity.resolve_root_identity(str(repo))
             self.assertEqual(detached.ref_kind, "detached")
@@ -70,6 +71,18 @@ class TestResolveRootIdentityBranch(unittest.TestCase):
             ident = identity.resolve_root_identity(str(repo))
             self.assertIsNone(ident.remote_identity)
 
+    def test_explicit_root_ignores_inherited_git_checkout_context(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as foreign:
+            repo = make_git_repo(tmp, remote_url="git@github.com:Owner/Selected.git")
+            other = make_git_repo(foreign, remote_url="git@github.com:Owner/Other.git")
+            before = identity.resolve_root_identity(str(repo))
+            subprocess.run(["git", "-C", str(repo), "commit", "-q", "--allow-empty", "-m", "forward"],
+                           check=True)
+            selected = identity.resolve_root_identity(str(repo))
+            with patch.dict(os.environ, {"GIT_DIR": str(other / ".git"), "GIT_WORK_TREE": str(repo)}):
+                self.assertEqual(identity.resolve_root_identity(str(repo)), selected)
+                self.assertIs(identity.prove_ancestry(str(repo), before.observed_head, selected.observed_head), True)
+
     def test_linked_worktree_shares_common_dir_but_has_its_own_git_dir(self):
         """Plan verification-strategy gate: "Identity matrix ... linked
         worktrees." A linked worktree is a distinct physical_root/git_dir (its
@@ -77,8 +90,6 @@ class TestResolveRootIdentityBranch(unittest.TestCase):
         checkout's common_dir (one shared object store/refs) -- proving
         identity resolution keeps these two notions separate rather than
         conflating "this worktree" with "this repo clone"."""
-        import subprocess
-
         with tempfile.TemporaryDirectory() as tmp:
             repo = make_git_repo(tmp, branch="main")
             wt_path = Path(tmp) / "linked-worktree"
@@ -100,8 +111,6 @@ class TestResolveRootIdentityBranch(unittest.TestCase):
         for the same task_id because each worktree sits on its own branch --
         the same "branch affects workstream" rule already proven via in-place
         checkout, now proven via a real linked worktree."""
-        import subprocess
-
         with tempfile.TemporaryDirectory() as tmp:
             repo = make_git_repo(tmp, branch="main", remote_url="git@github.com:Owner/Repo.git")
             wt_path = Path(tmp) / "linked-worktree"
@@ -179,8 +188,6 @@ class TestKeyHashing(unittest.TestCase):
     def test_same_task_on_different_branch_yields_different_workstream(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = make_git_repo(tmp, branch="main")
-            import subprocess
-
             subprocess.run(["git", "-C", str(repo), "checkout", "-q", "-b", "other"], check=True)
             ident_other = identity.resolve_root_identity(str(repo))
             subprocess.run(["git", "-C", str(repo), "checkout", "-q", "main"], check=True)
