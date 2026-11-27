@@ -49,12 +49,14 @@ def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
             return result("WORKSTREAM_UNAVAILABLE")
         if identity.operation_marker != "none":
             return result("GIT_CONFLICT")
+        if identity_mod.workstream_key_for(repo_key, clone_key, task_id, identity) != workstream_key:
+            return result("IDENTITY_MISMATCH")
 
         with observe_workstream_lock(workstream_key):
             try:
                 checkpoint, ambiguous = index.resolve_checkpoint(
                     repo_key, clone_key, workstream_key, adopted_since=registration["updated_at"],
-                    live_branch=identity.branch[:200] if identity.branch is not None else None,
+                    live_branch=identity.branch,
                 )
             except FileNotFoundError:
                 return result("INVALID_EVIDENCE")

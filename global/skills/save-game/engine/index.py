@@ -151,10 +151,13 @@ def _check_prepared_snapshot(scope: tuple[str, str, str], prepared: dict, checkp
     # after proving the exact branch matches the live workstream, so two
     # different names with the same redaction cannot satisfy this check.
     if live_branch is not None:
-        if observed_root.get("branch") != live_branch:
+        # Current and prepared v1 records both store a bounded branch label.
+        # The observer separately binds the full branch to the workstream key.
+        recorded_branch = live_branch[:200]
+        if observed_root.get("branch") != recorded_branch:
             raise ValueError("prepared operation has a different branch")
         observed_root = observed_root | {
-            "branch": privacy.redact_text(live_branch, "$.root.branch")[0],
+            "branch": privacy.redact_text(recorded_branch, "$.root.branch")[0],
         }
     if (canonical.sha256_hex(canonical.canonical_bytes(document)) != prepared["snapshot_digest"]
             or document["workstream_key"] != scope[2] or root != observed_root

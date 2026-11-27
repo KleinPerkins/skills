@@ -100,6 +100,32 @@ class ObservationTests(ReconcileTestCase):
         prepared.write_bytes(original)
         self.observe("MATCH")
 
+    def test_long_branch_display_prefix_does_not_alias_workstreams(self):
+        prefix = "fixture/" + "a" * 200
+        saved_branch = prefix + "-one"
+        other_branch = prefix + "-two"
+        self.assertEqual(saved_branch[:200], other_branch[:200])
+        _support._git(self.repo, "switch", "-q", "-c", saved_branch)
+        self.identity = identity_mod.resolve_root_identity(str(self.repo))
+        self.workstream_key = identity_mod.workstream_key_for(
+            self.repo_key, self.clone_key, TASK_ID, self.identity,
+        )
+        self.adopt()
+        checkpoint = self._flush()["checkpoint_id"]
+        self.assertEqual(self.observe("MATCH")["checkpoint"]["id"], checkpoint)
+
+        _support._git(self.repo, "switch", "-q", "-c", other_branch)
+        self.observe("WORKSTREAM_UNAVAILABLE")
+        different_identity = identity_mod.resolve_root_identity(str(self.repo))
+        before = self.snapshot()
+        result = observation.observe_reconcile(
+            self.repo_key, self.clone_key, self.workstream_key,
+            task_id=TASK_ID, identity=different_identity,
+        )
+        self.assertEqual(result["status"], "IDENTITY_MISMATCH")
+        self.assertNotIn("checkpoint", result)
+        self.assertEqual(self.snapshot(), before)
+
     def test_absent_disabled_and_late_adoption_are_distinct(self):
         self.observe("UNADOPTED")
         self.adopt(enabled=False)
