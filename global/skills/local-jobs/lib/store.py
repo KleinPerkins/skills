@@ -71,12 +71,11 @@ class Store:
     def load(self) -> dict[str, Any]:
         """Read + forward-migrate in memory (re-merge defaults, stamp version)."""
 
-        def _do() -> dict[str, Any]:
-            data = self._read_raw()
-            migrate.forward_migrate(data, self.schema_version, self.field_defaults)
-            return data
-
-        return self._with_lock(_do)
+        # Writers publish a complete snapshot by replacing a sibling temporary
+        # file under the write lock. Readers can open either snapshot directly.
+        data = self._read_raw()
+        migrate.forward_migrate(data, self.schema_version, self.field_defaults)
+        return data
 
     def save(self, data: dict[str, Any]) -> Path:
         def _do() -> Path:
