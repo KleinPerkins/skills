@@ -13,6 +13,7 @@ import yaml
 PACKAGE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PACKAGE / "lib"))
 import configured
+from store import Store
 
 
 class ConfigurationInventory(unittest.TestCase):
@@ -46,6 +47,25 @@ class ConfigurationInventory(unittest.TestCase):
     def test_missing_state_is_observed_without_creation(self):
         self.assertEqual([], self.view()["instances"])
         self.assertFalse(self.state.exists())
+
+    def test_operational_store_reads_with_writes_denied(self):
+        entry = {"id": "inspect", "program": "/usr/bin/true"}
+        path = self.write("command", {"version": 1, "instances": [entry]})
+        before = path.read_bytes()
+        open_path = Path.open
+
+        def read_only(file, mode="r", *args, **kwargs):
+            if file.parent == path.parent and set(mode).intersection("wax+"):
+                raise PermissionError("job directory is read-only")
+            return open_path(file, mode, *args, **kwargs)
+
+        store = Store(path, field_defaults={"enabled": True})
+        with patch.object(Path, "open", read_only):
+            self.assertEqual([{**entry, "enabled": True}], store.list())
+            with self.assertRaisesRegex(PermissionError, "read-only"):
+                store.remove("inspect")
+        self.assertEqual(before, path.read_bytes())
+        self.assertEqual([path], list(self.config.iterdir()))
 
     def test_declared_values_stay_lexical_and_commands_stay_private(self):
         target = self.root / "unselected"
