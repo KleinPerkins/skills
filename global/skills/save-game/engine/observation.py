@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import canonical, identity as identity_mod, index, lifecycle, schemas, transaction
+from . import canonical, identity as identity_mod, index, lifecycle, privacy, schemas, transaction
 from .lock import LockTimeoutError, observe_workstream_lock
 from .schemas_validate import SchemaValidationError
 
@@ -54,6 +54,7 @@ def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
             try:
                 checkpoint, ambiguous = index.resolve_checkpoint(
                     repo_key, clone_key, workstream_key, adopted_since=registration["updated_at"],
+                    live_branch=identity.branch[:200] if identity.branch is not None else None,
                 )
             except FileNotFoundError:
                 return result("INVALID_EVIDENCE")
@@ -73,7 +74,8 @@ def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
                 return result("GIT_CONFLICT")
             if conflicts is None:
                 return result("WORKSTREAM_UNAVAILABLE")
-            if (fresh_identity != identity or current["root"] != identity_mod.root_snapshot_dict(fresh_identity)
+            live_root, _ = privacy.scan_and_redact_document(identity_mod.root_snapshot_dict(fresh_identity))
+            if (fresh_identity != identity or current["root"] != live_root
                     or lifecycle.read_registration(repo_key, clone_key) != registration
                     or identity_mod.resolve_root_identity(identity.physical_root) != fresh_identity):
                 return result("LIVE_STATE_CHANGED")
@@ -98,5 +100,5 @@ def observe_reconcile(repo_key: str, clone_key: str, workstream_key: str, *,
         return result("CHECKPOINT_UNADOPTED")
     except FileNotFoundError:
         return result("WORKSTREAM_UNAVAILABLE")
-    except (OSError, ValueError, SchemaValidationError, transaction.CurrentStateCorruptError):
+    except (OSError, ValueError, SchemaValidationError, privacy.PrivacyGateError, transaction.CurrentStateCorruptError):
         return result("INVALID_EVIDENCE")

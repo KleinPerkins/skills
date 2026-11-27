@@ -15,7 +15,7 @@ from datetime import datetime
 from itertools import islice
 from typing import Optional
 
-from . import canonical, durability, ids, paths, schemas
+from . import canonical, durability, ids, paths, privacy, schemas
 
 _VALID_CLIENT_IDS = {"cursor", "claude", "codex", "unknown"}
 _PRECEDENCE_NOTICE = "Live canonical sources override this checkpoint; it is an index, never authority."
@@ -142,11 +142,22 @@ def _strict_finalized(entry, workstream_key: str) -> tuple[dict, dict] | None:
     return finalized, prepared
 
 
-def _check_prepared_snapshot(scope: tuple[str, str, str], prepared: dict, checkpoint: dict) -> None:
+def _check_prepared_snapshot(scope: tuple[str, str, str], prepared: dict, checkpoint: dict,
+                             *, live_branch: str | None) -> None:
     document = _strict_journal_record(paths.snapshot_path(*scope, prepared["snapshot_digest"]), "current.v1")
     root = {key: value for key, value in document["root"].items() if key != "remote_identity_key"}
+    observed_root = prepared["observed_root"]
+    # The prepared record historically kept the raw branch. Project it only
+    # after proving the exact branch matches the live workstream, so two
+    # different names with the same redaction cannot satisfy this check.
+    if live_branch is not None:
+        if observed_root.get("branch") != live_branch:
+            raise ValueError("prepared operation has a different branch")
+        observed_root = observed_root | {
+            "branch": privacy.redact_text(live_branch, "$.root.branch")[0],
+        }
     if (canonical.sha256_hex(canonical.canonical_bytes(document)) != prepared["snapshot_digest"]
-            or document["workstream_key"] != scope[2] or root != prepared["observed_root"]
+            or document["workstream_key"] != scope[2] or root != observed_root
             or document.get("previous_digest", "none") != prepared["old_digest"]
             or document["generation"] != checkpoint["active_state_generation"]
             or document["current_digest"] != checkpoint["active_state_digest"]
@@ -159,7 +170,8 @@ def _timestamp(value: str) -> datetime:
 
 
 def resolve_checkpoint(repo_key: str, clone_key: str, workstream_key: str,
-                       *, adopted_since: str | None = None) -> tuple[Optional[dict], bool]:
+                       *, adopted_since: str | None = None,
+                       live_branch: str | None = None) -> tuple[Optional[dict], bool]:
     """Returns (checkpoint_or_None, ambiguous). `ambiguous=True` means more than
     one incomparable maximum-generation checkpoint was found (ties at the same
     embedded active_state_generation) — callers must surface CHECKPOINT_AMBIGUOUS
@@ -200,7 +212,8 @@ def resolve_checkpoint(repo_key: str, clone_key: str, workstream_key: str,
                     or checkpoint_doc["active_state_digest"] != finalized["new_digest"]
                     or checkpoint_doc["active_state_generation"] != generation):
                 raise ValueError("inconsistent finalized checkpoint")
-            _check_prepared_snapshot((repo_key, clone_key, workstream_key), prepared, checkpoint_doc)
+            _check_prepared_snapshot((repo_key, clone_key, workstream_key), prepared, checkpoint_doc,
+                                     live_branch=live_branch)
             receipt = _strict_journal_record(
                 paths.receipt_path(repo_key, clone_key, workstream_key, finalized["receipt_id"]),
                 "flush-receipt.v1",

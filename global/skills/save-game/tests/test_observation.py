@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import _support
-from engine import canonical, durability, identity as identity_mod, ids, lifecycle, observation, paths, schemas, transaction
+from engine import canonical, durability, identity as identity_mod, ids, lifecycle, observation, paths, privacy, schemas, transaction
 from engine.schemas_validate import SchemaValidationError
 from engine.lock import workstream_lock
 from test_reconcile import ReconcileTestCase, TASK_ID, _candidate_builder
@@ -65,6 +65,40 @@ class ObservationTests(ReconcileTestCase):
         self.assertEqual(reply["checkpoint"]["generation"], 1)
         self.assertEqual(reply["workstream_key"], self.workstream_key)
         self.observe("WORKSTREAM_UNAVAILABLE", task_id="different-workstream")
+
+    def test_redacted_branch_matches_exact_live_workstream_and_rejects_another(self):
+        branch = "fixture/r4nd0m1-ab2cd3-ef4gh5-ij6kl7"
+        other = "fixture/z7yx6w-v5ut4s-r3qp2o-n1ml0k"
+        _support._git(self.repo, "switch", "-q", "-c", branch)
+        self.identity = identity_mod.resolve_root_identity(str(self.repo))
+        self.workstream_key = identity_mod.workstream_key_for(
+            self.repo_key, self.clone_key, TASK_ID, self.identity,
+        )
+        self.adopt()
+        saved = self._flush()
+        self.assertEqual(saved["status"], "SAVED")
+        scope = self.repo_key, self.clone_key, self.workstream_key
+        current = transaction.read_current(*scope)
+        redacted = current["root"]["branch"]
+        self.assertIn("[REDACTED:", redacted)
+        journal = paths.journal_workstream_dir(*scope)
+        prepared = next(journal.iterdir()) / "prepared.json"
+        original = prepared.read_bytes()
+        record = json.loads(original)
+        self.assertEqual(record["observed_root"]["branch"], branch)
+
+        reply = self.observe("MATCH")
+        self.assertEqual(reply["checkpoint"]["id"], saved["checkpoint_id"])
+        self.assertEqual(reply["checkpoint"]["generation"], 1)
+
+        self.assertEqual(privacy.redact_text(other, "$.root.branch")[0], redacted)
+        for mismatched in (other, redacted):
+            with self.subTest(branch=mismatched):
+                record["observed_root"]["branch"] = mismatched
+                prepared.write_bytes(canonical.canonical_bytes(record))
+                self.observe("INVALID_EVIDENCE")
+        prepared.write_bytes(original)
+        self.observe("MATCH")
 
     def test_absent_disabled_and_late_adoption_are_distinct(self):
         self.observe("UNADOPTED")
